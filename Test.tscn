@@ -1,0 +1,34 @@
+[gd_scene load_steps=6 format=3 uid="uid://bm24t8vu2m5tm"]
+
+[ext_resource type="PackedScene" uid="uid://bybc8xs0i0si8" path="res://dice_table.tscn" id="1_njov2"]
+[ext_resource type="PackedScene" uid="uid://c4hjov07fnj6j" path="res://RootDice.tscn" id="2_2au82"]
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_njov2"]
+sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+ground_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
+
+[sub_resource type="Sky" id="Sky_2au82"]
+sky_material = SubResource("ProceduralSkyMaterial_njov2")
+
+[sub_resource type="Environment" id="Environment_8tn2x"]
+background_mode = 2
+sky = SubResource("Sky_2au82")
+tonemap_mode = 2
+glow_enabled = true
+
+[node name="Test" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_8tn2x")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.866025, -0.433013, 0.25, 0, 0.5, 0.866025, -0.5, 0.75, -0.433013, 0, 0, 0)
+shadow_enabled = true
+
+[node name="DiceTable" parent="." instance=ExtResource("1_njov2")]
+
+[node name="RootDice" parent="." instance=ExtResource("2_2au82")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.673083, 0)
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.675629, 0.737242, 0, -0.737242, 0.675629, 0, 0.98074, 1.08894)
