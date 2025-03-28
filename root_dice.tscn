@@ -1,0 +1,17 @@
+[gd_scene load_steps=4 format=3 uid="uid://ryhbwf8w5jho"]
+
+[ext_resource type="PhysicsMaterial" uid="uid://d25ce7roxxajs" path="res://RootDicePhysicsMaterial.tres" id="1_2wn8y"]
+[ext_resource type="BoxMesh" uid="uid://51tpfyyvewe5" path="res://RootDice.tres" id="1_mx507"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_mx507"]
+points = PackedVector3Array(0.75, 0.75, 0.75, 0.75, 0.75, -0.75, -0.75, 0.75, 0.75, 0.75, -0.75, 0.75, 0.75, -0.75, -0.75, -0.75, 0.75, -0.75, -0.75, -0.75, 0.75, -0.75, -0.75, -0.75)
+
+[node name="root_dice" type="RigidBody3D"]
+physics_material_override = ExtResource("1_2wn8y")
+gravity_scale = 2.0
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_mx507")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_mx507")
