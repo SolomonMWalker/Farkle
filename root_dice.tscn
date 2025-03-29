@@ -8,7 +8,7 @@ points = PackedVector3Array(0.75, 0.75, 0.75, 0.75, 0.75, -0.75, -0.75, 0.75, 0.
 
 [node name="root_dice" type="RigidBody3D"]
 physics_material_override = ExtResource("1_2wn8y")
-gravity_scale = 2.0
+gravity_scale = 3.0
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = ExtResource("1_mx507")
