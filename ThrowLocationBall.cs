@@ -5,6 +5,10 @@ public partial class ThrowLocationBall : MeshInstance3D
 {
     [Export]
     public int width;
+    public int dicePerThrow = 6;
+    public ThrowLocationBallState state = ThrowLocationBallState.Inactive;
+    public Node3D throwLocation;
+    public Node diceHolder;
 
     private Tween tween;
     private Vector3 startingPosition;
@@ -13,19 +17,14 @@ public partial class ThrowLocationBall : MeshInstance3D
     {
         base._Ready();
         startingPosition = GlobalPosition;
-    }
-
-    public override void _Process(double delta)
-    {
-        base._Process(delta);
-        if(Input.IsKeyPressed(Key.Space))
-        {
-            Animate();
-        }
+        throwLocation = this.FindChild<Node3D>("ThrowLocation");
+        diceHolder = throwLocation.FindChild<Node>("DiceHolder");
     }
 
     public void Animate()
     {
+        state = ThrowLocationBallState.ReadyToThrow;
+
         tween?.Kill();
         tween = CreateTween();
         tween.SetLoops();
@@ -42,4 +41,17 @@ public partial class ThrowLocationBall : MeshInstance3D
             3
          );
     }
+
+    public void StopAnimation()
+    {
+        tween?.Stop();
+        Position = startingPosition;
+        state = ThrowLocationBallState.Inactive;
+    }
+}
+
+public enum ThrowLocationBallState
+{
+    Inactive,
+    ReadyToThrow
 }

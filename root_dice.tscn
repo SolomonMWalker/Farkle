@@ -1,14 +1,16 @@
-[gd_scene load_steps=4 format=3 uid="uid://ryhbwf8w5jho"]
+[gd_scene load_steps=5 format=3 uid="uid://ryhbwf8w5jho"]
 
 [ext_resource type="PhysicsMaterial" uid="uid://d25ce7roxxajs" path="res://RootDicePhysicsMaterial.tres" id="1_2wn8y"]
 [ext_resource type="BoxMesh" uid="uid://51tpfyyvewe5" path="res://RootDice.tres" id="1_mx507"]
+[ext_resource type="Script" uid="uid://dk3c4j8n832mv" path="res://RootDice.cs" id="2_24xm2"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_mx507"]
 points = PackedVector3Array(0.75, 0.75, 0.75, 0.75, 0.75, -0.75, -0.75, 0.75, 0.75, 0.75, -0.75, 0.75, 0.75, -0.75, -0.75, -0.75, 0.75, -0.75, -0.75, -0.75, 0.75, -0.75, -0.75, -0.75)
 
-[node name="root_dice" type="RigidBody3D"]
+[node name="RootDice" type="RigidBody3D"]
 physics_material_override = ExtResource("1_2wn8y")
 gravity_scale = 3.0
+script = ExtResource("2_24xm2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = ExtResource("1_mx507")
