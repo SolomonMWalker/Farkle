@@ -22,7 +22,7 @@ public partial class GameController : Node
     public override void _Ready()
     {
         base._Ready();
-        diceCollection = new DiceCollection(FindChild("DiceHolder").GetChildren<RootDice>());
+        diceCollection = new DiceCollection();
         diceHolder = this.FindChild<Node>("DiceHolder");
         throwLocationBall = this.FindChild<ThrowLocationBall>("ThrowLocationBall");
         throwLocationDiceHolder = throwLocationBall.diceHolder;
@@ -35,6 +35,14 @@ public partial class GameController : Node
 
         HandleDice();
     }
+
+    public override void _PhysicsProcess(double delta)
+    {
+        base._PhysicsProcess(delta);
+
+        HandleDicePhysics();
+    }
+
 
 
     public void HandleDice()
@@ -49,10 +57,18 @@ public partial class GameController : Node
             }
             else {
                 throwLocationBall.StopAnimation();
-                //ThrowDice();
+                ThrowDice();
             }
             
         }
+    }
+
+    public void HandleDicePhysics()
+    {
+        if(throwLocationBall.state == ThrowLocationBallState.ReadyToThrow)
+        {
+            diceCollection.diceList.ForEach(x => x.GlobalPosition = throwLocationBall.throwLocation.GlobalPosition);
+        }        
     }
 
     public void SetDicePositionForThrow()
@@ -65,8 +81,14 @@ public partial class GameController : Node
             {
                 var dice = packedRootDice.Instantiate<RootDice>();
                 diceCollection.diceList.Add(dice);
-                throwLocationDiceHolder.AddChild(dice);
             }
+            diceCollection.SetParent(throwLocationDiceHolder);
+        }
+        else
+        {
+            diceCollection.DisableCollision();
+            diceCollection.FreezeDice();
+            diceCollection.ChangeParent(throwLocationDiceHolder, false);
         }
 
         foreach(RootDice dice in diceCollection.diceList)
@@ -95,7 +117,7 @@ public partial class GameController : Node
     public void SetDiceVelocityForThrow()
     {
         //base velocity is 0,0,-1
-        var baseVelocity = new Vector3(0, 0, -1);
+        var baseVelocity = new Vector3(0, 0, -1) * 10;
         foreach(RootDice dice in diceCollection.diceList)
         {
             dice.SetVelocityUponThrow(HelperMethods.FuzzyUpVector3(baseVelocity, 0.5f));
@@ -104,7 +126,8 @@ public partial class GameController : Node
 
     public void ThrowDice()
     {
-        diceCollection.ChangeParent(diceHolder, false);
+        diceCollection.ChangeParent(diceHolder, true);
+        diceCollection.UnfreezeDice();
         diceCollection.EnableCollision();
         diceCollection.ThrowDice();
     }

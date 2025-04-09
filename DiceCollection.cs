@@ -31,6 +31,11 @@ public class DiceCollection{
         diceList.ForEach(x => x.Reparent(newParent, changeGlobalTransform));
     }
 
+    public void SetParent(Node newParent)
+    {
+        diceList.ForEach(x => newParent.AddChild(x));
+    }
+
     public void ThrowDice()
     {
         diceList.ForEach(x => x.Throw());

@@ -11,8 +11,9 @@ public partial class RootDice : RigidBody3D
     public override void _Ready()
     {
         base._Ready();
-        collisionShape = this.GetChildren<CollisionShape3D>().First();
-        
+        collisionShape = this.FindChild<CollisionShape3D>("CollisionShape3D");
+        collisionShape.Disabled = true;
+        Freeze = true;
         FreezeMode = FreezeModeEnum.Static;
     }
 
