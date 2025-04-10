@@ -1,0 +1,14 @@
+[gd_scene load_steps=3 format=3 uid="uid://buqk8hnnfrm5g"]
+
+[ext_resource type="SphereMesh" uid="uid://ccrakmg2sf78y" path="res://ThrowLocationBall.tres" id="1_vr3v1"]
+[ext_resource type="Script" uid="uid://dqi1ixw5c2omx" path="res://ThrowLocationBall.cs" id="2_gf3df"]
+
+[node name="ThrowLocationBall" type="MeshInstance3D"]
+mesh = ExtResource("1_vr3v1")
+skeleton = NodePath("")
+script = ExtResource("2_gf3df")
+
+[node name="ThrowLocation" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="DiceHolder" type="Node" parent="ThrowLocation"]

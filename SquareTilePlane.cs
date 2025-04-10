@@ -3,7 +3,7 @@ using Godot;
 
 /// <summary>
 /// Rectangle begins generation at origin in top left
-/// Width and Height must be a multiple of 5
+/// Width and Height must be a multiple of 1
 /// </summary>
 public partial class SquareTilePlane : Node3D
 {

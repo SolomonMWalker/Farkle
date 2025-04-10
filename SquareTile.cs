@@ -6,10 +6,10 @@ using Godot;
 /// </summary>
 public partial class SquareTile : Node3D
 {   
-    public static int SideLength = 5;
+    public static int SideLength = 1;
 
     [Export]
-    public Mesh mesh = GD.Load<Mesh>("res://SquareTile.res");
+    public Mesh mesh = GD.Load<Mesh>("res://SquareTile.tres");
 
     public override void _Ready()
     {

@@ -24,4 +24,9 @@ public static class HelperMethods {
 
         return vector;
     }
+
+    // get side length of cube from half its diagonal
+    // we have origin of a cube to a corner which is half its diagonal
+    // with this we can get the side length
+    public static float GetSideLengthFromHalfDiagonal(float halfDiagonal) => halfDiagonal / Mathf.Pow(3, 1/3);
 }

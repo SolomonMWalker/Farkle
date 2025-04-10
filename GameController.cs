@@ -24,7 +24,7 @@ public partial class GameController : Node
         base._Ready();
         diceCollection = new DiceCollection();
         diceHolder = this.FindChild<Node>("DiceHolder");
-        throwLocationBall = this.FindChild<ThrowLocationBall>("ThrowLocationBall");
+        throwLocationBall = FindChild("DiceTable").FindChild<ThrowLocationBall>("ThrowLocationBall");
         throwLocationDiceHolder = throwLocationBall.diceHolder;
         packedRootDice = GD.Load<PackedScene>("res://root_dice.tscn");
     }
@@ -117,7 +117,7 @@ public partial class GameController : Node
     public void SetDiceVelocityForThrow()
     {
         //base velocity is 0,0,-1
-        var baseVelocity = new Vector3(0, 0, -1) * 10;
+        var baseVelocity = new Vector3(0, 0, -1) * 5;
         foreach(RootDice dice in diceCollection.diceList)
         {
             dice.SetVelocityUponThrow(HelperMethods.FuzzyUpVector3(baseVelocity, 0.5f));

@@ -1,10 +1,10 @@
-using Godot;
+    using Godot;
 using System;
 
 public partial class ThrowLocationBall : MeshInstance3D
 {
     [Export]
-    public int width;
+    public float width;
     public int dicePerThrow = 6;
     public ThrowLocationBallState state = ThrowLocationBallState.Inactive;
     public Node3D throwLocation;
