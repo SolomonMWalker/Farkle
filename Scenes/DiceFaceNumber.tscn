@@ -1,0 +1,11 @@
+[gd_scene load_steps=2 format=3 uid="uid://krk243umv7su"]
+
+[ext_resource type="Script" uid="uid://bja8by20ecpsv" path="res://Code/Scripts/DiceFaceNumber.cs" id="1_hllnb"]
+
+[node name="DiceFaceNumber" type="Label3D"]
+shaded = true
+double_sided = false
+texture_filter = 0
+font_size = 65
+outline_size = 18
+script = ExtResource("1_hllnb")

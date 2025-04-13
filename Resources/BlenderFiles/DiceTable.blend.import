@@ -4,12 +4,12 @@ importer="scene"
 importer_version=1
 type="PackedScene"
 uid="uid://bcgqux5w7kol5"
-path="res://.godot/imported/DiceTable.blend-534ec07219c5e48a0b4cd24070e957f5.scn"
+path="res://.godot/imported/DiceTable.blend-6eb8f583488a5de1e657482b0eb05c78.scn"
 
 [deps]
 
-source_file="res://DiceTable.blend"
-dest_files=["res://.godot/imported/DiceTable.blend-534ec07219c5e48a0b4cd24070e957f5.scn"]
+source_file="res://Resources/BlenderFiles/DiceTable.blend"
+dest_files=["res://.godot/imported/DiceTable.blend-6eb8f583488a5de1e657482b0eb05c78.scn"]
 
 [params]
 

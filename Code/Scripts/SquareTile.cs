@@ -8,13 +8,14 @@ public partial class SquareTile : Node3D
 {   
     public static int SideLength = 1;
 
-    [Export]
-    public Mesh mesh = GD.Load<Mesh>("res://SquareTile.tres");
+    private Mesh mesh = GD.Load<Mesh>("res://Resources/Meshes/SquareTileMesh.tres");
+    private Material material = GD.Load<Material>("res://Resources/Materials/SquareTileMaterial.tres");
 
     public override void _Ready()
     {
         var meshInstance = new MeshInstance3D();
         meshInstance.Mesh = mesh;
+        meshInstance.MaterialOverlay = material;
 
         var staticBody3d = new StaticBody3D();
         

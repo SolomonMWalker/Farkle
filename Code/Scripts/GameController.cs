@@ -2,6 +2,7 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 public partial class GameController : Node
 {
@@ -26,7 +27,7 @@ public partial class GameController : Node
         diceHolder = this.FindChild<Node>("DiceHolder");
         throwLocationBall = FindChild("DiceTable").FindChild<ThrowLocationBall>("ThrowLocationBall");
         throwLocationDiceHolder = throwLocationBall.diceHolder;
-        packedRootDice = GD.Load<PackedScene>("res://root_dice.tscn");
+        packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
     }
 
     public override void _Process(double delta)
@@ -106,7 +107,12 @@ public partial class GameController : Node
                     );
                 }
             }
-            
+
+
+            dice.Rotate(
+                new Vector3(GD.Randf(), GD.Randf(), GD.Randf()).Normalized(),
+                GD.Randf()*(2*Mathf.Pi)
+            );
             dice.GlobalPosition = dicePosition;
             diceInPosition.diceList.Add(dice);
         }
@@ -117,7 +123,7 @@ public partial class GameController : Node
     public void SetDiceVelocityForThrow()
     {
         //base velocity is 0,0,-1
-        var baseVelocity = new Vector3(0, 0, -1) * 5;
+        var baseVelocity = new Vector3(0, 0, -1) * 6;
         foreach(RootDice dice in diceCollection.diceList)
         {
             dice.SetVelocityUponThrow(HelperMethods.FuzzyUpVector3(baseVelocity, 0.5f));

@@ -1,0 +1,3 @@
+[gd_scene format=3 uid="uid://clbk0ioy0vgii"]
+
+[node name="DiceFaceNumber" type="Label3D"]
