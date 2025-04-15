@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public class DiceCollection{
@@ -24,6 +25,11 @@ public class DiceCollection{
             }
         }
         return false;
+    }
+
+    public bool IsDoneRolling()
+    {
+        return diceList.All(x => x.IsDoneRolling() == true);
     }
 
     public void ChangeParent(Node newParent, bool changeGlobalTransform)
@@ -54,4 +60,9 @@ public class DiceCollection{
     public void EnableCollision() => diceList.ForEach(x => x.EnableCollision());
 
     public void DisableCollision() => diceList.ForEach(x => x.DisableCollision());
+}
+
+public enum DiceCollectionState{
+    NotRolling,
+    Rolling
 }

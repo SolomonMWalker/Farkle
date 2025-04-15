@@ -12,4 +12,9 @@ public class DiceFaceCollection
         var maxY =  faces.Max(x => x.Position.Y);
         return faces.First(x => x.Position.Y == maxY).number;
     }
+
+    public float GetHeightOfLowestFace()
+    {
+        return faces.Min(x => x.Position.Y);
+    }
 }

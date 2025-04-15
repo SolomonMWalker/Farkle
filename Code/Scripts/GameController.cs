@@ -4,6 +4,13 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
+public enum GameState{
+    PreRoll,
+    Rolling,
+    //PickDice,
+    PostRoll
+}
+
 public partial class GameController : Node
 {
     [Export]
@@ -18,7 +25,7 @@ public partial class GameController : Node
     private ThrowLocationBall throwLocationBall;
     private Node throwLocationDiceHolder;
     private PackedScene packedRootDice;
-
+    private GameState gameState;
 
     public override void _Ready()
     {
@@ -28,6 +35,7 @@ public partial class GameController : Node
         throwLocationBall = FindChild("DiceTable").FindChild<ThrowLocationBall>("ThrowLocationBall");
         throwLocationDiceHolder = throwLocationBall.diceHolder;
         packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
+        gameState = GameState.PostRoll;
     }
 
     public override void _Process(double delta)
@@ -48,19 +56,35 @@ public partial class GameController : Node
 
     public void HandleDice()
     {
-        if(Input.IsActionJustPressed("space"))
+        if(gameState == GameState.PreRoll)
         {
-            if(throwLocationBall.state == ThrowLocationBallState.Inactive)
+            if(Input.IsActionJustPressed("space"))
             {
-                SetDicePositionForThrow();
-                SetDiceVelocityForThrow();
-                throwLocationBall.Animate();
-            }
-            else {
                 throwLocationBall.StopAnimation();
                 ThrowDice();
+                gameState = GameState.Rolling;
             }
-            
+        }
+        else if(gameState == GameState.Rolling)
+        {
+            if(diceCollection.IsDoneRolling())
+            {
+                gameState = GameState.PostRoll;
+            }
+        }
+        else //gameState == GameState.PostRoll
+        {
+            if(Input.IsActionJustPressed("space"))
+            {
+                if(throwLocationBall.state == ThrowLocationBallState.Inactive)
+                {
+                    SetDicePositionForThrow();
+                    SetDiceVelocityForThrow();
+                    throwLocationBall.Animate();
+                }
+
+                gameState = GameState.PreRoll;
+            }
         }
     }
 

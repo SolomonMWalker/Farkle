@@ -7,9 +7,9 @@ public partial class RootDice : RigidBody3D
     private CollisionShape3D collisionShape;
     private Node3D corner;
     private Vector3 velocityUponThrow;
+    private DiceFaceCollection diceFaceCollection;
     private float edgelength;
-    //diagonal of cube formula (3^(1/3))*sideLength = diagonal
-    //sidelength = diagonal / ((3^(1/3)*sidelength))
+    
 
     public override void _Ready()
     {
@@ -20,6 +20,15 @@ public partial class RootDice : RigidBody3D
         collisionShape.Disabled = true;
         Freeze = true;
         FreezeMode = FreezeModeEnum.Static;
+        SetupDiceFaces();
+    }
+
+    public void SetupDiceFaces()
+    {
+        var diceFaceParent = FindChild("DiceFaces");
+        var diceFaces = diceFaceParent.GetChildren<DiceFaceNumber>();
+        diceFaceCollection = new DiceFaceCollection();
+        diceFaceCollection.faces = diceFaces;
     }
 
     public bool PointTooClose(Vector3 point, float margin)
@@ -39,6 +48,13 @@ public partial class RootDice : RigidBody3D
     {
         LinearVelocity = velocityUponThrow;
     }
+
+    public bool IsDoneRolling() {
+        var velocityIsCloseToZero = Mathf.Abs(LinearVelocity.Length()) < 0.1;
+        var lowestFaceHeightIsCloseToTable = 
+            Mathf.Abs(diceFaceCollection.GetHeightOfLowestFace()) < (edgelength/2) + 0.1 ;
+        return velocityIsCloseToZero && lowestFaceHeightIsCloseToTable;
+    } 
 
     public void DisableCollision()
     {
