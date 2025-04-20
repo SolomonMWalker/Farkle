@@ -18,21 +18,6 @@ ambient_light_color = Color(1, 1, 1, 1)
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="Animation" id="Animation_f2nln"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Camera3D:rotation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector3(-1.15192, 0, 0)]
-}
-
 [sub_resource type="Animation" id="Animation_0dy5s"]
 resource_name = "Camera_Move_To_DicePick"
 tracks/0/type = "position_3d"
@@ -77,6 +62,21 @@ tracks/1/keys = {
 "values": [Vector3(-1.53589, 0, 0), Vector3(-1.15192, 0, 0)]
 }
 
+[sub_resource type="Animation" id="Animation_f2nln"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-1.15192, 0, 0)]
+}
+
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_efk68"]
 _data = {
 &"Camera_Move_To_DicePick": SubResource("Animation_0dy5s"),
@@ -114,7 +114,7 @@ transform = Transform3D(1, 0, 0, 0, 0.406737, 0.913545, 0, -0.913545, 0.406737, 
 transform = Transform3D(1, 0, 0, 0, 0.0348995, 0.999391, 0, -0.999391, 0.0348995, 0, 6, 0.35)
 
 [node name="Camera3D" type="Camera3D" parent="GameController/CameraController"]
-transform = Transform3D(1, 0, 0, 0, 0.406737, 0.913545, 0, -0.913545, 0.406737, 0, 7.15, 4.485)
+transform = Transform3D(1, 0, 0, 0, 0.406734, 0.913546, 0, -0.913546, 0.406734, 0, 7.15, 4.485)
 near = 0.005
 
 [node name="DiceTable" parent="GameController" instance=ExtResource("1_njov2")]

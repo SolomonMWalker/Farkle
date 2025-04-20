@@ -15,8 +15,8 @@ gravity_scale = 1.5
 script = ExtResource("2_24xm2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-material_overlay = ExtResource("3_uva2f")
 mesh = ExtResource("1_mx507")
+surface_material_override/0 = ExtResource("3_uva2f")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("ConvexPolygonShape3D_tctqp")
