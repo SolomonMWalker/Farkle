@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://bm24t8vu2m5tm"]
+[gd_scene load_steps=11 format=3 uid="uid://bm24t8vu2m5tm"]
 
 [ext_resource type="Script" uid="uid://dijluwumyer0g" path="res://Code/Scripts/GameController.cs" id="1_aq4fw"]
 [ext_resource type="PackedScene" uid="uid://bumu5lp3edko4" path="res://Scenes/dice_table.tscn" id="1_njov2"]
+[ext_resource type="Script" uid="uid://chg753s0anfd6" path="res://Code/Scripts/CameraController.cs" id="2_0dy5s"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_njov2"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -17,6 +18,72 @@ ambient_light_color = Color(1, 1, 1, 1)
 tonemap_mode = 2
 glow_enabled = true
 
+[sub_resource type="Animation" id="Animation_f2nln"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-1.15192, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_0dy5s"]
+resource_name = "Camera_Move_To_DicePick"
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 7.15, 4.485, 1, 1, 0, 6, 0.35)
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:rotation")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-1.15192, 0, 0), Vector3(-1.53589, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_efk68"]
+resource_name = "Camera_Move_To_ThrowDice"
+tracks/0/type = "position_3d"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D")
+tracks/0/interp = 2
+tracks/0/loop_wrap = true
+tracks/0/keys = PackedFloat32Array(0, 1, 0, 6, 0.35, 1, 1, 0, 7.15, 4.485)
+tracks/1/type = "value"
+tracks/1/imported = false
+tracks/1/enabled = true
+tracks/1/path = NodePath("Camera3D:rotation")
+tracks/1/interp = 2
+tracks/1/loop_wrap = true
+tracks/1/keys = {
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
+"update": 0,
+"values": [Vector3(-1.53589, 0, 0), Vector3(-1.15192, 0, 0)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_efk68"]
+_data = {
+&"Camera_Move_To_DicePick": SubResource("Animation_0dy5s"),
+&"Camera_Move_To_ThrowDice": SubResource("Animation_efk68"),
+&"RESET": SubResource("Animation_f2nln")
+}
+
 [node name="Test" type="Node3D"]
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
@@ -31,8 +98,23 @@ directional_shadow_mode = 0
 [node name="GameController" type="Node" parent="."]
 script = ExtResource("1_aq4fw")
 
-[node name="Camera3D" type="Camera3D" parent="GameController"]
-transform = Transform3D(1, 0, 0, 0, 0.406737, 0.913545, 0, -0.913545, 0.406737, 0, 7.14048, 4.48471)
+[node name="CameraController" type="Node3D" parent="GameController"]
+script = ExtResource("2_0dy5s")
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="GameController/CameraController"]
+deterministic = true
+libraries = {
+&"": SubResource("AnimationLibrary_efk68")
+}
+
+[node name="ThrowDiceCameraLocation" type="Node3D" parent="GameController/CameraController"]
+transform = Transform3D(1, 0, 0, 0, 0.406737, 0.913545, 0, -0.913545, 0.406737, 0, 7.15, 4.485)
+
+[node name="DicePickCameraLocation" type="Node3D" parent="GameController/CameraController"]
+transform = Transform3D(1, 0, 0, 0, 0.0348995, 0.999391, 0, -0.999391, 0.0348995, 0, 6, 0.35)
+
+[node name="Camera3D" type="Camera3D" parent="GameController/CameraController"]
+transform = Transform3D(1, 0, 0, 0, 0.406737, 0.913545, 0, -0.913545, 0.406737, 0, 7.15, 4.485)
 near = 0.005
 
 [node name="DiceTable" parent="GameController" instance=ExtResource("1_njov2")]

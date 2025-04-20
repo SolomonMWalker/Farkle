@@ -1,0 +1,3 @@
+Game Mechanics
+    Score Card with limited entries
+        can score different ways as rewards through game, but must remove other scoring options

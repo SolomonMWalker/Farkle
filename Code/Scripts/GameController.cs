@@ -25,6 +25,7 @@ public partial class GameController : Node
     private ThrowLocationBall throwLocationBall;
     private Node throwLocationDiceHolder;
     private PackedScene packedRootDice;
+    private CameraController cameraController;
     private GameState gameState;
 
     public override void _Ready()
@@ -35,6 +36,7 @@ public partial class GameController : Node
         throwLocationBall = FindChild("DiceTable").FindChild<ThrowLocationBall>("ThrowLocationBall");
         throwLocationDiceHolder = throwLocationBall.diceHolder;
         packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
+        cameraController = this.FindChild<CameraController>("CameraController");
         gameState = GameState.PostRoll;
     }
 
@@ -42,7 +44,7 @@ public partial class GameController : Node
     {
         base._Process(delta);
 
-        HandleDice();
+        HandleGameState();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -54,7 +56,7 @@ public partial class GameController : Node
 
 
 
-    public void HandleDice()
+    public void HandleGameState()
     {
         if(gameState == GameState.PreRoll)
         {
@@ -62,6 +64,7 @@ public partial class GameController : Node
             {
                 throwLocationBall.StopAnimation();
                 ThrowDice();
+                cameraController.MoveToDicePickLocation();
                 gameState = GameState.Rolling;
             }
         }
@@ -69,7 +72,11 @@ public partial class GameController : Node
         {
             if(diceCollection.IsDoneRolling())
             {
-                gameState = GameState.PostRoll;
+                if(Input.IsActionJustPressed("space"))
+                {
+                    cameraController.MoveToThrowDiceLocation();
+                    gameState = GameState.PostRoll;
+                }
             }
         }
         else //gameState == GameState.PostRoll
