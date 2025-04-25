@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public partial class RootDice : RigidBody3D
@@ -10,6 +11,7 @@ public partial class RootDice : RigidBody3D
     private Node3D corner;
     private Vector3 velocityUponThrow;
     private DiceFaceCollection diceFaceCollection;
+    private int colliderId;
     private float edgelength;
     private const string RootDiceMaterialPath = "res://Resources/Materials/RootDiceMaterial.tres";
     private const string RootDiceSelectedMaterialPath = "res://Resources/Materials/RootDiceSelectedMaterial.tres";
@@ -28,6 +30,36 @@ public partial class RootDice : RigidBody3D
         Freeze = true;
         FreezeMode = FreezeModeEnum.Static;
         SetupDiceFaces();
+    }
+
+    public override void _Input(InputEvent @event)
+    {
+        base._Input(@event);
+        var mouse = Vector2.Zero;
+        if(@event is InputEventMouseMotion eventMouseMotion)
+        {
+            mouse = eventMouseMotion.Position;
+        }
+        else if (@event is InputEventMouseButton eventMouseButton)
+        {
+            if(eventMouseButton.Pressed is false && eventMouseButton.ButtonIndex is MouseButton.Left)
+            {
+                GetCollisions(mouse);
+            }
+        }
+    }
+
+    public void GetCollisions(Vector2 mouse)
+    {
+        var space = GetWorld3D().DirectSpaceState;
+        var start = GetViewport().GetCamera3D().ProjectRayOrigin(mouse);
+        var end = GetViewport().GetCamera3D().ProjectPosition(mouse, 1000);
+        var queryParams = new PhysicsRayQueryParameters3D();
+        queryParams.From = start;
+        queryParams.To = end;
+
+        var result = space.IntersectRay(queryParams);
+        GD.Print(result);
     }
 
     public void SetupDiceFaces()

@@ -11,7 +11,7 @@ public enum GameState{
     PostRoll
 }
 
-public partial class GameController : Node
+public partial class GameController : Node3D
 {
     [Export]
     public int diceOriginSphereRadius = 5;
@@ -28,6 +28,8 @@ public partial class GameController : Node
     private CameraController cameraController;
     private GameState gameState;
 
+    private Vector2 mousePosition;
+
     public override void _Ready()
     {
         base._Ready();
@@ -38,6 +40,7 @@ public partial class GameController : Node
         packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
         cameraController = this.FindChild<CameraController>("CameraController");
         gameState = GameState.PostRoll;
+        mousePosition = Vector2.Zero;
     }
 
     public override void _Process(double delta)
@@ -53,8 +56,6 @@ public partial class GameController : Node
 
         HandleDicePhysics();
     }
-
-
 
     public void HandleGameState()
     {

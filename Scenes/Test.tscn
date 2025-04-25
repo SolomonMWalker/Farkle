@@ -95,7 +95,7 @@ light_energy = 0.85
 light_angular_distance = 20.0
 directional_shadow_mode = 0
 
-[node name="GameController" type="Node" parent="."]
+[node name="GameController" type="Node3D" parent="."]
 script = ExtResource("1_aq4fw")
 
 [node name="CameraController" type="Node3D" parent="GameController"]
