@@ -5,18 +5,25 @@ using System.Linq;
 public partial class RootDice : RigidBody3D
 {
     private CollisionShape3D collisionShape;
+    private MeshInstance3D meshInstance;
+    private Material rootDiceMaterial, rootDiceSelectedMaterial;
     private Node3D corner;
     private Vector3 velocityUponThrow;
     private DiceFaceCollection diceFaceCollection;
     private float edgelength;
+    private const string RootDiceMaterialPath = "res://Resources/Materials/RootDiceMaterial.tres";
+    private const string RootDiceSelectedMaterialPath = "res://Resources/Materials/RootDiceSelectedMaterial.tres";
     
 
     public override void _Ready()
     {
         base._Ready();
         collisionShape = this.FindChild<CollisionShape3D>("CollisionShape3D");
+        meshInstance = this.FindChild<MeshInstance3D>("MeshInstance3D");
         corner = this.FindChild<Node3D>("Corner");
         edgelength = HelperMethods.GetSideLengthFromHalfDiagonal(Position.DistanceTo(corner.Position));
+        rootDiceMaterial = GD.Load<Material>(RootDiceMaterialPath);
+        rootDiceSelectedMaterial = GD.Load<Material>(RootDiceSelectedMaterialPath);
         collisionShape.Disabled = true;
         Freeze = true;
         FreezeMode = FreezeModeEnum.Static;

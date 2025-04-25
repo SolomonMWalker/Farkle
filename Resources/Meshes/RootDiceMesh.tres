@@ -1,4 +1,7 @@
-[gd_resource type="BoxMesh" format=3 uid="uid://078efvk0u5qi"]
+[gd_resource type="BoxMesh" load_steps=2 format=3 uid="uid://078efvk0u5qi"]
+
+[ext_resource type="Material" uid="uid://c5ps6uona3ypa" path="res://Resources/Materials/RootDiceMaterial.tres" id="1_qxnmb"]
 
 [resource]
+material = ExtResource("1_qxnmb")
 size = Vector3(0.4, 0.4, 0.4)

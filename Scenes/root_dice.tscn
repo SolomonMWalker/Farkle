@@ -1,9 +1,8 @@
-[gd_scene load_steps=7 format=3 uid="uid://ryhbwf8w5jho"]
+[gd_scene load_steps=6 format=3 uid="uid://ryhbwf8w5jho"]
 
 [ext_resource type="PhysicsMaterial" uid="uid://d25ce7roxxajs" path="res://Resources/PhysicsMaterials/RootDicePhysicsMaterial.tres" id="1_2wn8y"]
 [ext_resource type="BoxMesh" uid="uid://078efvk0u5qi" path="res://Resources/Meshes/RootDiceMesh.tres" id="1_mx507"]
 [ext_resource type="Script" uid="uid://dk3c4j8n832mv" path="res://Code/Scripts/RootDice.cs" id="2_24xm2"]
-[ext_resource type="Material" uid="uid://c5ps6uona3ypa" path="res://Resources/Materials/RootDiceMaterial.tres" id="3_uva2f"]
 [ext_resource type="PackedScene" uid="uid://krk243umv7su" path="res://Scenes/DiceFaceNumber.tscn" id="5_tctqp"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_tctqp"]
@@ -16,7 +15,6 @@ script = ExtResource("2_24xm2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = ExtResource("1_mx507")
-surface_material_override/0 = ExtResource("3_uva2f")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
 shape = SubResource("ConvexPolygonShape3D_tctqp")
