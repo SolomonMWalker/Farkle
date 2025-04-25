@@ -3,7 +3,7 @@
 [ext_resource type="PhysicsMaterial" uid="uid://d25ce7roxxajs" path="res://Resources/PhysicsMaterials/RootDicePhysicsMaterial.tres" id="1_2wn8y"]
 [ext_resource type="BoxMesh" uid="uid://078efvk0u5qi" path="res://Resources/Meshes/RootDiceMesh.tres" id="1_mx507"]
 [ext_resource type="Script" uid="uid://dk3c4j8n832mv" path="res://Code/Scripts/RootDice.cs" id="2_24xm2"]
-[ext_resource type="PackedScene" uid="uid://krk243umv7su" path="res://Scenes/DiceFaceNumber.tscn" id="5_tctqp"]
+[ext_resource type="PackedScene" uid="uid://krk243umv7su" path="res://Scenes/DiceFace.tscn" id="5_tctqp"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_tctqp"]
 points = PackedVector3Array(-0.2, -0.2, -0.2, 0.199991, 0.2, 0.2, 0.199991, 0.2, -0.2, 0.199991, -0.2, 0.2, -0.2, 0.2, 0.2, 0.199991, -0.2, -0.2, -0.2, 0.2, -0.2, -0.2, -0.2, 0.2)

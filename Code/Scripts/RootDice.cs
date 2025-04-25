@@ -5,6 +5,8 @@ using System.Linq;
 
 public partial class RootDice : RigidBody3D
 {
+    public bool selected;
+
     private CollisionShape3D collisionShape;
     private MeshInstance3D meshInstance;
     private Material rootDiceMaterial, rootDiceSelectedMaterial;
@@ -29,24 +31,8 @@ public partial class RootDice : RigidBody3D
         collisionShape.Disabled = true;
         Freeze = true;
         FreezeMode = FreezeModeEnum.Static;
+        selected = false;
         SetupDiceFaces();
-    }
-
-    public override void _Input(InputEvent @event)
-    {
-        base._Input(@event);
-        var mouse = Vector2.Zero;
-        if(@event is InputEventMouseMotion eventMouseMotion)
-        {
-            mouse = eventMouseMotion.Position;
-        }
-        else if (@event is InputEventMouseButton eventMouseButton)
-        {
-            if(eventMouseButton.Pressed is false && eventMouseButton.ButtonIndex is MouseButton.Left)
-            {
-                GetCollisions(mouse);
-            }
-        }
     }
 
     public void GetCollisions(Vector2 mouse)
@@ -65,7 +51,7 @@ public partial class RootDice : RigidBody3D
     public void SetupDiceFaces()
     {
         var diceFaceParent = FindChild("DiceFaces");
-        var diceFaces = diceFaceParent.GetChildren<DiceFaceNumber>();
+        var diceFaces = diceFaceParent.GetChildren<DiceFace>();
         diceFaceCollection = new DiceFaceCollection();
         diceFaceCollection.faces = diceFaces;
     }
@@ -103,5 +89,24 @@ public partial class RootDice : RigidBody3D
     public void EnableCollision()
     {
         collisionShape.Disabled = false;
+    }
+
+    public DiceFace GetResultOfRoll()
+    {
+        return diceFaceCollection.GetResultOfRoll();
+    }
+
+    public void SelectDice()
+    {
+        if(selected)
+        {
+            meshInstance.SetSurfaceOverrideMaterial(0, rootDiceMaterial);
+            selected = false;
+        }
+        else
+        {
+            meshInstance.SetSurfaceOverrideMaterial(0, rootDiceSelectedMaterial);
+            selected = true;
+        }        
     }
 }

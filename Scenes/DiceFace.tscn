@@ -1,8 +1,8 @@
 [gd_scene load_steps=2 format=3 uid="uid://krk243umv7su"]
 
-[ext_resource type="Script" uid="uid://bja8by20ecpsv" path="res://Code/Scripts/DiceFaceNumber.cs" id="1_hllnb"]
+[ext_resource type="Script" uid="uid://bja8by20ecpsv" path="res://Code/Scripts/DiceFace.cs" id="1_hllnb"]
 
-[node name="DiceFaceNumber" type="Label3D"]
+[node name="DiceFace" type="Label3D"]
 shaded = true
 double_sided = false
 texture_filter = 0

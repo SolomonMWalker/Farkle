@@ -4,26 +4,22 @@ using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
-public class MouseClicker3d()
+public class MouseTools()
 {
-    public Variant? GetCollisionFromMouseClick(InputEvent e, Vector2 mousePosition, Node3D node)
+
+    //MAKE MOUSEPOSITION REFERENCE OR SEPARATE OUT TO ITS OWN METHOD
+    public static GodotObject GetCollisionFromMouseClick(Vector2 mousePosition, InputEventMouseButton mouseButtonEvent, Node3D node)
     {
-        if(e is InputEventMouseMotion eventMouseMotion)
+        if(mouseButtonEvent.Pressed is false && mouseButtonEvent.ButtonIndex is MouseButton.Left)
         {
-            mousePosition = eventMouseMotion.Position;
-        }
-        else if (e is InputEventMouseButton eventMouseButton)
-        {
-            if(eventMouseButton.Pressed is false && eventMouseButton.ButtonIndex is MouseButton.Left)
-            {
-                return GetCollisions(node, mousePosition);
-            }
+            return GetCollidingObject(node, mousePosition);
         }
         return null;
     }
 
-    public Variant? GetCollisions(Node3D node, Vector2 mouse)
+    private static GodotObject GetCollidingObject(Node3D node, Vector2 mouse)
     {
+        //Ripped from https://github.com/Chevifier/ChevifierTutorials/blob/main/Mouse%20Interaction%203D%20Tutorial/main.gd
         var space = node.GetWorld3D().DirectSpaceState;
         var start = node.GetViewport().GetCamera3D().ProjectRayOrigin(mouse);
         var end = node.GetViewport().GetCamera3D().ProjectPosition(mouse, 1000);

@@ -1,7 +1,7 @@
 using Godot;
 using System;
 
-public partial class DiceFaceNumber : Label3D
+public partial class DiceFace : Label3D
 {
     public int number;
 

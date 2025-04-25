@@ -60,6 +60,19 @@ public class DiceCollection{
     public void EnableCollision() => diceList.ForEach(x => x.EnableCollision());
 
     public void DisableCollision() => diceList.ForEach(x => x.DisableCollision());
+
+    public RootDice GetDiceEqualTo(GodotObject obj)
+    {
+        foreach(RootDice diceObj in diceList)
+        {
+            if(diceObj.Equals(obj))
+            {
+                return diceObj;
+            }
+        }
+
+        return null;
+    }
 }
 
 public enum DiceCollectionState{

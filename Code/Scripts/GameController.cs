@@ -96,6 +96,33 @@ public partial class GameController : Node3D
         }
     }
 
+    public override void _Input(InputEvent @event)
+    {
+        base._Input(@event);
+        HandleMouseInput(@event);
+    }
+
+    public void HandleMouseInput(InputEvent inputEvent)
+    {
+        if(inputEvent is InputEventMouseMotion mouseMotion)
+        {
+            mousePosition = mouseMotion.Position;
+        }
+        else if(inputEvent is InputEventMouseButton mouseButton)
+        {
+            var selectedDice = HandleMouseClickOnObject(
+                MouseTools.GetCollisionFromMouseClick(mousePosition, mouseButton, this));
+
+            if(selectedDice is not null) {selectedDice.SelectDice();}
+        }
+    }
+
+    public RootDice HandleMouseClickOnObject(GodotObject obj)
+    {
+        var dice =  diceCollection.GetDiceEqualTo(obj);
+        return dice is not null ? dice : null; 
+    }
+
     public void HandleDicePhysics()
     {
         if(throwLocationBall.state == ThrowLocationBallState.ReadyToThrow)
