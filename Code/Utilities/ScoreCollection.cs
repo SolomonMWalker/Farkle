@@ -8,11 +8,21 @@ public class ScoreCollection{
 
     private int CalculateScore()
     {
-        int score = 0;
+        int calculatedScore = 0;
         foreach(IScoreRule scoreRule in scoreRules)
         {
-            score += scoreRule.GetScore(scorableResult);
+            var newScore = scoreRule.GetScore(scorableResult);
+            if(newScore > calculatedScore)
+            {
+                calculatedScore = newScore;
+            }
         }
+        
+        if(calculatedScore > score)
+        {
+            score = calculatedScore;
+        }
+
         return score;
     }
 
