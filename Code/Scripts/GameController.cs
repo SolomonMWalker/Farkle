@@ -1,53 +1,45 @@
 using Godot;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-public enum GameState{
-    PreRoll,
-    Rolling,
-    //PickDice,
-    PostRoll
-}
 
 public partial class GameController : Node3D
 {
     [Export]
-    public int diceOriginSphereRadius = 5;
+    public int diceOriginSphereRadius = 1;
     [Export]
     public float diceOriginMargin = 0.01f;
     [Export]
     public int diceAmount = 6;
 
     private DiceCollection diceCollection;
-    private Node diceHolder;
+    private Node3D diceHolder;
     private ThrowLocationBall throwLocationBall;
     private Node throwLocationDiceHolder;
     private PackedScene packedRootDice;
     private CameraController cameraController;
-    private GameState gameState;
-
+    private GameStateManager gameStateManager;
     private Vector2 mousePosition;
+    private Label label;
 
     public override void _Ready()
     {
         base._Ready();
         diceCollection = new DiceCollection();
-        diceHolder = this.FindChild<Node>("DiceHolder");
+        diceHolder = this.FindChild<Node3D>("DiceHolder");
         throwLocationBall = FindChild("DiceTable").FindChild<ThrowLocationBall>("ThrowLocationBall");
         throwLocationDiceHolder = throwLocationBall.diceHolder;
         packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
         cameraController = this.FindChild<CameraController>("CameraController");
-        gameState = GameState.PostRoll;
+        label = this.FindChild<Label>("Label");
+        gameStateManager = new GameStateManager();
         mousePosition = Vector2.Zero;
+
+        ReadyDiceForThrow();
     }
 
     public override void _Process(double delta)
     {
         base._Process(delta);
 
-        HandleGameState();
+        RunGame();
     }
 
     public override void _PhysicsProcess(double delta)
@@ -57,42 +49,55 @@ public partial class GameController : Node3D
         HandleDicePhysics();
     }
 
-    public void HandleGameState()
+    public void RunGame()
     {
+        var gameState = gameStateManager.GetState();
+
         if(gameState == GameState.PreRoll)
         {
             if(Input.IsActionJustPressed("space"))
             {
-                throwLocationBall.StopAnimation();
+                ReadyDiceForThrow();
+                throwLocationBall.Animate();
+                gameStateManager.ProgressState();
+            }
+        }
+        else if(gameState == GameState.RollReady)
+        {
+            if(Input.IsActionJustPressed("space"))
+            {
                 ThrowDice();
-                cameraController.MoveToDicePickLocation();
-                gameState = GameState.Rolling;
+                throwLocationBall.StopAnimation();
+                cameraController.MoveToDiceZoomLocation();
+                gameStateManager.ProgressState();
             }
         }
         else if(gameState == GameState.Rolling)
         {
-            if(diceCollection.IsDoneRolling())
+            if(diceCollection.IsDoneRolling() && !cameraController.IsAnimationPlaying())
             {
-                if(Input.IsActionJustPressed("space"))
-                {
-                    cameraController.MoveToThrowDiceLocation();
-                    gameState = GameState.PostRoll;
-                }
+                gameStateManager.ProgressState();
             }
         }
-        else //gameState == GameState.PostRoll
+        else if(gameState == GameState.SelectDice)
         {
             if(Input.IsActionJustPressed("space"))
             {
-                if(throwLocationBall.state == ThrowLocationBallState.Inactive)
-                {
-                    SetDicePositionForThrow();
-                    SetDiceVelocityForThrow();
-                    throwLocationBall.Animate();
-                }
-
-                gameState = GameState.PreRoll;
+                cameraController.MoveToUserPerspectiveLocation();
+                gameStateManager.ProgressState();
             }
+        }
+        else if (gameState == GameState.ExitDiceZoomAnimation)
+        {
+            if(!cameraController.IsAnimationPlaying())
+            {
+                gameStateManager.ProgressState();
+            }
+        }
+
+        if(label.Text != gameState.ToString())
+        {
+            label.Text = gameState.ToString();
         }
     }
 
@@ -125,16 +130,15 @@ public partial class GameController : Node3D
 
     public void HandleDicePhysics()
     {
-        if(throwLocationBall.state == ThrowLocationBallState.ReadyToThrow)
+        if(gameStateManager.GetState() is GameState.RollReady)
         {
-            diceCollection.diceList.ForEach(x => x.GlobalPosition = throwLocationBall.throwLocation.GlobalPosition);
+            diceCollection.diceList.ForEach(
+                x => x.GlobalPosition = throwLocationBall.throwLocation.GlobalPosition);
         }        
     }
 
     public void SetDicePositionForThrow()
     {
-        var diceInPosition = new DiceCollection();
-
         if(diceCollection.diceList.Count == 0)
         {
             for(int i = 0; i < diceAmount; i++)
@@ -142,41 +146,21 @@ public partial class GameController : Node3D
                 var dice = packedRootDice.Instantiate<RootDice>();
                 diceCollection.diceList.Add(dice);
             }
-            diceCollection.SetParent(throwLocationDiceHolder);
+            diceCollection.SetParent(diceHolder);
         }
         else
         {
             diceCollection.DisableCollision();
             diceCollection.FreezeDice();
-            diceCollection.ChangeParent(throwLocationDiceHolder, false);
         }
 
         foreach(RootDice dice in diceCollection.diceList)
         {
-            var dicePosition = HelperMethods.GetRandomPointInSphere(
-                diceOriginSphereRadius, throwLocationBall.throwLocation.GlobalPosition
-            );
-
-            if(diceInPosition.diceList.Count > 0 )
-            {
-                while(diceInPosition.PointTooClose(dicePosition, diceOriginMargin))
-                {
-                    dicePosition = HelperMethods.GetRandomPointInSphere(
-                        diceOriginSphereRadius, throwLocationBall.throwLocation.GlobalPosition
-                    );
-                }
-            }
-
-
             dice.Rotate(
                 new Vector3(GD.Randf(), GD.Randf(), GD.Randf()).Normalized(),
                 GD.Randf()*(2*Mathf.Pi)
             );
-            dice.GlobalPosition = dicePosition;
-            diceInPosition.diceList.Add(dice);
         }
-
-        diceCollection = diceInPosition;
     }
 
     public void SetDiceVelocityForThrow()
@@ -189,9 +173,14 @@ public partial class GameController : Node3D
         }
     }
 
+    public void ReadyDiceForThrow()
+    {
+        SetDicePositionForThrow();
+        SetDiceVelocityForThrow();
+    }
+
     public void ThrowDice()
     {
-        diceCollection.ChangeParent(diceHolder, true);
         diceCollection.UnfreezeDice();
         diceCollection.EnableCollision();
         diceCollection.ThrowDice();

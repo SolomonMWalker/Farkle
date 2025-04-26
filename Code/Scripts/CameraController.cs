@@ -3,29 +3,34 @@ using System;
 
 public partial class CameraController : Node3D
 {
-    private Node3D throwDiceCameraLocation, dicePickCameraLocation;
+    private Node3D userPerspectiveCameraLocation, diceZoomCameraLocation;
     private Camera3D camera;
     private AnimationPlayer animationPlayer;
 
     public override void _Ready()
     {
         base._Ready();
-        throwDiceCameraLocation = this.FindChild<Node3D>("ThrowDiceCameraLocation");
-        dicePickCameraLocation = this.FindChild<Node3D>("DicePickCameraLocation");
+        userPerspectiveCameraLocation = this.FindChild<Node3D>("UserPerspectiveCameraLocation");
+        diceZoomCameraLocation = this.FindChild<Node3D>("DiceZoomCameraLocation");
         animationPlayer = this.FindChild<AnimationPlayer>("AnimationPlayer");
         camera = this.FindChild<Camera3D>("Camera3D");
 
-        camera.Position = throwDiceCameraLocation.Position;
-        camera.RotationDegrees = throwDiceCameraLocation.RotationDegrees;
+        camera.Position = userPerspectiveCameraLocation.Position;
+        camera.RotationDegrees = userPerspectiveCameraLocation.RotationDegrees;
     }
 
-    public void MoveToThrowDiceLocation()
+    public void MoveToUserPerspectiveLocation()
     {
-        animationPlayer.Play("Camera_Move_To_ThrowDice");
+        animationPlayer.Play("Camera_MoveTo_UserPerspective");
     }
 
-    public void MoveToDicePickLocation()
+    public void MoveToDiceZoomLocation()
     {
-        animationPlayer.Play("Camera_Move_To_DicePick");
+        animationPlayer.Play("Camera_MoveTo_DiceZoom");
+    }
+
+    public bool IsAnimationPlaying()
+    {
+        return animationPlayer.IsPlaying();
     }
 }

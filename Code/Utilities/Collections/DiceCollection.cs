@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using Godot;
 
 public class DiceCollection{
@@ -61,6 +62,8 @@ public class DiceCollection{
 
     public void DisableCollision() => diceList.ForEach(x => x.DisableCollision());
 
+    public void ResetPosition() => diceList.ForEach(x => x.Position = Vector3.Zero);
+
     public RootDice GetDiceEqualTo(GodotObject obj)
     {
         foreach(RootDice diceObj in diceList)
@@ -72,6 +75,13 @@ public class DiceCollection{
         }
 
         return null;
+    }
+
+    public List<int> GetResultOfRoll()
+    {
+        var returnList = new List<int>();
+        diceList.ForEach(x => returnList.Add(x.GetResultOfRoll().number));
+        return returnList;
     }
 }
 

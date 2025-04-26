@@ -11,4 +11,4 @@ script = ExtResource("2_gf3df")
 [node name="ThrowLocation" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
-[node name="DiceHolder" type="Node" parent="ThrowLocation"]
+[node name="DiceHolder" type="Node3D" parent="ThrowLocation"]
