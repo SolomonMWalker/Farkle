@@ -18,21 +18,6 @@ ambient_light_color = Color(1, 1, 1, 1)
 tonemap_mode = 2
 glow_enabled = true
 
-[sub_resource type="Animation" id="Animation_f2nln"]
-length = 0.001
-tracks/0/type = "value"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("Camera3D:rotation")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
-"update": 0,
-"values": [Vector3(-1.15192, 0, 0)]
-}
-
 [sub_resource type="Animation" id="Animation_0dy5s"]
 resource_name = "Camera_Move_To_DicePick"
 tracks/0/type = "position_3d"
@@ -75,6 +60,21 @@ tracks/1/keys = {
 "transitions": PackedFloat32Array(1, 1),
 "update": 0,
 "values": [Vector3(-1.53589, 0, 0), Vector3(-1.15192, 0, 0)]
+}
+
+[sub_resource type="Animation" id="Animation_f2nln"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("Camera3D:rotation")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Vector3(-1.15192, 0, 0)]
 }
 
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_efk68"]
@@ -122,6 +122,11 @@ near = 0.005
 [node name="DiceHolder" type="Node3D" parent="GameController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 100)
 
-[node name="Label" type="Label" parent="GameController"]
+[node name="GameState" type="Label" parent="GameController"]
 offset_right = 343.0
 offset_bottom = 71.0
+
+[node name="Score" type="Label" parent="GameController"]
+offset_top = 74.0
+offset_right = 343.0
+offset_bottom = 145.0

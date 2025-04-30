@@ -8,7 +8,7 @@ public class MouseTools()
 {
 
     //MAKE MOUSEPOSITION REFERENCE OR SEPARATE OUT TO ITS OWN METHOD
-    public static GodotObject GetCollisionFromMouseClick(Vector2 mousePosition, InputEventMouseButton mouseButtonEvent, Node3D node)
+    public static ulong? GetCollisionIdFromMouseClick(Vector2 mousePosition, InputEventMouseButton mouseButtonEvent, Node3D node)
     {
         if(mouseButtonEvent.Pressed is false && mouseButtonEvent.ButtonIndex is MouseButton.Left)
         {
@@ -17,7 +17,7 @@ public class MouseTools()
         return null;
     }
 
-    private static GodotObject GetCollidingObject(Node3D node, Vector2 mouse)
+    private static ulong? GetCollidingObject(Node3D node, Vector2 mouse)
     {
         //Ripped from https://github.com/Chevifier/ChevifierTutorials/blob/main/Mouse%20Interaction%203D%20Tutorial/main.gd
         var space = node.GetWorld3D().DirectSpaceState;
@@ -31,7 +31,7 @@ public class MouseTools()
         var result = space.IntersectRay(queryParams);
         if(result.Count > 0)
         {
-            return (GodotObject)result["collider"];
+            return (ulong)result["collider_id"];
         }
 
         return null;

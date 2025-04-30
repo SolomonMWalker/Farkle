@@ -5,6 +5,7 @@ using Godot;
 
 public class DiceCollection{
     public List<RootDice> diceList;
+    public DiceCollectionScore score;
 
     public DiceCollection()
     {
@@ -14,6 +15,26 @@ public class DiceCollection{
     public DiceCollection(List<RootDice> rootDice)
     {
         diceList = rootDice;
+    }
+
+    public void AddDice(RootDice dice)
+    {
+        diceList.Add(dice);
+    }
+
+    public void AddDice(List<RootDice> dice) => dice.ForEach(d => AddDice(d));
+
+    public void RemoveDice(RootDice dice)
+    {
+        diceList.Remove(dice);
+    }
+
+    public void RemoveDice(List<RootDice> dice) => dice.ForEach(d => RemoveDice(d));
+
+    public int CalculateScore()
+    {
+        score ??= new DiceCollectionScore(this);
+        return score.RecalculateScore(this);
     }
 
     public bool PointTooClose(Vector3 point, float margin)
@@ -48,6 +69,16 @@ public class DiceCollection{
         diceList.ForEach(x => x.Throw());
     }
 
+    public void TurnOn()
+    {
+        diceList.ForEach(x => x.TurnOn());
+    }
+
+     public void TurnOff()
+    {
+        diceList.ForEach(x => x.TurnOff());
+    }
+
     public void FreezeDice()
     {
         diceList.ForEach(x => x.Freeze = true);
@@ -64,11 +95,11 @@ public class DiceCollection{
 
     public void ResetPosition() => diceList.ForEach(x => x.Position = Vector3.Zero);
 
-    public RootDice GetDiceEqualTo(GodotObject obj)
+    public RootDice GetDiceWithInstanceIdEqualTo(ulong objInstanceId)
     {
         foreach(RootDice diceObj in diceList)
         {
-            if(diceObj.Equals(obj))
+            if(diceObj.GetInstanceId() == objInstanceId)
             {
                 return diceObj;
             }
@@ -83,9 +114,4 @@ public class DiceCollection{
         diceList.ForEach(x => returnList.Add(x.GetResultOfRoll().number));
         return returnList;
     }
-}
-
-public enum DiceCollectionState{
-    NotRolling,
-    Rolling
 }

@@ -79,7 +79,19 @@ public partial class RootDice : RigidBody3D
         var lowestFaceHeightIsCloseToTable = 
             Mathf.Abs(diceFaceCollection.GetHeightOfLowestFace()) < (edgelength/2) + 0.1 ;
         return velocityIsCloseToZero && lowestFaceHeightIsCloseToTable;
-    } 
+    }
+
+    public void TurnOff()
+    {
+        DisableCollision();
+        Freeze = true;
+    }
+
+    public void TurnOn()
+    {
+        EnableCollision();
+        Freeze = false;
+    }
 
     public void DisableCollision()
     {

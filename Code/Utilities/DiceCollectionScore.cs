@@ -1,15 +1,15 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class ScoreCollection{
-    public List<IScoreRule> scoreRules;
+public class DiceCollectionScore{
+    public ScoreRuleCollection scoreRules = ScoreRuleCollection.GetDefaultRules();
     public ScorableResult scorableResult;
-    public int score;
+    public int score = 0;
 
-    private int CalculateScore()
+    public int CalculateScore()
     {
         int calculatedScore = 0;
-        foreach(IScoreRule scoreRule in scoreRules)
+        foreach(IScoreRule scoreRule in scoreRules.scoreRuleList)
         {
             var newScore = scoreRule.GetScore(scorableResult);
             if(newScore > calculatedScore)
@@ -26,14 +26,21 @@ public class ScoreCollection{
         return score;
     }
 
-    public ScoreCollection(DiceCollection collection)
+    public DiceCollectionScore(DiceCollection collection)
     {
-        scorableResult = new ScorableResult(collection);
+        scorableResult = ScorableResult.NewScorableResult(collection);
         score = CalculateScore();
     }
 
-    public int GetScore()
+
+    public int RecalculateScore(DiceCollection collection)
     {
+        score = 0;
+        scorableResult = ScorableResult.NewScorableResult(collection);
+
+        if(scorableResult == null) {return 0;}
+
+        score = CalculateScore();
         return score;
     }
 }
@@ -42,7 +49,7 @@ public class ScorableResult{
     public HashSet<int> set;
     public Dictionary<int, int> dict;
 
-    public ScorableResult(DiceCollection diceCollection)
+    private ScorableResult(DiceCollection diceCollection)
     {
         var results = diceCollection.GetResultOfRoll();
         set = results.ToHashSet();
@@ -59,6 +66,40 @@ public class ScorableResult{
             }
         }
     }
+
+    public static ScorableResult NewScorableResult(DiceCollection diceCollection)
+    {
+        if(diceCollection == null || diceCollection.diceList.Count == 0)
+        {
+            return null;
+        }
+        else
+        {
+            return new ScorableResult(diceCollection);
+        }
+    }
+}
+
+public class ScoreRuleCollection
+{
+    public List<IScoreRule> scoreRuleList;
+
+    public ScoreRuleCollection()
+    {
+        scoreRuleList = new List<IScoreRule>();
+    }
+
+    public ScoreRuleCollection(List<IScoreRule> rules)
+    {
+        scoreRuleList = rules;
+    }
+
+    public static ScoreRuleCollection GetDefaultRules()
+    {
+        return new ScoreRuleCollection([
+            new SingleOneScoreRule()
+        ]);
+    }
 }
 
 public interface IScoreRule{
@@ -68,6 +109,12 @@ public interface IScoreRule{
 public class SingleOneScoreRule : IScoreRule{
     public int GetScore(ScorableResult scorableResult)
     {
+        if(scorableResult.dict == null ||
+            !scorableResult.dict.ContainsKey(1))
+        {
+            return 0;
+        }
+
         var numOfOnes = scorableResult.dict[1];
         if(numOfOnes == 1)
         {

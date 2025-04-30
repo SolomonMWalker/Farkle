@@ -3,6 +3,7 @@ using System;
 
 public partial class DiceFace : Label3D
 {
+    [Export]
     public int number;
 
     public override void _Ready()

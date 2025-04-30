@@ -9,8 +9,19 @@ public class DiceFaceCollection
     //might need to change this later
     public DiceFace GetResultOfRoll()
     {
-        var maxY =  faces.Max(x => x.Position.Y);
-        return faces.First(x => x.Position.Y == maxY);
+        DiceFace faceOnTop = null;
+        foreach(DiceFace face in faces)
+        {
+            if(faceOnTop == null)
+            {
+                faceOnTop = face;
+            }
+            else if(face.GlobalPosition.Y > faceOnTop.GlobalPosition.Y)
+            {
+                faceOnTop = face;
+            }
+        }
+        return faceOnTop;
     }
 
     public float GetHeightOfLowestFace()

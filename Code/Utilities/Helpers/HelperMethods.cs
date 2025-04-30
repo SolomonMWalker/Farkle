@@ -29,4 +29,9 @@ public static class HelperMethods {
     // we have origin of a cube to a corner which is half its diagonal
     // with this we can get the side length
     public static float GetSideLengthFromHalfDiagonal(float halfDiagonal) => halfDiagonal / Mathf.Pow(3, 1/3);
+
+    public static Vector3 GetRandomVector3(float coefficient = 1f)
+    {
+        return new Vector3(GD.Randf()*coefficient, GD.Randf()*coefficient, GD.Randf()*coefficient);
+    }
 }
