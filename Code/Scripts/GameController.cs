@@ -145,7 +145,7 @@ public partial class GameController : Node3D
         {
             return null;
         }
-        var dice =  rollableDiceCollection.GetDiceWithInstanceIdEqualTo(objInstanceId.Value);
+        var dice = rollableDiceCollection.GetDiceWithInstanceIdEqualTo(objInstanceId.Value);
         return dice; 
     }
 
@@ -199,5 +199,4 @@ public partial class GameController : Node3D
         rollableDiceCollection.TurnOn();
         rollableDiceCollection.ThrowDice();
     }
-
 }

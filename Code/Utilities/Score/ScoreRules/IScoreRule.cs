@@ -2,11 +2,11 @@ using System.Collections.Generic;
 using System.Linq;
 
 public interface IScoreRule{
-    public CalculateScoreResult GetScore(ScorableCollection scorableResult);
+    public CalculatedScoreResult GetScore(ScorableCollection scorableResult);
 }
 
 public class SingleOneScoreRule : IScoreRule{
-    public CalculateScoreResult GetScore(ScorableCollection scorableResult)
+    public CalculatedScoreResult GetScore(ScorableCollection scorableResult)
     {
         if(scorableResult.fDict == null ||
             !scorableResult.fDict.ContainsKey(1))
@@ -36,7 +36,7 @@ public class SingleOneScoreRule : IScoreRule{
 }
 
 public class SingleFiveScoreRule : IScoreRule{
-    public CalculateScoreResult GetScore(ScorableCollection scorableResult)
+    public CalculatedScoreResult GetScore(ScorableCollection scorableResult)
     {
         if(scorableResult.fDict == null ||
             !scorableResult.fDict.ContainsKey(5))
@@ -66,7 +66,7 @@ public class SingleFiveScoreRule : IScoreRule{
 }
 
 public class ThreeOrMoreOfAKindScoreRule : IScoreRule{
-    public CalculateScoreResult GetScore(ScorableCollection scorableResult)
+    public CalculatedScoreResult GetScore(ScorableCollection scorableResult)
     {
         if(scorableResult.fDict == null){return new (-1, null);}
 

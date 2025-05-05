@@ -5,10 +5,10 @@ using Godot;
 public static class DiceCollectionScore{
     public static readonly ScoreRuleCollection scoreRules = ScoreRuleCollection.GetDefaultRules();
 
-    public static CalculateScoreResult CalculateScore(DiceCollection collection)
+    public static CalculatedScoreResult CalculateScore(DiceCollection collection)
     {
         var scorableResult = ScorableCollection.NewScorableCollection(collection);
-        CalculateScoreResult calculatedScoreResult = new (-1, []);
+        CalculatedScoreResult calculatedScoreResult = new (-1, []);
         foreach(IScoreRule scoreRule in scoreRules.scoreRuleList)
         {
             var newScore = scoreRule.GetScore(scorableResult);
@@ -28,4 +28,4 @@ public static class DiceCollectionScore{
     }
 }
 
-public record CalculateScoreResult(int Score, IEnumerable<RootDice> UnusedDice);
+public record CalculatedScoreResult(int Score, IEnumerable<RootDice> UnusedDice);

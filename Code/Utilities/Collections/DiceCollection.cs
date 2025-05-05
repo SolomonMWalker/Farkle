@@ -6,6 +6,9 @@ using Godot;
 public class DiceCollection{
     public ImmutableList<RootDice> diceList;
 
+    public CalculatedScoreResult CalculateScoreResult { get => _calculatedScoreResult;}
+    private CalculatedScoreResult _calculatedScoreResult;
+
     public DiceCollection()
     {
         diceList = [];
@@ -41,11 +44,14 @@ public class DiceCollection{
     }
     public DiceCollection RemoveDice(DiceCollection dc) => RemoveDice(dc.diceList);
 
-    public CalculateScoreResult CalculateScore()
+    public CalculatedScoreResult CalculateScore()
     {
         if(diceList.IsEmpty){return new (-1, null);}
-        return DiceCollectionScore.CalculateScore(this);
+        _calculatedScoreResult = DiceCollectionScore.CalculateScore(this);
+        return _calculatedScoreResult;
     }
+
+    public bool HasUnusedScoreDice() => _calculatedScoreResult.UnusedDice.Count() > 0;
 
     public bool PointTooClose(Vector3 point, float margin)
     {
