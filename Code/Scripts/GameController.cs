@@ -123,17 +123,16 @@ public partial class GameController : Node3D
 
             if(selectedDice is not null) 
             {
-                GD.Print($"selected dice highest face is {selectedDice.GetResultOfRoll().number}");
                 if(scoringDiceCollection.diceList.Contains(selectedDice))
                 {
                     scoringDiceCollection = scoringDiceCollection.RemoveDice(selectedDice);
-                    scoreLabel.Text = scoringDiceCollection.CalculateScore().ToString();
+                    scoreLabel.Text = scoringDiceCollection.CalculateScore().Score.ToString();
                     selectedDice.SelectDice();
                 }
                 else
                 {
                     scoringDiceCollection = scoringDiceCollection.AddDice(selectedDice);
-                    scoreLabel.Text = scoringDiceCollection.CalculateScore().ToString();
+                    scoreLabel.Text = scoringDiceCollection.CalculateScore().Score.ToString();
                     selectedDice.SelectDice();
                 }
             }

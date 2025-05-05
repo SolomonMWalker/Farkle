@@ -5,30 +5,27 @@ using Godot;
 public static class DiceCollectionScore{
     public static readonly ScoreRuleCollection scoreRules = ScoreRuleCollection.GetDefaultRules();
 
-    public static int CalculateScore(DiceCollection collection)
+    public static CalculateScoreResult CalculateScore(DiceCollection collection)
     {
         var scorableResult = ScorableCollection.NewScorableCollection(collection);
-        int calculatedScore = -1;
-        HashSet<RootDice> diceUsed = [];
+        CalculateScoreResult calculatedScoreResult = new (-1, []);
         foreach(IScoreRule scoreRule in scoreRules.scoreRuleList)
         {
             var newScore = scoreRule.GetScore(scorableResult);
-            if(newScore.Item1 > calculatedScore)
+            if(newScore.Score > calculatedScoreResult.Score) 
             {
-                calculatedScore = newScore.Item1;
-                diceUsed = newScore.Item2.ToHashSet();
+                calculatedScoreResult = new (newScore.Score, newScore.UnusedDice);
             }
         }
 
-        if(calculatedScore == -1) {return -1;}
+        if(calculatedScoreResult.Score == -1 || !calculatedScoreResult.UnusedDice.Any()) {return calculatedScoreResult;}
+        
+        var moreScoreResult = CalculateScore(new DiceCollection(calculatedScoreResult.UnusedDice));
+        if(moreScoreResult.Score == -1) {return calculatedScoreResult;}
+        calculatedScoreResult = new(moreScoreResult.Score + calculatedScoreResult.Score, moreScoreResult.UnusedDice);        
 
-        if(diceUsed.Count < collection.diceList.Count)
-        {
-            var moreScore = CalculateScore(collection.RemoveDice(diceUsed));
-            if(moreScore == -1) {return calculatedScore;}
-            calculatedScore += moreScore;
-        }
-
-        return calculatedScore;
+        return calculatedScoreResult;
     }
 }
+
+public record CalculateScoreResult(int Score, IEnumerable<RootDice> UnusedDice);

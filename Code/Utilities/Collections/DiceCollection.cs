@@ -41,9 +41,9 @@ public class DiceCollection{
     }
     public DiceCollection RemoveDice(DiceCollection dc) => RemoveDice(dc.diceList);
 
-    public int CalculateScore()
+    public CalculateScoreResult CalculateScore()
     {
-        if(diceList.IsEmpty){return -1;}
+        if(diceList.IsEmpty){return new (-1, null);}
         return DiceCollectionScore.CalculateScore(this);
     }
 

@@ -6,10 +6,12 @@ public class ScorableCollection{
     public FrozenSet<int> fSet;
     public FrozenDictionary<int, int> fDict;
     public readonly IEnumerable<DiceFace> faces;
+    public readonly DiceCollection diceCollection;
 
     private ScorableCollection(DiceCollection collection)
     {
-        faces = collection.GetResultOfRoll();
+        diceCollection = collection;
+        faces = diceCollection.GetResultOfRoll();
         fSet = faces.Select(r => r.number).ToFrozenSet();
         var dict = new Dictionary<int, int>();
         foreach(DiceFace face in faces)
