@@ -5,7 +5,7 @@ using System.Linq;
 public class ScorableCollection{
     public FrozenSet<int> fSet;
     public FrozenDictionary<int, int> fDict;
-    public readonly List<DiceFace> faces;
+    public readonly IEnumerable<DiceFace> faces;
 
     private ScorableCollection(DiceCollection collection)
     {

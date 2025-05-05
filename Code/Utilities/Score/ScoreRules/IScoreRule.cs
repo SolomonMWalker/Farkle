@@ -1,14 +1,12 @@
-using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 
 public interface IScoreRule{
-    public (int, HashSet<RootDice>) GetScore(ScorableCollection scorableResult);
+    public (int, IEnumerable<RootDice>) GetScore(ScorableCollection scorableResult);
 }
 
 public class SingleOneScoreRule : IScoreRule{
-    public (int, HashSet<RootDice>) GetScore(ScorableCollection scorableResult)
+    public (int, IEnumerable<RootDice>) GetScore(ScorableCollection scorableResult)
     {
         if(scorableResult.fDict == null ||
             !scorableResult.fDict.ContainsKey(1))
@@ -38,10 +36,10 @@ public class SingleOneScoreRule : IScoreRule{
 }
 
 public class SingleFiveScoreRule : IScoreRule{
-    public (int, HashSet<RootDice>) GetScore(ScorableCollection scorableResult)
+    public (int, IEnumerable<RootDice>) GetScore(ScorableCollection scorableResult)
     {
         if(scorableResult.fDict == null ||
-            !scorableResult.fDict.ContainsKey(1))
+            !scorableResult.fDict.ContainsKey(5))
         {
             return (-1, null);
         }
@@ -68,7 +66,7 @@ public class SingleFiveScoreRule : IScoreRule{
 }
 
 public class ThreeOrMoreOfAKindScoreRule : IScoreRule{
-    public (int, HashSet<RootDice>) GetScore(ScorableCollection scorableResult)
+    public (int, IEnumerable<RootDice>) GetScore(ScorableCollection scorableResult)
     {
         if(scorableResult.fDict == null){return (-1, null);}
 
@@ -78,7 +76,7 @@ public class ThreeOrMoreOfAKindScoreRule : IScoreRule{
 
         //if mult is 4 or up, only one per collection
         //else, there might be more, so get the highest scoring group first
-        int diceNumber = highestMultiple > 3 ? 
+        int diceNumber = highestMultiple > scorableResult.faces.Count() / 2 ? 
             scorableResult.fDict
                 .Where(x => x.Value == highestMultiple)
                 .Select(x => x.Key)

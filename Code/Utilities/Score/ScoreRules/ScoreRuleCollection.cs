@@ -1,23 +1,26 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 
 public class ScoreRuleCollection
 {
-    public List<IScoreRule> scoreRuleList;
+    public ImmutableList<IScoreRule> scoreRuleList;
 
     public ScoreRuleCollection()
     {
-        scoreRuleList = new List<IScoreRule>();
+        scoreRuleList = [];
     }
 
-    public ScoreRuleCollection(List<IScoreRule> rules)
+    public ScoreRuleCollection(IEnumerable<IScoreRule> rules)
     {
-        scoreRuleList = rules;
+        scoreRuleList = rules.ToImmutableList();
     }
 
     public static ScoreRuleCollection GetDefaultRules()
     {
         return new ScoreRuleCollection([
-            new SingleOneScoreRule()
+            new SingleOneScoreRule(),
+            new SingleFiveScoreRule(),
+            new ThreeOrMoreOfAKindScoreRule()
         ]);
     }
 }

@@ -4,7 +4,7 @@ using Godot;
 
 public static class NodeExtensions
 {
-    public static List<T> GetChildren<T>(this Node node) where T: Node
+    public static IEnumerable<T> GetChildren<T>(this Node node) where T: Node
     {
         return node.GetChildren().OfType<T>().ToList();
     }

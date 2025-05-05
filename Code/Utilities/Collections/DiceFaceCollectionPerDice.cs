@@ -3,7 +3,7 @@ using System.Linq;
 
 public class DiceFaceCollectionPerDice
 {
-    public List<DiceFace> faces;
+    public IEnumerable<DiceFace> faces;
 
     //Get the dice face that has the highest y-value
     //might need to change this later

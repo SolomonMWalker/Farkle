@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 public partial class GameController : Node3D
@@ -32,9 +33,9 @@ public partial class GameController : Node3D
         scoreLabel = this.FindChild<Label>("Score");
         gameStateManager = new GameStateManager();
         mousePosition = Vector2.Zero;
+        scoringDiceCollection = new DiceCollection();
 
         CreateDiceCollection();
-        scoringDiceCollection = new DiceCollection();
     }
 
     public override void _Process(double delta)
@@ -160,11 +161,13 @@ public partial class GameController : Node3D
 
     public void CreateDiceCollection()
     {
+        var tempDiceList = new List<RootDice>();
         for(int i = 0; i < diceAmount; i++)
         {
             var dice = packedRootDice.Instantiate<RootDice>();
-            rollableDiceCollection.diceList.Add(dice);
+            tempDiceList.Add(dice);
         }
+        rollableDiceCollection = new DiceCollection(tempDiceList);
         rollableDiceCollection.SetParent(diceHolder);
     }
 

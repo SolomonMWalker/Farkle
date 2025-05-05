@@ -1,12 +1,10 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using Godot;
 
 public class DiceCollection{
     public ImmutableList<RootDice> diceList;
-    public DiceCollectionScore score;
 
     public DiceCollection()
     {
@@ -25,7 +23,7 @@ public class DiceCollection{
 
     public DiceCollection AddDice(RootDice dice)
     {
-        var tempDiceList = diceList.ToList();
+        var tempDiceList = diceList.Count > 0 ? diceList.ToList() : [];
         tempDiceList.Add(dice);
         return new DiceCollection(tempDiceList);
     }
@@ -45,8 +43,8 @@ public class DiceCollection{
 
     public int CalculateScore()
     {
-        score ??= new DiceCollectionScore(this);
-        return score.RecalculateScore(this);
+        if(diceList.IsEmpty){return -1;}
+        return DiceCollectionScore.CalculateScore(this);
     }
 
     public bool PointTooClose(Vector3 point, float margin)
@@ -120,5 +118,5 @@ public class DiceCollection{
         return null;
     }
 
-    public List<DiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
+    public IEnumerable<DiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
 }
