@@ -1,35 +1,47 @@
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using Godot;
 
 public class DiceCollection{
-    public List<RootDice> diceList;
+    public ImmutableList<RootDice> diceList;
     public DiceCollectionScore score;
 
     public DiceCollection()
     {
-        diceList = new List<RootDice>();
+        diceList = [];
     }
 
-    public DiceCollection(List<RootDice> rootDice)
+    public DiceCollection(IEnumerable<RootDice> rootDice)
     {
-        diceList = rootDice;
+        diceList = rootDice.ToImmutableList();
     }
 
-    public void AddDice(RootDice dice)
+    public DiceCollection(IEnumerable<DiceFace> diceFaces)
     {
-        diceList.Add(dice);
+        diceList = diceFaces.Select(df => df.AssociatedDice).ToImmutableList();
     }
 
-    public void AddDice(List<RootDice> dice) => dice.ForEach(d => AddDice(d));
-
-    public void RemoveDice(RootDice dice)
+    public DiceCollection AddDice(RootDice dice)
     {
-        diceList.Remove(dice);
+        var tempDiceList = diceList.ToList();
+        tempDiceList.Add(dice);
+        return new DiceCollection(tempDiceList);
     }
 
-    public void RemoveDice(List<RootDice> dice) => dice.ForEach(d => RemoveDice(d));
+    public DiceCollection RemoveDice(RootDice dice)
+    {
+        if(!diceList.Contains(dice)){return this;}
+
+        var tempDiceList = diceList.ToList();
+        tempDiceList.Remove(dice);
+        return new DiceCollection(tempDiceList);
+    }
+    public DiceCollection RemoveDice(IEnumerable<RootDice> dice){
+        return new DiceCollection(diceList.Where(d => !dice.Contains(d)).ToList());
+    }
+    public DiceCollection RemoveDice(DiceCollection dc) => RemoveDice(dc.diceList);
 
     public int CalculateScore()
     {
@@ -108,10 +120,5 @@ public class DiceCollection{
         return null;
     }
 
-    public List<int> GetResultOfRoll()
-    {
-        var returnList = new List<int>();
-        diceList.ForEach(x => returnList.Add(x.GetResultOfRoll().number));
-        return returnList;
-    }
+    public List<DiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
 }

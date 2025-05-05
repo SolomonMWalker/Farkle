@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-public class DiceFaceCollection
+public class DiceFaceCollectionPerDice
 {
     public List<DiceFace> faces;
 

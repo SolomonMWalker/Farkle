@@ -12,7 +12,7 @@ public partial class RootDice : RigidBody3D
     private Material rootDiceMaterial, rootDiceSelectedMaterial;
     private Node3D corner;
     private Vector3 velocityUponThrow;
-    private DiceFaceCollection diceFaceCollection;
+    private DiceFaceCollectionPerDice diceFaceCollection;
     private int colliderId;
     private float edgelength;
     private const string RootDiceMaterialPath = "res://Resources/Materials/RootDiceMaterial.tres";
@@ -52,7 +52,7 @@ public partial class RootDice : RigidBody3D
     {
         var diceFaceParent = FindChild("DiceFaces");
         var diceFaces = diceFaceParent.GetChildren<DiceFace>();
-        diceFaceCollection = new DiceFaceCollection();
+        diceFaceCollection = new DiceFaceCollectionPerDice();
         diceFaceCollection.faces = diceFaces;
     }
 

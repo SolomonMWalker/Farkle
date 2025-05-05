@@ -1,27 +1,29 @@
+using System.Collections.Frozen;
 using System.Collections.Generic;
 using System.Linq;
 
 public class ScorableCollection{
-    public HashSet<int> set;
-    public Dictionary<int, int> dict;
-    public List<int> rollResults;
+    public FrozenSet<int> fSet;
+    public FrozenDictionary<int, int> fDict;
+    public readonly List<DiceFace> faces;
 
-    private ScorableCollection(DiceCollection diceCollection)
+    private ScorableCollection(DiceCollection collection)
     {
-        rollResults = diceCollection.GetResultOfRoll();
-        set = rollResults.ToHashSet();
-        dict = new Dictionary<int, int>();
-        foreach(int result in rollResults)
+        faces = collection.GetResultOfRoll();
+        fSet = faces.Select(r => r.number).ToFrozenSet();
+        var dict = new Dictionary<int, int>();
+        foreach(DiceFace face in faces)
         {
-            if(dict.Keys.Contains(result))
+            if(dict.Keys.Contains(face.number))
             {
-                dict[result] += 1;
+                dict[face.number] += 1;
             }
             else
             {
-                dict[result] = 1;
+                dict[face.number] = 1;
             }
         }
+        fDict = dict.ToFrozenDictionary();
     }
 
     public static ScorableCollection NewScorableCollection(DiceCollection diceCollection)

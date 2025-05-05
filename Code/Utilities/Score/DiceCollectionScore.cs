@@ -1,22 +1,33 @@
 using System.Collections.Generic;
 using System.Linq;
+using Godot;
 
 public class DiceCollectionScore{
     public ScoreRuleCollection scoreRules = ScoreRuleCollection.GetDefaultRules();
-    public ScorableCollection scorableResult;
     public int score = 0;
 
-    public int CalculateScore()
+    public int CalculateScore(DiceCollection collection)
     {
-        int calculatedScore = 0;
+        var scorableResult = ScorableCollection.NewScorableCollection(collection);
+        int calculatedScore = -1;
+        HashSet<RootDice> diceUsed = [];
         foreach(IScoreRule scoreRule in scoreRules.scoreRuleList)
         {
-            //need to fix this with new scoring return
-            // var newScore = scoreRule.GetScore(scorableResult);
-            // if(newScore > calculatedScore)
-            // {
-            //     calculatedScore = newScore;
-            // }
+            var newScore = scoreRule.GetScore(scorableResult);
+            if(newScore.Item1 > calculatedScore)
+            {
+                calculatedScore = newScore.Item1;
+                diceUsed = newScore.Item2;
+            }
+        }
+
+        if(calculatedScore == -1) {return -1;}
+
+        if(diceUsed.Count < collection.diceList.Count)
+        {
+            var moreScore = CalculateScore(collection.RemoveDice(diceUsed));
+            if(moreScore == -1) {return score;}
+            calculatedScore += moreScore;
         }
         
         if(calculatedScore > score)
@@ -29,19 +40,17 @@ public class DiceCollectionScore{
 
     public DiceCollectionScore(DiceCollection collection)
     {
-        scorableResult = ScorableCollection.NewScorableCollection(collection);
-        score = CalculateScore();
+        score = CalculateScore(collection);
     }
 
 
     public int RecalculateScore(DiceCollection collection)
     {
-        score = 0;
-        scorableResult = ScorableCollection.NewScorableCollection(collection);
+        var scorableResult = ScorableCollection.NewScorableCollection(collection);
 
         if(scorableResult == null) {return 0;}
 
-        score = CalculateScore();
+        score = CalculateScore(collection);
         return score;
     }
 }
