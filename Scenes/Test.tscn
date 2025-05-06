@@ -122,6 +122,9 @@ near = 0.005
 [node name="DiceHolder" type="Node3D" parent="GameController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 100)
 
+[node name="OutOfPlayDiceLocation" type="Node3D" parent="GameController"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 200)
+
 [node name="GameState" type="Label" parent="GameController"]
 offset_right = 343.0
 offset_bottom = 71.0
@@ -130,3 +133,8 @@ offset_bottom = 71.0
 offset_top = 74.0
 offset_right = 343.0
 offset_bottom = 145.0
+
+[node name="ScorePerRoll" type="RichTextLabel" parent="GameController"]
+offset_left = 959.0
+offset_right = 1153.0
+offset_bottom = 277.0

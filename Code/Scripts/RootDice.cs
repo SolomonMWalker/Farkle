@@ -9,7 +9,8 @@ public partial class RootDice : RigidBody3D
 
     private CollisionShape3D collisionShape;
     private MeshInstance3D meshInstance;
-    private Material rootDiceMaterial, rootDiceSelectedMaterial;
+    private Material rootDiceMaterial, rootDiceSelectedMaterial, rootDiceFlashRedMaterial;
+    private AnimationPlayer animationPlayer;
     private Node3D corner;
     private Vector3 velocityUponThrow;
     private DiceFaceCollectionPerDice diceFaceCollection;
@@ -17,7 +18,7 @@ public partial class RootDice : RigidBody3D
     private float edgelength;
     private const string RootDiceMaterialPath = "res://Resources/Materials/RootDiceMaterial.tres";
     private const string RootDiceSelectedMaterialPath = "res://Resources/Materials/RootDiceSelectedMaterial.tres";
-    
+    private const string RootDiceFlashRedMaterialPath = "res://Resources/Materials/RootDiceFlashRedMaterial.tres";
 
     public override void _Ready()
     {
@@ -25,9 +26,11 @@ public partial class RootDice : RigidBody3D
         collisionShape = this.FindChild<CollisionShape3D>("CollisionShape3D");
         meshInstance = this.FindChild<MeshInstance3D>("MeshInstance3D");
         corner = this.FindChild<Node3D>("Corner");
+        animationPlayer = this.FindChild<AnimationPlayer>("AnimationPlayer");
         edgelength = HelperMethods.GetSideLengthFromHalfDiagonal(Position.DistanceTo(corner.Position));
         rootDiceMaterial = GD.Load<Material>(RootDiceMaterialPath);
         rootDiceSelectedMaterial = GD.Load<Material>(RootDiceSelectedMaterialPath);
+        rootDiceFlashRedMaterial = GD.Load<Material>(RootDiceFlashRedMaterialPath);        
         collisionShape.Disabled = true;
         Freeze = true;
         FreezeMode = FreezeModeEnum.Static;
@@ -108,7 +111,7 @@ public partial class RootDice : RigidBody3D
         return diceFaceCollection.GetResultOfRoll();
     }
 
-    public void SelectDice()
+    public void ToggleSelectDice()
     {
         if(selected)
         {
@@ -120,5 +123,22 @@ public partial class RootDice : RigidBody3D
             meshInstance.SetSurfaceOverrideMaterial(0, rootDiceSelectedMaterial);
             selected = true;
         }        
+    }
+
+    public void SelectDice()
+    {
+        meshInstance.SetSurfaceOverrideMaterial(0, rootDiceSelectedMaterial);
+        selected = true;
+    }
+
+    public void UnselectDice()
+    {
+        meshInstance.SetSurfaceOverrideMaterial(0, rootDiceMaterial);
+        selected = false;
+    }
+
+    public void FlashRed()
+    {
+        animationPlayer.Play("SelectedFlashRed");
     }
 }

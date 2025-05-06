@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Godot;
 
@@ -23,12 +24,32 @@ public class DiceCollection{
     {
         diceList = diceFaces.Select(df => df.AssociatedDice).ToImmutableList();
     }
+    public DiceCollection(DiceCollection collection)
+    {
+        var tempDiceList = new List<RootDice>();
+        foreach(RootDice d in collection.diceList)
+        {
+            tempDiceList.Add(d);
+        }
+        diceList = tempDiceList.ToImmutableList();
+    }
 
     public DiceCollection AddDice(RootDice dice)
     {
         var tempDiceList = diceList.Count > 0 ? diceList.ToList() : [];
         tempDiceList.Add(dice);
         return new DiceCollection(tempDiceList);
+    }
+
+    public DiceCollection AddDice(IEnumerable<RootDice> dice)
+    {
+        var tempDiceList = diceList.Concat(dice);
+        return new DiceCollection(tempDiceList);
+    }
+
+    public DiceCollection AddDice(DiceCollection collection)
+    {
+        return AddDice(collection.diceList);
     }
 
     public DiceCollection RemoveDice(RootDice dice)
@@ -52,6 +73,18 @@ public class DiceCollection{
     }
 
     public bool HasUnusedScoreDice() => _calculatedScoreResult.UnusedDice.Count() > 0;
+
+    public int Count()
+    {
+        if(diceList == null || diceList.IsEmpty)
+        {
+            return 0;
+        }
+        else
+        {
+            return diceList.Count;
+        }
+    }
 
     public bool PointTooClose(Vector3 point, float margin)
     {
@@ -125,4 +158,5 @@ public class DiceCollection{
     }
 
     public IEnumerable<DiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
+    public void FlashRed() => diceList.ForEach(d => d.FlashRed());
 }
