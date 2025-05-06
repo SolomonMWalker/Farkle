@@ -1,51 +1,35 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Metadata.Ecma335;
 
 public interface IScoreRule{
     public CalculatedScoreResult GetScore(ScorableCollection scorableResult);
 }
 
-public class SingleOneScoreRule : IScoreRule{
-    public CalculatedScoreResult GetScore(ScorableCollection scorableResult)
+public class SingleNumScoreRule(int num, int scoreOfOneNum) : IScoreRule
+{
+    public int Num { get; } = num;
+    public int ScoreOfOneNum { get; } = scoreOfOneNum;
+
+    public static IEnumerable<SingleNumScoreRule> GenerateSingleNumScoreRules(IEnumerable<(int num, int score)> numsAndScores)
     {
-        if(scorableResult.fDict == null ||
-            !scorableResult.fDict.ContainsKey(1))
-        {
-            return new (-1, []);
-        }
+        SingleNumScoreRule[] scoreRules = new SingleNumScoreRule[numsAndScores.Count()];
 
-        var diceFaceScoredOne = scorableResult.faces
-            .Where(f => f.number == 1);
-        var diceFaceScoredOneCount = diceFaceScoredOne.Count();
-
-        if(diceFaceScoredOneCount > 2)
+        (int num, int score)[] numsAndScoresDistinct = [.. numsAndScores.Distinct()];
+        for(int i = 0; i < numsAndScores.Count(); i++)
         {
-            return new (-1, []);
-        }
-        if(diceFaceScoredOneCount == 1)
-        {
-            return new (100, scorableResult.diceCollection.RemoveDice(diceFaceScoredOne.Select(df => df.AssociatedDice)).diceList);
-        }
-        if (diceFaceScoredOneCount == 2)
-        {
-            return new (200, scorableResult.diceCollection.RemoveDice(diceFaceScoredOne.Select(df => df.AssociatedDice)).diceList);
+            scoreRules[i] = new SingleNumScoreRule(numsAndScoresDistinct[i].num, numsAndScoresDistinct[i].score);
         }
         
-        return new (-1, []);
+        return scoreRules;
     }
-}
 
-public class SingleFiveScoreRule : IScoreRule{
     public CalculatedScoreResult GetScore(ScorableCollection scorableResult)
     {
-        if(scorableResult.fDict == null ||
-            !scorableResult.fDict.ContainsKey(5))
-        {
-            return new (-1, []);
-        }
+        if(scorableResult.fDict == null || !scorableResult.fDict.ContainsKey(Num)) {return new (-1, []);}
 
         var diceFaceScored = scorableResult.faces
-            .Where(f => f.number == 5);
+            .Where(f => f.number == Num);
         var diceFaceScoredCount = diceFaceScored.Count();
 
         if(diceFaceScoredCount > 2)
@@ -54,11 +38,13 @@ public class SingleFiveScoreRule : IScoreRule{
         }
         if(diceFaceScoredCount == 1)
         {
-            return new (50, scorableResult.diceCollection.RemoveDice(diceFaceScored.Select(df => df.AssociatedDice)).diceList);
+            return new (ScoreOfOneNum, 
+                scorableResult.diceCollection.RemoveDice(diceFaceScored.Select(df => df.AssociatedDice)).diceList);
         }
         if (diceFaceScoredCount == 2)
         {
-            return new (100, scorableResult.diceCollection.RemoveDice(diceFaceScored.Select(df => df.AssociatedDice)).diceList);
+            return new (ScoreOfOneNum * 2, 
+                scorableResult.diceCollection.RemoveDice(diceFaceScored.Select(df => df.AssociatedDice)).diceList);
         }
         
         return new (-1, []);
@@ -76,7 +62,7 @@ public class ThreeOrMoreOfAKindScoreRule : IScoreRule{
 
         //if mult is 4 or up, only one per collection
         //else, there might be more, so get the highest scoring group first
-        int diceNumber = highestMultiple > scorableResult.faces.Count() / 2 ? 
+        int diceNumber = scorableResult.faces.Count() - highestMultiple >= highestMultiple ? 
             scorableResult.fDict
                 .Where(x => x.Value == highestMultiple)
                 .Select(x => x.Key)

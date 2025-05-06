@@ -12,15 +12,20 @@ public class ScoreRuleCollection
 
     public ScoreRuleCollection(IEnumerable<IScoreRule> rules)
     {
-        scoreRuleList = rules.ToImmutableList();
+        scoreRuleList = [.. rules];
     }
 
     public static ScoreRuleCollection GetDefaultRules()
     {
-        return new ScoreRuleCollection([
-            new SingleOneScoreRule(),
-            new SingleFiveScoreRule(),
-            new ThreeOrMoreOfAKindScoreRule()
-        ]);
+        List<(int num, int score)> singleNumScores = [(1, 100), (5, 50)];
+
+        List<IScoreRule> ruleList = [];
+        foreach(SingleNumScoreRule rule in SingleNumScoreRule.GenerateSingleNumScoreRules(singleNumScores))
+        {
+            ruleList.Add(rule);
+        }
+        ruleList.Add(new ThreeOrMoreOfAKindScoreRule());
+
+        return new ScoreRuleCollection(ruleList);
     }
 }

@@ -20,5 +20,4 @@ public partial class DiceFace : Label3D
         number = newNumber;
         Text = number.ToString();
     }
-
 }

@@ -10,6 +10,7 @@ public class DiceCollection{
     public CalculatedScoreResult CalculateScoreResult { get => _calculatedScoreResult;}
     private CalculatedScoreResult _calculatedScoreResult;
 
+    //Constructors
     public DiceCollection()
     {
         diceList = [];
@@ -17,26 +18,21 @@ public class DiceCollection{
 
     public DiceCollection(IEnumerable<RootDice> rootDice)
     {
-        diceList = rootDice.ToImmutableList();
+        diceList = [.. rootDice];
     }
 
     public DiceCollection(IEnumerable<DiceFace> diceFaces)
     {
-        diceList = diceFaces.Select(df => df.AssociatedDice).ToImmutableList();
-    }
-    public DiceCollection(DiceCollection collection)
-    {
-        var tempDiceList = new List<RootDice>();
-        foreach(RootDice d in collection.diceList)
-        {
-            tempDiceList.Add(d);
-        }
-        diceList = tempDiceList.ToImmutableList();
+        diceList = [.. diceFaces.Select(df => df.AssociatedDice)];
     }
 
+    public DiceCollection(DiceCollection collection) => diceList = collection.diceList;
+
+
+    //Immutable modifiers, return new DiceCollection
     public DiceCollection AddDice(RootDice dice)
     {
-        var tempDiceList = diceList.Count > 0 ? diceList.ToList() : [];
+        List<RootDice> tempDiceList = !diceList.IsEmpty ? [.. diceList] : [];
         tempDiceList.Add(dice);
         return new DiceCollection(tempDiceList);
     }
@@ -47,24 +43,21 @@ public class DiceCollection{
         return new DiceCollection(tempDiceList);
     }
 
-    public DiceCollection AddDice(DiceCollection collection)
-    {
-        return AddDice(collection.diceList);
-    }
+    public DiceCollection AddDice(DiceCollection collection) => AddDice(collection.diceList);
 
     public DiceCollection RemoveDice(RootDice dice)
     {
         if(!diceList.Contains(dice)){return this;}
 
-        var tempDiceList = diceList.ToList();
+        List<RootDice> tempDiceList = [.. diceList];
         tempDiceList.Remove(dice);
         return new DiceCollection(tempDiceList);
     }
-    public DiceCollection RemoveDice(IEnumerable<RootDice> dice){
-        return new DiceCollection(diceList.Where(d => !dice.Contains(d)).ToList());
-    }
+    
+    public DiceCollection RemoveDice(IEnumerable<RootDice> dice) => new([.. diceList.Where(d => !dice.Contains(d))]);
     public DiceCollection RemoveDice(DiceCollection dc) => RemoveDice(dc.diceList);
 
+    //Scoring methods
     public CalculatedScoreResult CalculateScore()
     {
         if(diceList.IsEmpty){return new (-1, null);}
@@ -72,6 +65,7 @@ public class DiceCollection{
         return _calculatedScoreResult;
     }
 
+    //Get properties of Dice
     public bool HasUnusedScoreDice() => _calculatedScoreResult.UnusedDice.Count() > 0;
 
     public int Count()

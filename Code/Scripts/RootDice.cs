@@ -38,24 +38,11 @@ public partial class RootDice : RigidBody3D
         SetupDiceFaces();
     }
 
-    public void GetCollisions(Vector2 mouse)
-    {
-        var space = GetWorld3D().DirectSpaceState;
-        var start = GetViewport().GetCamera3D().ProjectRayOrigin(mouse);
-        var end = GetViewport().GetCamera3D().ProjectPosition(mouse, 1000);
-        var queryParams = new PhysicsRayQueryParameters3D();
-        queryParams.From = start;
-        queryParams.To = end;
-
-        var result = space.IntersectRay(queryParams);
-        GD.Print(result);
-    }
-
     public void SetupDiceFaces()
     {
         var diceFaceParent = FindChild("DiceFaces");
         var diceFaces = diceFaceParent.GetChildren<DiceFace>();
-        diceFaceCollection = new DiceFaceCollectionPerDice();
+        diceFaceCollection = new ();
         diceFaceCollection.faces = diceFaces;
     }
 
@@ -96,20 +83,9 @@ public partial class RootDice : RigidBody3D
         Freeze = false;
     }
 
-    public void DisableCollision()
-    {
-        collisionShape.Disabled = true;
-    }
-
-    public void EnableCollision()
-    {
-        collisionShape.Disabled = false;
-    }
-
-    public DiceFace GetResultOfRoll()
-    {
-        return diceFaceCollection.GetResultOfRoll();
-    }
+    public void DisableCollision() {collisionShape.Disabled = true;}
+    public void EnableCollision() {collisionShape.Disabled = false;}
+    public DiceFace GetResultOfRoll() {return diceFaceCollection.GetResultOfRoll();}
 
     public void ToggleSelectDice()
     {

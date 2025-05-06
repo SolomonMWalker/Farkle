@@ -206,7 +206,7 @@ public partial class GameController : Node3D
 
     public void CreateDiceCollection()
     {
-        var tempDiceList = new List<RootDice>();
+        List<RootDice> tempDiceList = [];
         for(int i = 0; i < diceAmount; i++)
         {
             var dice = packedRootDice.Instantiate<RootDice>();
