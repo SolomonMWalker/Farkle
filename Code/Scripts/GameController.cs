@@ -19,8 +19,9 @@ public partial class GameController : Node3D
     private CameraController cameraController;
     private GameStateManager gameStateManager;
     private Vector2 mousePosition;
-    private Label gameStateLabel, scoreLabel;
+    private Label gameStateLabel, scoreLabel, farkleLabel;
     private RichTextLabel scorePerRollLabel;
+    private bool farkled = false;
 
     public override void _Ready()
     {
@@ -31,14 +32,16 @@ public partial class GameController : Node3D
         outOfPlayDiceLocation = this.FindChild<Node3D>("OutOfPlayDiceLocation");
         packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
         cameraController = this.FindChild<CameraController>("CameraController");
-        gameStateLabel = this.FindChild<Label>("GameState");
-        scoreLabel = this.FindChild<Label>("Score");
-        scorePerRollLabel = this.FindChild<RichTextLabel>("ScorePerRoll");
+        gameStateLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("GameState");
+        scoreLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("Score");
+        farkleLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("FarkleLabel");
+        scorePerRollLabel = this.FindChild<Control>("ControlParent").FindChild<RichTextLabel>("ScorePerRoll");
         gameStateManager = new GameStateManager();
         mousePosition = Vector2.Zero;
         scoringDiceCollection = new DiceCollection();
         scoredDiceCollection = new DiceCollection();
 
+        ClearFarkle();
         CreateDiceCollection();
     }
 
@@ -83,6 +86,14 @@ public partial class GameController : Node3D
         {
             if(rollableDiceCollection.IsDoneRolling() && !cameraController.IsAnimationPlaying())
             {
+                if(rollableDiceCollection.CalculateScoreResult == null)
+                {
+                    if(rollableDiceCollection.CalculateScore().Score == -1)
+                    {
+                        Farkle();
+                        farkled = true;
+                    }
+                }
                 gameStateManager.ProgressState();
             }
         }
@@ -163,45 +174,73 @@ public partial class GameController : Node3D
 
     public void HandleSelectDiceState()
     {
-        if(Input.IsActionJustPressed("space"))
+        if(farkled)
+        {
+            if(Input.IsActionJustPressed("space"))
             {
-                scoringDiceCollection.CalculateScore();
-                if(scoringDiceCollection.CalculateScoreResult.Score == -1)
+                ClearFarkle();
+                farkled = false;
+
+                persistentDiceCollection.diceList.ForEach(d => d.UnselectDice());
+                rollableDiceCollection = new DiceCollection(persistentDiceCollection);
+                MoveRollableDiceOffCamera();
+                scoredDiceCollection = new DiceCollection();
+
+                scoringDiceCollection = new DiceCollection();
+
+                cameraController.MoveToUserPerspectiveLocation();
+                gameStateManager.ProgressState();
+            }
+        }
+        else if(Input.IsActionJustPressed("space"))
+        {
+            if(scoringDiceCollection.Count() == 0)
+            {
+                return;
+            }
+            scoringDiceCollection.CalculateScore();
+            if(scoringDiceCollection.HasUnusedScoreDice())
+            {
+                scoringDiceCollection.CalculateScoreResult.UnusedDice.ToList()
+                    .ForEach(d => d.FlashRed());
+            }
+            else
+            {
+                scorePerRollLabel.Text += $"score of roll = {scoringDiceCollection.CalculateScoreResult.Score}\n";
+
+                var scoredDiceCount = scoredDiceCollection.Count() + scoringDiceCollection.Count();
+                if(scoredDiceCount == persistentDiceCollection.diceList.Count)
                 {
-                    scoringDiceCollection.diceList.ForEach(d => d.FlashRed());
-                }
-                else if(scoringDiceCollection.HasUnusedScoreDice())
-                {
-                    scoringDiceCollection.CalculateScoreResult.UnusedDice.ToList()
-                        .ForEach(d => d.FlashRed());
+                    persistentDiceCollection.diceList.ForEach(d => d.UnselectDice());
+                    rollableDiceCollection = new DiceCollection(persistentDiceCollection);
+                    MoveRollableDiceOffCamera();
+                    scoredDiceCollection = new DiceCollection();
                 }
                 else
                 {
-                    scorePerRollLabel.Text += $"score of roll = {scoringDiceCollection.CalculateScoreResult.Score}\n";
-
-                    var scoredDiceCount = scoredDiceCollection.Count() + scoringDiceCollection.Count();
-                    if(scoredDiceCount == persistentDiceCollection.diceList.Count)
-                    {
-                        persistentDiceCollection.diceList.ForEach(d => d.UnselectDice());
-                        rollableDiceCollection = new DiceCollection(persistentDiceCollection);
-                        MoveRollableDiceOffCamera();
-                        scoredDiceCollection = new DiceCollection();
-                    }
-                    else
-                    {
-                        rollableDiceCollection = rollableDiceCollection.RemoveDice(scoringDiceCollection);
-                        scoredDiceCollection = scoredDiceCollection.AddDice(scoringDiceCollection);
-                        scoredDiceCollection.TurnOff();
-                        scoredDiceCollection.diceList.ForEach(d => d.UnselectDice());
-                        MoveScoredDiceOffCamera();
-                    }
-
-                    scoringDiceCollection = new DiceCollection();
-
-                    cameraController.MoveToUserPerspectiveLocation();
-                    gameStateManager.ProgressState();
+                    rollableDiceCollection = rollableDiceCollection.RemoveDice(scoringDiceCollection);
+                    scoredDiceCollection = scoredDiceCollection.AddDice(scoringDiceCollection);
+                    scoredDiceCollection.TurnOff();
+                    scoredDiceCollection.diceList.ForEach(d => d.UnselectDice());
+                    MoveScoredDiceOffCamera();
                 }
+
+                scoringDiceCollection = new DiceCollection();
+
+                cameraController.MoveToUserPerspectiveLocation();
+                gameStateManager.ProgressState();
             }
+        }
+    }
+
+    public void Farkle()
+    {
+        farkleLabel.Text = "You Farkled";
+    }
+
+    public void ClearFarkle()
+    {
+        farkleLabel.Text = "";
     }
 
     public void CreateDiceCollection()

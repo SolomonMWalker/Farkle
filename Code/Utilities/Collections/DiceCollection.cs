@@ -8,7 +8,7 @@ public class DiceCollection{
     public ImmutableList<RootDice> diceList;
 
     public CalculatedScoreResult CalculateScoreResult { get => _calculatedScoreResult;}
-    private CalculatedScoreResult _calculatedScoreResult;
+    private CalculatedScoreResult _calculatedScoreResult = null;
 
     //Constructors
     public DiceCollection()
