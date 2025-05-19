@@ -3,14 +3,21 @@ using Godot;
 
 public class GameStateManager{
 
-    private GameState gameState = GameState.PreRoll;
-    private readonly GameState[] stateProgression = {
+    private GameState gameState = GameState.PlayerSetup;
+    private SelectDiceSubstate selectDiceSubstate = SelectDiceSubstate.SelectingDice;
+    private readonly GameState[] stateProgression = [
         GameState.PreRoll,
         GameState.RollReady,
         GameState.Rolling,
         GameState.SelectDice,
         GameState.ExitDiceZoomAnimation
-    };
+    ];
+
+    public GameState StartGame()
+    {
+        gameState = GameState.PreRoll;
+        return gameState;
+    } 
 
     public GameState ProgressState()
     {
@@ -19,17 +26,33 @@ public class GameStateManager{
         return gameState;
     }
 
-    public GameState GetState()
+    public GameState GetState => gameState;
+
+    public SelectDiceSubstate Farkle()
     {
-        return gameState;
+        selectDiceSubstate = SelectDiceSubstate.Farkled;
+        return selectDiceSubstate;
     }
 
+    public SelectDiceSubstate ClearFarkle()
+    {
+        selectDiceSubstate = SelectDiceSubstate.SelectingDice;
+        return selectDiceSubstate;
+    }
+
+    public SelectDiceSubstate GetSelectDiceSubstate => selectDiceSubstate;
 }
 
 public enum GameState{
+    PlayerSetup,
     PreRoll,
     RollReady,
     Rolling,
     SelectDice,
     ExitDiceZoomAnimation,
+}
+
+public enum SelectDiceSubstate{
+    Farkled,
+    SelectingDice,
 }
