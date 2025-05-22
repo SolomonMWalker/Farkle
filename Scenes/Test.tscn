@@ -145,6 +145,12 @@ offset_top = 74.0
 offset_right = 343.0
 offset_bottom = 145.0
 
+[node name="OnLastRound" type="Label" parent="GameController/ControlParent"]
+layout_mode = 0
+offset_top = 186.0
+offset_right = 343.0
+offset_bottom = 257.0
+
 [node name="ScorePerRoll" type="RichTextLabel" parent="GameController/ControlParent"]
 layout_mode = 0
 offset_left = 959.0

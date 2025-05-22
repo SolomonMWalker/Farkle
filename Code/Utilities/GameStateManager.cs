@@ -1,5 +1,4 @@
 using System;
-using Godot;
 
 public class GameStateManager{
 
@@ -40,11 +39,14 @@ public class GameStateManager{
         return selectDiceSubstate;
     }
 
+    public GameState GameOver() => gameState = GameState.GameOver;
+
     public SelectDiceSubstate GetSelectDiceSubstate => selectDiceSubstate;
 }
 
 public enum GameState{
     PlayerSetup,
+    GameOver,
     PreRoll,
     RollReady,
     Rolling,
@@ -52,7 +54,8 @@ public enum GameState{
     ExitDiceZoomAnimation,
 }
 
-public enum SelectDiceSubstate{
+public enum SelectDiceSubstate
+{
     Farkled,
     SelectingDice,
 }
