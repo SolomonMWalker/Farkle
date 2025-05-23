@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection.Metadata.Ecma335;
 
 public interface IScoreRule{
-    public CalculatedScoreResult GetScore(ScorableCollection scorableResult);
+    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection);
 }
 
 public class SingleNumScoreRule(int num, int scoreOfOneNum) : IScoreRule
@@ -24,11 +24,11 @@ public class SingleNumScoreRule(int num, int scoreOfOneNum) : IScoreRule
         return scoreRules;
     }
 
-    public CalculatedScoreResult GetScore(ScorableCollection scorableResult)
+    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection)
     {
-        if(scorableResult.fDict == null || !scorableResult.fDict.ContainsKey(Num)) {return new (-1, []);}
+        if(scorableCollection.dict == null || !scorableCollection.dict.ContainsKey(Num)) {return new (-1, []);}
 
-        var diceFaceScored = scorableResult.faces
+        var diceFaceScored = scorableCollection.faces
             .Where(f => f.number == Num);
         var diceFaceScoredCount = diceFaceScored.Count();
 
@@ -39,43 +39,90 @@ public class SingleNumScoreRule(int num, int scoreOfOneNum) : IScoreRule
         if(diceFaceScoredCount == 1)
         {
             return new (ScoreOfOneNum, 
-                scorableResult.diceCollection.RemoveDice(diceFaceScored.Select(df => df.AssociatedDice)).diceList);
+                scorableCollection.diceCollection.RemoveDice(diceFaceScored.Select(df => df.AssociatedDice)).diceList);
         }
         if (diceFaceScoredCount == 2)
         {
             return new (ScoreOfOneNum * 2, 
-                scorableResult.diceCollection.RemoveDice(diceFaceScored.Select(df => df.AssociatedDice)).diceList);
+                scorableCollection.diceCollection.RemoveDice(diceFaceScored.Select(df => df.AssociatedDice)).diceList);
         }
         
         return new (-1, []);
     }
 }
 
-public class ThreeOrMoreOfAKindScoreRule : IScoreRule{
-    public CalculatedScoreResult GetScore(ScorableCollection scorableResult)
+public class ThreeOrMoreOfAKindScoreRule : IScoreRule
+{
+    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection)
     {
-        if(scorableResult.fDict == null){return new (-1, null);}
+        if (scorableCollection.dict == null) { return new(-1, null); }
 
-        var highestMultiple = scorableResult.fDict.Values.Max();
+        var highestMultiple = scorableCollection.dict.Values.Max();
 
-        if(highestMultiple < 3) {return new (-1, null);}
+        if (highestMultiple < 3) { return new(-1, null); }
 
         //if mult is 4 or up, only one per collection
         //else, there might be more, so get the highest scoring group first
-        int diceNumber = scorableResult.faces.Count() - highestMultiple >= highestMultiple ? 
-            scorableResult.fDict
+        int diceNumber = scorableCollection.faces.Count() - highestMultiple >= highestMultiple ?
+            scorableCollection.dict
                 .Where(x => x.Value == highestMultiple)
                 .Select(x => x.Key)
                 .Single() :
-            scorableResult.fDict
+            scorableCollection.dict
                 .Where(x => x.Value == 3)
                 .Max(x => x.Key);
 
         //score = score of threeOfAKind + (1000 for each extra past three)
         //comes out to score with 3 + (1000 * (number of dice over three that exists))
-        int score = diceNumber is 1 ? 1000 + 1000*(highestMultiple - 3) : diceNumber*100 + 1000*(highestMultiple - 3);
+        int score = diceNumber is 1 ? 1000 + 1000 * (highestMultiple - 3) : diceNumber * 100 + 1000 * (highestMultiple - 3);
 
-        return new (score, 
-            scorableResult.faces.Where(f => f.number != diceNumber).Select(f => f.AssociatedDice).ToList());
+        return new(score,
+            [.. scorableCollection.faces.Where(f => f.number != diceNumber).Select(f => f.AssociatedDice)]);
+    }
+}
+
+public class StraightScoreRule : IScoreRule
+{
+    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection)
+    {
+        (int start, int length) longestStraightStartAndLength = (0, 0);
+
+        int straightStart = 0;
+        int straightLength = 0;
+        int lastNumberInSet = 0;
+        for (int i = 0; i < scorableCollection.sSet.Count; i++)
+        {
+            if (straightStart == 0)
+            {
+                straightStart = scorableCollection.sSet[i];
+                straightLength = 1;
+                lastNumberInSet = straightStart;
+            }
+            else if (scorableCollection.sSet[i] == lastNumberInSet + 1)
+            {
+                straightLength++;
+            }
+            else
+            {
+                if (longestStraightStartAndLength.length > straightLength)
+                {
+                    longestStraightStartAndLength = (straightStart, straightLength);
+                    straightStart = scorableCollection.sSet[i];
+                    straightLength = 1;
+                    lastNumberInSet = straightStart;
+                }
+            }
+        }
+
+        if (longestStraightStartAndLength.length < 5)
+        {
+            return new(-1, []);
+        }
+
+        var score = longestStraightStartAndLength.length > 5 ? 2000 : 1500;
+        var unusedDice = scorableCollection.faces.Where(f => f.number < longestStraightStartAndLength.start &&
+            f.number >= longestStraightStartAndLength.start + longestStraightStartAndLength.length)
+            .Select(f => f.AssociatedDice);
+        return new(score, [.. unusedDice]);
     }
 }

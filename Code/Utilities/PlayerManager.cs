@@ -7,7 +7,6 @@ public class PlayerManager
     public List<string> players = [];
     public int currentPlayerTurnIndex = 0;
 
-    private bool isLastRound = false;
     private int lastRoundStartingIndex;
 
     public PlayerManager() { }
@@ -38,7 +37,6 @@ public class PlayerManager
 
     public void MakeLastRound()
     {
-        isLastRound = true;
         lastRoundStartingIndex = currentPlayerTurnIndex;
     }
 
@@ -118,3 +116,11 @@ public class PlayerManager
 }
 
 public record PlayerScore(string Player, int Score);
+public record ScoreEntry(int Score, string Description);
+
+public class PlayerScoreHistory()
+{
+    public string Player { get; set; }
+    public int TotalScore { get; set; } = 0;
+    public List<ScoreEntry> ScoreEntries {get; set; } = [];
+}

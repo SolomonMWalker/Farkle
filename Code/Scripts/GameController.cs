@@ -48,8 +48,6 @@ public partial class GameController : Node3D
         playerInputLineEdit.TextSubmitted += HandlePlayerNameSubmitted;
         playerInputLineEdit.KeepEditingOnTextSubmit = true;
 
-        ClearFarkle();
-        CreateDiceCollection();
         StartPlayerSetup();
     }
 
@@ -81,7 +79,7 @@ public partial class GameController : Node3D
                 {
                     ReadyDiceForRoll();
                     throwLocationBall.Animate();
-                    gameStateManager.ProgressState();
+                    TryProgressState();
                 }
                 break;
             case GameState.RollReady:
@@ -90,7 +88,7 @@ public partial class GameController : Node3D
                     ThrowDice();
                     throwLocationBall.StopAnimation();
                     cameraController.MoveToDiceZoomLocation();
-                    gameStateManager.ProgressState();
+                    TryProgressState();
                 }
                 break;
             case GameState.Rolling:
@@ -103,7 +101,7 @@ public partial class GameController : Node3D
                             Farkle();
                         }
                     }
-                    gameStateManager.ProgressState();
+                    TryProgressState();
                 }
                 break;
             case GameState.SelectDice:
@@ -112,8 +110,11 @@ public partial class GameController : Node3D
             case GameState.ExitDiceZoomAnimation:
                 if (!cameraController.IsAnimationPlaying())
                 {
-                    gameStateManager.ProgressState();
+                    TryProgressState();
                 }
+                break;
+            case GameState.GameOver:
+                HandleGameOverState();
                 break;
         }
 
@@ -123,9 +124,9 @@ public partial class GameController : Node3D
         }
     }
 
-    public void SetPlayerTurnLabel()
+    public void SetPlayerTurnLabel(bool gameOver = false)
     {
-        playerTurnLabel.Text = $"{activePlayerManager.GetWhoseTurnItIs()}'s turn";
+        playerTurnLabel.Text = gameOver ? "GameOver" : $"{activePlayerManager.GetWhoseTurnItIs()}'s turn";
     }
 
     public void StartGame()
@@ -141,6 +142,9 @@ public partial class GameController : Node3D
 
     public void StartPlayerSetup()
     {
+        gameStateManager.StartPlayerSetup();
+        ClearFarkle();
+        CreateDiceCollection();
         playerTurnLabel.Text = "Enter player 1 name";
         playerInputLineEdit.Edit();
     }
@@ -226,11 +230,17 @@ public partial class GameController : Node3D
             {
                 ClearFarkle();
                 ResetAllDice();
-                activePlayerManager.AdvanceTurn();
-                BuildScoreText();
-                SetPlayerTurnLabel();
+                if (TryAdvanceTurn())
+                {
+                    BuildScoreText();
+                    SetPlayerTurnLabel();
+                }
+                else
+                {
+                    GameOver();
+                }
                 cameraController.MoveToUserPerspectiveLocation();
-                gameStateManager.ProgressState();
+                TryProgressState();
             }
         }
         else if (Input.IsActionJustPressed("space") && TryRecordScore())
@@ -246,26 +256,42 @@ public partial class GameController : Node3D
             }
 
             cameraController.MoveToUserPerspectiveLocation();
-            gameStateManager.ProgressState();
+            TryProgressState();
         }
         else if (Input.IsActionJustPressed("enter") && TryRecordScore())
         {
             activePlayerManager.AddToPlayerScore(activePlayerManager.GetWhoseTurnItIs(), roundScore);
             roundScore = 0;
+            BeginLastRoundIfPlayerAtMaxScore();
             ResetAllDice();
             if (TryAdvanceTurn())
             {
                 BuildScoreText();
                 SetPlayerTurnLabel();
-                cameraController.MoveToUserPerspectiveLocation();
-                gameStateManager.ProgressState();
             }
             else
             {
-                gameStateManager.GameOver();
+                GameOver();
             }
             
+            cameraController.MoveToUserPerspectiveLocation();
+            TryProgressState();
         }
+    }
+
+    public void HandleGameOverState()
+    {
+        if (Input.IsActionJustPressed("space"))
+        {
+            StartPlayerSetup();
+        }
+    }
+
+    public void GameOver()
+    {
+        gameStateManager.GameOver();
+        BuildScoreText(gameOver: true);
+        SetPlayerTurnLabel(gameOver: true);
     }
 
     public bool TryAdvanceTurn()
@@ -293,6 +319,7 @@ public partial class GameController : Node3D
                 .ForEach(d => d.FlashRed());
             return false;
         }
+        scoreLabel.Text = "";
         roundScore += selectedDiceCollection.CalculateScoreResult.Score;
         BuildScoreText();
         return true;
@@ -307,6 +334,16 @@ public partial class GameController : Node3D
             lastRoundLabel.Text = $"On last round with {lastRoundPlayerScore.Player} leading!";
             lastRoundPlayerManager = regularPlayerManager.GetLastRoundPlayerManager(playerScoreAtMaxScore.Player);
             activePlayerManager = lastRoundPlayerManager;
+            return true;
+        }
+        return false;
+    }
+
+    public bool TryProgressState()
+    {
+        if (gameStateManager.GetState is not GameState.GameOver)
+        {
+            gameStateManager.ProgressState();
             return true;
         }
         return false;
@@ -399,16 +436,18 @@ public partial class GameController : Node3D
         rollableDiceCollection.diceList.ForEach(d => d.GlobalPosition = outOfPlayDiceLocation.GlobalPosition);
     }
 
-    public void BuildScoreText()
+    public void BuildScoreText(bool gameOver = false)
     {
         var scoreString = "";
         foreach(var player in activePlayerManager.players)
         {
             scoreString += $"{player} total score = {activePlayerManager.playerScores[player]}\n";
         }
-        scoreString += $"{activePlayerManager.GetWhoseTurnItIs()} is playing the current round.\n";
-        scoreString += $"Round score = {roundScore}";
-
+        if (!gameOver)
+        {
+            scoreString += $"{activePlayerManager.GetWhoseTurnItIs()} is playing the current round.\n";
+            scoreString += $"Round score = {roundScore}";
+        }
         scorePerRollLabel.Text = scoreString;
     }
 }

@@ -16,6 +16,12 @@ public class GameStateManager{
     {
         gameState = GameState.PreRoll;
         return gameState;
+    }
+
+    public GameState StartPlayerSetup()
+    {
+        gameState = GameState.PlayerSetup;
+        return gameState;
     } 
 
     public GameState ProgressState()
