@@ -14,24 +14,24 @@ public class ScorableCollection{
         diceCollection = collection;
         faces = diceCollection.GetResultOfRoll();
         sSet = [.. faces.Select(r => r.number)];
-        var dict = new Dictionary<int, int>();
+        var buildingDict = new Dictionary<int, int>();
         foreach(DiceFace face in faces)
         {
-            if(dict.Keys.Contains(face.number))
+            if(buildingDict.ContainsKey(face.number))
             {
-                dict[face.number] += 1;
+                buildingDict[face.number] += 1;
             }
             else
             {
-                dict[face.number] = 1;
+                buildingDict[face.number] = 1;
             }
         }
-        this.dict = dict.ToDictionary();
+        dict = buildingDict.ToDictionary();
     }
 
     public static ScorableCollection NewScorableCollection(DiceCollection diceCollection)
     {
-        if(diceCollection == null || diceCollection.diceList.Count == 0)
+        if(diceCollection == null || diceCollection.diceList == null || diceCollection.diceList.Count == 0)
         {
             return null;
         }

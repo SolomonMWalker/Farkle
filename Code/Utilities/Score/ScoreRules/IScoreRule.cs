@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Metadata.Ecma335;
 
 public interface IScoreRule{
     public CalculatedScoreResult GetScore(ScorableCollection scorableCollection);
@@ -61,16 +60,9 @@ public class ThreeOrMoreOfAKindScoreRule : IScoreRule
 
         if (highestMultiple < 3) { return new(-1, null); }
 
-        //if mult is 4 or up, only one per collection
-        //else, there might be more, so get the highest scoring group first
-        int diceNumber = scorableCollection.faces.Count() - highestMultiple >= highestMultiple ?
-            scorableCollection.dict
-                .Where(x => x.Value == highestMultiple)
-                .Select(x => x.Key)
-                .Single() :
-            scorableCollection.dict
-                .Where(x => x.Value == 3)
-                .Max(x => x.Key);
+        int diceNumber = scorableCollection.dict
+            .Where(x => x.Value == highestMultiple)
+            .Max(x => x.Key);            
 
         //score = score of threeOfAKind + (1000 for each extra past three)
         //comes out to score with 3 + (1000 * (number of dice over three that exists))
@@ -101,17 +93,24 @@ public class StraightScoreRule : IScoreRule
             else if (scorableCollection.sSet[i] == lastNumberInSet + 1)
             {
                 straightLength++;
+                lastNumberInSet = scorableCollection.sSet[i];
             }
             else
             {
-                if (longestStraightStartAndLength.length > straightLength)
+                if (straightLength > longestStraightStartAndLength.length)
                 {
                     longestStraightStartAndLength = (straightStart, straightLength);
-                    straightStart = scorableCollection.sSet[i];
-                    straightLength = 1;
-                    lastNumberInSet = straightStart;
                 }
+                straightStart = scorableCollection.sSet[i];
+                straightLength = 1;
+                lastNumberInSet = straightStart;
             }
+        }
+
+        //Check in case last in set was part of straight
+        if (straightLength > longestStraightStartAndLength.length)
+        {
+            longestStraightStartAndLength = (straightStart, straightLength);
         }
 
         if (longestStraightStartAndLength.length < 5)
@@ -119,10 +118,38 @@ public class StraightScoreRule : IScoreRule
             return new(-1, []);
         }
 
+        List<int> numbersInStraight = [];
+        for (int i = longestStraightStartAndLength.start; i < longestStraightStartAndLength.start + longestStraightStartAndLength.length; i++)
+        {
+            numbersInStraight.Add(i);
+        }
+
         var score = longestStraightStartAndLength.length > 5 ? 2000 : 1500;
         var unusedDice = scorableCollection.faces.Where(f => f.number < longestStraightStartAndLength.start &&
             f.number >= longestStraightStartAndLength.start + longestStraightStartAndLength.length)
-            .Select(f => f.AssociatedDice);
+            .Select(f => f.AssociatedDice).ToList();
+        if (scorableCollection.dict.Any(kv => numbersInStraight.Contains(kv.Key) && kv.Value == 2))
+        {
+            var extraDice = scorableCollection.faces.Where(f => f.number == scorableCollection.dict.First(kv => numbersInStraight.Contains(kv.Key) && kv.Value == 2).Key)
+                .Select(f => f.AssociatedDice).First();
+            unusedDice.Add(extraDice);
+        }
         return new(score, [.. unusedDice]);
+    }
+}
+
+public class ThreePairScoreRule : IScoreRule
+{
+    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection)
+    {
+        var pairs = scorableCollection.dict.Where(d => d.Value == 2).ToDictionary();
+
+        if (pairs.Keys.Count < 3)
+        {
+            return new(-1, []);
+        }
+
+        var unusedDice = scorableCollection.faces.Where(f => !pairs.ContainsKey(f.number)).Select(f => f.AssociatedDice);
+        return new(1500, [.. unusedDice]);
     }
 }

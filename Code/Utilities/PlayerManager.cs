@@ -70,7 +70,7 @@ public class PlayerManager
 
     public bool TryAdvanceTurnOnLastRound(out string nextPlayer)
     {
-        if (GetIncrementedCurrentPlayerTurn() == lastRoundStartingIndex)
+        if (GetIncrementedCurrentPlayerTurnIndex() == lastRoundStartingIndex)
         {
             nextPlayer = null;
             return false;
@@ -82,7 +82,7 @@ public class PlayerManager
 
     public string AdvanceTurn()
     {
-        currentPlayerTurnIndex = GetIncrementedCurrentPlayerTurn();
+        currentPlayerTurnIndex = GetIncrementedCurrentPlayerTurnIndex();
         return players[currentPlayerTurnIndex];
     }
 
@@ -99,13 +99,13 @@ public class PlayerManager
         return true;
     }
 
-    private int GetIncrementedCurrentPlayerTurn() => (currentPlayerTurnIndex + 1) % players.Count;
+    private int GetIncrementedCurrentPlayerTurnIndex() => (currentPlayerTurnIndex + 1) % players.Count;
     
     private PlayerManager GetPlayerManagerExceptPlayer(string player)
     {
-        var newPlayerScores = playerScores.Where(ps => ps.Key.Equals(player)).ToDictionary();
+        var newPlayerScores = playerScores.Where(ps => !ps.Key.Equals(player)).ToDictionary();
         List<string> newPlayers = [.. newPlayerScores.Keys];
-        var playerNext = players[(currentPlayerTurnIndex + 1) % players.Count];
+        var playerNext = players[GetIncrementedCurrentPlayerTurnIndex()];
         return new()
         {
             playerScores = newPlayerScores,

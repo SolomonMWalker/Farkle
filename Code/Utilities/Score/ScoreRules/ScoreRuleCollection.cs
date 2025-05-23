@@ -26,6 +26,7 @@ public class ScoreRuleCollection
         }
         ruleList.Add(new ThreeOrMoreOfAKindScoreRule());
         ruleList.Add(new StraightScoreRule());
+        ruleList.Add(new ThreePairScoreRule());
 
         return new ScoreRuleCollection(ruleList);
     }

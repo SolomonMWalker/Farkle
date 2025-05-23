@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using Godot;
 
@@ -94,12 +95,9 @@ public partial class GameController : Node3D
             case GameState.Rolling:
                 if (rollableDiceCollection.IsDoneRolling() && !cameraController.IsAnimationPlaying())
                 {
-                    if (rollableDiceCollection.CalculateScoreResult == null)
+                    if (rollableDiceCollection.Count() != 0 && rollableDiceCollection.CalculateScore()?.Score is -1)
                     {
-                        if (rollableDiceCollection.CalculateScore().Score == -1)
-                        {
-                            Farkle();
-                        }
+                        Farkle();
                     }
                     TryProgressState();
                 }
@@ -226,7 +224,11 @@ public partial class GameController : Node3D
     {
         if (gameStateManager.GetSelectDiceSubstate is SelectDiceSubstate.Farkled)
         {
-            if (Input.IsActionJustPressed("space"))
+            if (onLastRound)
+            {
+                GameOver();
+            }
+            else if (Input.IsActionJustPressed("space"))
             {
                 ClearFarkle();
                 ResetAllDice();
@@ -235,10 +237,7 @@ public partial class GameController : Node3D
                     BuildScoreText();
                     SetPlayerTurnLabel();
                 }
-                else
-                {
-                    GameOver();
-                }
+
                 cameraController.MoveToUserPerspectiveLocation();
                 TryProgressState();
             }
@@ -246,7 +245,7 @@ public partial class GameController : Node3D
         else if (Input.IsActionJustPressed("space") && TryRecordScore())
         {
             var scoredDiceCount = scoredDiceCollection.Count() + selectedDiceCollection.Count();
-            if (scoredDiceCount == persistentDiceCollection.diceList.Count)
+            if (scoredDiceCount == persistentDiceCollection.Count())
             {
                 ResetAllDice();
             }
@@ -262,11 +261,10 @@ public partial class GameController : Node3D
         {
             activePlayerManager.AddToPlayerScore(activePlayerManager.GetWhoseTurnItIs(), roundScore);
             roundScore = 0;
-            BeginLastRoundIfPlayerAtMaxScore();
             ResetAllDice();
             if (TryAdvanceTurn())
             {
-                BuildScoreText();
+                BuildScoreText(onLastRound);
                 SetPlayerTurnLabel();
             }
             else
@@ -299,6 +297,10 @@ public partial class GameController : Node3D
         if (onLastRound && !activePlayerManager.TryAdvanceTurnOnLastRound(out _))
         {
             return false;
+        }
+        if (BeginLastRoundIfPlayerAtMaxScore())
+        {
+            return true;
         }
         activePlayerManager.AdvanceTurn();
         return true;
@@ -443,11 +445,13 @@ public partial class GameController : Node3D
         {
             scoreString += $"{player} total score = {activePlayerManager.playerScores[player]}\n";
         }
-        if (!gameOver)
+        if (gameOver)
         {
-            scoreString += $"{activePlayerManager.GetWhoseTurnItIs()} is playing the current round.\n";
-            scoreString += $"Round score = {roundScore}";
+            scoreString += $"{lastRoundPlayerScore.Player} total score = {lastRoundPlayerScore.Score}\n";
         }
+        scoreString += $"{activePlayerManager.GetWhoseTurnItIs()} is playing the current round.\n";
+        scoreString += $"Round score = {roundScore}";
+
         scorePerRollLabel.Text = scoreString;
     }
 }
