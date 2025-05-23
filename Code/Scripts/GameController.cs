@@ -5,7 +5,7 @@ using Godot;
 
 public partial class GameController : Node3D
 {
-    public const int ScoreToWin = 10000;
+    public const int ScoreToWin = 500;
     public const int DiceAmount = 6;
 
     private DiceCollection persistentDiceCollection, rollableDiceCollection, selectedDiceCollection,
@@ -141,6 +141,8 @@ public partial class GameController : Node3D
     public void StartPlayerSetup()
     {
         gameStateManager.StartPlayerSetup();
+        playerInputLineEdit.Editable = true;
+        playerInputLineEdit.Visible = true;
         ClearFarkle();
         CreateDiceCollection();
         playerTurnLabel.Text = "Enter player 1 name";
