@@ -125,15 +125,12 @@ public class StraightScoreRule : IScoreRule
         }
 
         var score = longestStraightStartAndLength.length > 5 ? 2000 : 1500;
-        var unusedDice = scorableCollection.faces.Where(f => f.number < longestStraightStartAndLength.start &&
-            f.number >= longestStraightStartAndLength.start + longestStraightStartAndLength.length)
-            .Select(f => f.AssociatedDice).ToList();
-        if (scorableCollection.dict.Any(kv => numbersInStraight.Contains(kv.Key) && kv.Value == 2))
+        List<RootDice> usedDice = [];
+        foreach (int number in numbersInStraight)
         {
-            var extraDice = scorableCollection.faces.Where(f => f.number == scorableCollection.dict.First(kv => numbersInStraight.Contains(kv.Key) && kv.Value == 2).Key)
-                .Select(f => f.AssociatedDice).First();
-            unusedDice.Add(extraDice);
+            usedDice.Add(scorableCollection.faces.First(f => f.number == number).AssociatedDice);
         }
+        var unusedDice = scorableCollection.diceCollection.RemoveDice(usedDice).diceList;
         return new(score, [.. unusedDice]);
     }
 }
@@ -149,7 +146,19 @@ public class ThreePairScoreRule : IScoreRule
             return new(-1, []);
         }
 
-        var unusedDice = scorableCollection.faces.Where(f => !pairs.ContainsKey(f.number)).Select(f => f.AssociatedDice);
+
+        List<DiceFace> usedDiceFaces = [];
+        foreach (KeyValuePair<int, int> pair in pairs)
+        {
+            for (int i = 0; i < pair.Value; i++)
+            {
+                usedDiceFaces.Add(scorableCollection.faces.First(f => f.number == pair.Key &&
+                    !usedDiceFaces.Contains(f)));
+            }
+        }
+
+        var unusedDice = scorableCollection.diceCollection.RemoveDice(
+            usedDiceFaces.Select(f => f.AssociatedDice)).diceList;
         return new(1500, [.. unusedDice]);
     }
 }

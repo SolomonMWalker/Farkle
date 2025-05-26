@@ -65,10 +65,11 @@ public partial class RootDice : RigidBody3D
     }
 
     public bool IsDoneRolling() {
-        var velocityIsCloseToZero = Mathf.Abs(LinearVelocity.Length()) < 0.1;
+        var velocityIsCloseToZero = Mathf.Abs(LinearVelocity.Length()) < 0.05;
+        var angularVelocityIsClostToZero = Mathf.Abs(AngularVelocity.Length()) < 0.05;
         var lowestFaceHeightIsCloseToTable = 
-            Mathf.Abs(diceFaceCollection.GetHeightOfLowestFace()) < (edgelength/2) + 0.1 ;
-        return velocityIsCloseToZero && lowestFaceHeightIsCloseToTable;
+            Mathf.Abs(diceFaceCollection.GetHeightOfLowestFace()) < (edgelength/2) + 0.05 ;
+        return velocityIsCloseToZero && angularVelocityIsClostToZero && lowestFaceHeightIsCloseToTable;
     }
 
     public void TurnOff()

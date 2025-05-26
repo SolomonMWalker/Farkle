@@ -5,7 +5,7 @@ using Godot;
 
 public partial class GameController : Node3D
 {
-    public const int ScoreToWin = 500;
+    public const int ScoreToWin = 10000;
     public const int DiceAmount = 6;
 
     private DiceCollection persistentDiceCollection, rollableDiceCollection, selectedDiceCollection,
@@ -124,7 +124,8 @@ public partial class GameController : Node3D
 
     public void SetPlayerTurnLabel(bool gameOver = false)
     {
-        playerTurnLabel.Text = gameOver ? "GameOver" : $"{activePlayerManager.GetWhoseTurnItIs()}'s turn";
+        playerTurnLabel.Text = gameOver ? "GameOver, press space to play again" 
+            : $"{activePlayerManager.GetWhoseTurnItIs()}'s turn";
     }
 
     public void StartGame()
@@ -266,7 +267,7 @@ public partial class GameController : Node3D
             ResetAllDice();
             if (TryAdvanceTurn())
             {
-                BuildScoreText(onLastRound);
+                BuildScoreText();
                 SetPlayerTurnLabel();
             }
             else
@@ -290,7 +291,7 @@ public partial class GameController : Node3D
     public void GameOver()
     {
         gameStateManager.GameOver();
-        BuildScoreText(gameOver: true);
+        BuildScoreText();
         SetPlayerTurnLabel(gameOver: true);
     }
 
@@ -440,14 +441,14 @@ public partial class GameController : Node3D
         rollableDiceCollection.diceList.ForEach(d => d.GlobalPosition = outOfPlayDiceLocation.GlobalPosition);
     }
 
-    public void BuildScoreText(bool gameOver = false)
+    public void BuildScoreText()
     {
         var scoreString = "";
         foreach(var player in activePlayerManager.players)
         {
             scoreString += $"{player} total score = {activePlayerManager.playerScores[player]}\n";
         }
-        if (gameOver)
+        if (onLastRound)
         {
             scoreString += $"{lastRoundPlayerScore.Player} total score = {lastRoundPlayerScore.Score}\n";
         }
