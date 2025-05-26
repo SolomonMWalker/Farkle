@@ -134,19 +134,21 @@ grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 6
 
-[node name="GameState" type="Label" parent="GameController/ControlParent"]
+[node name="Instructions" type="Label" parent="GameController/ControlParent"]
 layout_mode = 0
 offset_right = 343.0
-offset_bottom = 71.0
+offset_bottom = 193.0
+autowrap_mode = 3
 
 [node name="Score" type="Label" parent="GameController/ControlParent"]
 layout_mode = 1
 anchors_preset = -1
-anchor_top = 0.169
-anchor_bottom = 0.169
-offset_top = -35.512
-offset_right = 343.0
-offset_bottom = 35.488
+anchor_top = 0.328
+anchor_bottom = 0.328
+offset_left = 2.0
+offset_top = -35.544
+offset_right = 345.0
+offset_bottom = 35.456
 
 [node name="OnLastRound" type="Label" parent="GameController/ControlParent"]
 layout_mode = 1

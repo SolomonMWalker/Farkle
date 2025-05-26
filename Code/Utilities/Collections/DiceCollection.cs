@@ -6,7 +6,6 @@ using Godot;
 
 public class DiceCollection{
     public ImmutableList<RootDice> diceList;
-
     public CalculatedScoreResult CalculateScoreResult { get => _calculatedScoreResult;}
     private CalculatedScoreResult _calculatedScoreResult = null;
 

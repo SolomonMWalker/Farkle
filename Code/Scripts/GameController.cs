@@ -1,10 +1,10 @@
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 using Godot;
 
 public partial class GameController : Node3D
 {
+    #region Properties
     public const int ScoreToWin = 10000;
     public const int DiceAmount = 6;
 
@@ -17,7 +17,7 @@ public partial class GameController : Node3D
     private ThrowLocationBall throwLocationBall;
     private PackedScene packedRootDice;
     private Vector2 mousePosition;
-    private Label gameStateLabel, scoreLabel, farkleLabel, playerTurnLabel, lastRoundLabel;
+    private Label instructionLabel, scoreLabel, farkleLabel, playerTurnLabel, lastRoundLabel;
     private RichTextLabel scorePerRollLabel;
     private LineEdit playerInputLineEdit;
     private bool arePlayersReady = false;
@@ -25,6 +25,9 @@ public partial class GameController : Node3D
     private PlayerScore lastRoundPlayerScore;
     private int roundScore = 0;
 
+    #endregion
+
+    #region Initialization
     public override void _Ready()
     {
         base._Ready();
@@ -34,7 +37,7 @@ public partial class GameController : Node3D
         outOfPlayDiceLocation = this.FindChild<Node3D>("OutOfPlayDiceLocation");
         packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
         cameraController = this.FindChild<CameraController>("CameraController");
-        gameStateLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("GameState");
+        instructionLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("Instructions");
         scoreLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("Score");
         farkleLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("FarkleLabel");
         playerTurnLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("PlayerTurn");
@@ -49,9 +52,35 @@ public partial class GameController : Node3D
         playerInputLineEdit.TextSubmitted += HandlePlayerNameSubmitted;
         playerInputLineEdit.KeepEditingOnTextSubmit = true;
 
-        StartPlayerSetup();
+        SetupGameStateEnterExitActions();
+
+        CreateDiceCollection();
+
+        gameStateManager.StartPlayerSetup();
     }
 
+    public void SetupGameStateEnterExitActions()
+    {
+        gameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.PlayerSetup, [
+            StartPlayerSetup, 
+        ]);
+        gameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.PreRoll, [
+            ReadyDiceForRoll,
+        ]);
+        gameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.RollReady, [
+            AnimateDiceThrowerBall,
+        ]);
+        gameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.Rolling, [
+            ThrowDice,
+        ]);
+        gameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.SelectDice, [
+            PreSelectDiceFarkleCheck,
+        ]);
+    }
+
+    #endregion
+
+    #region MainGodotFunctions
     public override void _Process(double delta)
     {
         base._Process(delta);
@@ -66,9 +95,18 @@ public partial class GameController : Node3D
         HandleDicePhysics();
     }
 
+    public override void _Input(InputEvent @event)
+    {
+        base._Input(@event);
+        HandleMouseInput(@event);
+    }
+
+    #endregion
+
+    #region MainGameLogic
     public void RunGame()
     {
-        var gameState = gameStateManager.GetState;
+        var gameState = gameStateManager.GameState;
 
         switch (gameState)
         {
@@ -78,27 +116,18 @@ public partial class GameController : Node3D
             case GameState.PreRoll:
                 if (Input.IsActionJustPressed("space"))
                 {
-                    ReadyDiceForRoll();
-                    throwLocationBall.Animate();
                     TryProgressState();
                 }
                 break;
             case GameState.RollReady:
                 if (Input.IsActionJustPressed("space"))
                 {
-                    ThrowDice();
-                    throwLocationBall.StopAnimation();
-                    cameraController.MoveToDiceZoomLocation();
                     TryProgressState();
                 }
                 break;
             case GameState.Rolling:
                 if (rollableDiceCollection.IsDoneRolling() && !cameraController.IsAnimationPlaying())
                 {
-                    if (rollableDiceCollection.Count() != 0 && rollableDiceCollection.CalculateScore()?.Score is -1)
-                    {
-                        Farkle();
-                    }
                     TryProgressState();
                 }
                 break;
@@ -115,39 +144,6 @@ public partial class GameController : Node3D
                 HandleGameOverState();
                 break;
         }
-
-        if (gameStateLabel.Text != gameState.ToString())
-        {
-            gameStateLabel.Text = gameState.ToString();
-        }
-    }
-
-    public void SetPlayerTurnLabel(bool gameOver = false)
-    {
-        playerTurnLabel.Text = gameOver ? "GameOver, press space to play again" 
-            : $"{activePlayerManager.GetWhoseTurnItIs()}'s turn";
-    }
-
-    public void StartGame()
-    {
-        playerInputLineEdit.Editable = false;
-        playerInputLineEdit.Visible = false;
-        gameStateManager.StartGame();
-        regularPlayerManager.StartGame();
-        activePlayerManager = regularPlayerManager;
-        SetPlayerTurnLabel();
-        BuildScoreText();
-    }
-
-    public void StartPlayerSetup()
-    {
-        gameStateManager.StartPlayerSetup();
-        playerInputLineEdit.Editable = true;
-        playerInputLineEdit.Visible = true;
-        ClearFarkle();
-        CreateDiceCollection();
-        playerTurnLabel.Text = "Enter player 1 name";
-        playerInputLineEdit.Edit();
     }
 
     public void HandlePlayerNameSubmitted(string newText)
@@ -166,15 +162,9 @@ public partial class GameController : Node3D
         }
     }
 
-    public override void _Input(InputEvent @event)
-    {
-        base._Input(@event);
-        HandleMouseInput(@event);
-    }
-
     public void HandleMouseInput(InputEvent inputEvent)
     {
-        if (gameStateManager.GetState == GameState.SelectDice)
+        if (gameStateManager.GameState == GameState.SelectDice)
         {
             if (inputEvent is InputEventMouseMotion mouseMotion)
             {
@@ -216,7 +206,7 @@ public partial class GameController : Node3D
 
     public void HandleDicePhysics()
     {
-        if (gameStateManager.GetState is GameState.RollReady)
+        if (gameStateManager.GameState is GameState.RollReady)
         {
             rollableDiceCollection.diceList.ForEach(
                 x => x.GlobalPosition = throwLocationBall.throwLocation.GlobalPosition);
@@ -237,7 +227,7 @@ public partial class GameController : Node3D
                 ResetAllDice();
                 if (TryAdvanceTurn())
                 {
-                    BuildScoreText();
+                    BuildAndSetScoreText();
                     SetPlayerTurnLabel();
                 }
 
@@ -260,23 +250,31 @@ public partial class GameController : Node3D
             cameraController.MoveToUserPerspectiveLocation();
             TryProgressState();
         }
-        else if (Input.IsActionJustPressed("enter") && TryRecordScore())
+        else if (Input.IsActionJustPressed("enter"))
         {
-            activePlayerManager.AddToPlayerScore(activePlayerManager.GetWhoseTurnItIs(), roundScore);
-            roundScore = 0;
-            ResetAllDice();
-            if (TryAdvanceTurn())
+            var scoredDiceCount = scoredDiceCollection.Count() + selectedDiceCollection.Count();
+            if (scoredDiceCount == persistentDiceCollection.Count())
             {
-                BuildScoreText();
-                SetPlayerTurnLabel();
+                selectedDiceCollection.FlashRed();
             }
-            else
+            else if(TryRecordScore())
             {
-                GameOver();
+                activePlayerManager.AddToPlayerScore(activePlayerManager.GetWhoseTurnItIs(), roundScore);
+                roundScore = 0;
+                ResetAllDice();
+
+                if (TryAdvanceTurn())
+                {
+                    BuildAndSetScoreText();
+                    SetPlayerTurnLabel();
+                }
+                else
+                {
+                    GameOver();
+                }
+                cameraController.MoveToUserPerspectiveLocation();
+                TryProgressState();
             }
-            
-            cameraController.MoveToUserPerspectiveLocation();
-            TryProgressState();
         }
     }
 
@@ -284,17 +282,89 @@ public partial class GameController : Node3D
     {
         if (Input.IsActionJustPressed("space"))
         {
-            StartPlayerSetup();
+            TryProgressState();
         }
     }
 
-    public void GameOver()
+    public bool TryProgressState()
     {
-        gameStateManager.GameOver();
-        BuildScoreText();
-        SetPlayerTurnLabel(gameOver: true);
+        if (gameStateManager.GameState is not GameState.GameOver)
+        {
+            gameStateManager.ProgressState();
+            SetInstructionLabel(gameStateManager.GameState);
+            return true;
+        }
+        return false;
     }
 
+    #endregion
+
+    #region PlayerSetup
+    public void StartPlayerSetup()
+    {
+        playerInputLineEdit.Editable = true;
+        playerInputLineEdit.Visible = true;
+        ClearFarkle();
+        SetInstructionLabel(GameState.PlayerSetup);
+        playerTurnLabel.Text = "Enter player 1 name";
+        playerInputLineEdit.Edit();
+    }
+
+    public void StartGame()
+    {
+        playerInputLineEdit.Editable = false;
+        playerInputLineEdit.Visible = false;
+        regularPlayerManager.StartGame();
+        activePlayerManager = regularPlayerManager;
+        SetPlayerTurnLabel();
+        BuildAndSetScoreText();
+        SetInstructionLabel(GameState.PreRoll);
+        gameStateManager.StartGame();
+    }
+
+    #endregion
+
+    #region UI
+    public void SetPlayerTurnLabel(bool gameOver = false)
+    {
+        playerTurnLabel.Text = gameOver ? "GameOver, press space to play again"
+            : $"{activePlayerManager.GetWhoseTurnItIs()}'s turn";
+    }
+
+    public void BuildAndSetScoreText()
+    {
+        var scoreString = "";
+        foreach (var player in activePlayerManager.players)
+        {
+            scoreString += $"{player} total score = {activePlayerManager.playerScores[player]}\n";
+        }
+        if (onLastRound)
+        {
+            scoreString += $"{lastRoundPlayerScore.Player} total score = {lastRoundPlayerScore.Score}\n";
+        }
+        scoreString += $"{activePlayerManager.GetWhoseTurnItIs()} is playing the current round.\n";
+        scoreString += $"Round score = {roundScore}";
+
+        scorePerRollLabel.Text = scoreString;
+    }
+
+    public void SetInstructionLabel(GameState gameState)
+    {
+        instructionLabel.Text = gameState switch
+        {
+            GameState.PlayerSetup => "Type in player name and press enter to continue.",
+            GameState.PreRoll => "Press space to find rolling position.",
+            GameState.RollReady => "Press space to select rolling position and roll dice.",
+            GameState.Rolling => "Wait for dice to finish rolling.",
+            GameState.SelectDice => "Select dice with the mouse. Press space to enter your score and roll again. Press enter to submit your score. If all six die are scored, you must press space to roll again.",
+            GameState.GameOver => "Press space to play a new game.",
+            _ => ""
+        };
+    }
+
+    #endregion
+
+    #region PlayersTurnsAndScore
     public bool TryAdvanceTurn()
     {
         if (onLastRound && !activePlayerManager.TryAdvanceTurnOnLastRound(out _))
@@ -318,7 +388,8 @@ public partial class GameController : Node3D
         }
 
         selectedDiceCollection.CalculateScore();
-        if (selectedDiceCollection.HasUnusedScoreDice())
+        if (selectedDiceCollection.HasUnusedScoreDice() ||
+            selectedDiceCollection.CalculateScoreResult.Score == -1)
         {
             selectedDiceCollection.CalculateScoreResult.UnusedDice.ToList()
                 .ForEach(d => d.FlashRed());
@@ -326,7 +397,7 @@ public partial class GameController : Node3D
         }
         scoreLabel.Text = "";
         roundScore += selectedDiceCollection.CalculateScoreResult.Score;
-        BuildScoreText();
+        BuildAndSetScoreText();
         return true;
     }
 
@@ -344,16 +415,39 @@ public partial class GameController : Node3D
         return false;
     }
 
-    public bool TryProgressState()
+    public void GameOver()
     {
-        if (gameStateManager.GetState is not GameState.GameOver)
-        {
-            gameStateManager.ProgressState();
-            return true;
-        }
-        return false;
+        gameStateManager.GameOver();
+        BuildAndSetScoreText();
+        SetPlayerTurnLabel(gameOver: true);
     }
 
+    public void PreSelectDiceFarkleCheck()
+    {
+        if (DidRolledDiceFarkle())
+        {
+            Farkle();
+        }
+    }
+
+    public bool DidRolledDiceFarkle() => rollableDiceCollection.CalculateScore().Score == -1;
+
+    public void Farkle()
+    {
+        roundScore = 0;
+        gameStateManager.Farkle();
+        farkleLabel.Text = "You Farkled";
+    }
+
+    public void ClearFarkle()
+    {
+        gameStateManager.ClearFarkle();
+        farkleLabel.Text = "";
+    }
+
+    #endregion
+
+    #region Dice
     public void ResetAllDice()
     {
         persistentDiceCollection.diceList.ForEach(d => d.UnselectDice());
@@ -375,23 +469,10 @@ public partial class GameController : Node3D
         selectedDiceCollection = new DiceCollection();
     }
 
-    public void Farkle()
-    {
-        roundScore = 0;
-        gameStateManager.Farkle();
-        farkleLabel.Text = "You Farkled";
-    }
-
-    public void ClearFarkle()
-    {
-        gameStateManager.ClearFarkle();
-        farkleLabel.Text = "";
-    }
-
     public void CreateDiceCollection()
     {
         List<RootDice> tempDiceList = [];
-        for(int i = 0; i < DiceAmount; i++)
+        for (int i = 0; i < DiceAmount; i++)
         {
             var dice = packedRootDice.Instantiate<RootDice>();
             tempDiceList.Add(dice);
@@ -403,16 +484,16 @@ public partial class GameController : Node3D
 
     public void SetDiceRotationForThrow()
     {
-        foreach(RootDice dice in rollableDiceCollection.diceList)
+        foreach (RootDice dice in rollableDiceCollection.diceList)
         {
-            dice.Rotate(HelperMethods.GetRandomVector3().Normalized(), GD.Randf()*(2*Mathf.Pi));
+            dice.Rotate(HelperMethods.GetRandomVector3().Normalized(), GD.Randf() * (2 * Mathf.Pi));
         }
     }
 
     public void SetDiceVelocityForThrow()
     {
         var baseVelocity = new Vector3(0, 0, -1) * 6;
-        foreach(RootDice dice in rollableDiceCollection.diceList)
+        foreach (RootDice dice in rollableDiceCollection.diceList)
         {
             dice.SetVelocityUponThrow(HelperMethods.FuzzyUpVector3(baseVelocity, 0.5f));
         }
@@ -425,10 +506,17 @@ public partial class GameController : Node3D
         SetDiceVelocityForThrow();
     }
 
+    public void AnimateDiceThrowerBall()
+    {
+        throwLocationBall.Animate();
+    }
+
     public void ThrowDice()
     {
         rollableDiceCollection.TurnOn();
         rollableDiceCollection.ThrowDice();
+        throwLocationBall.StopAnimation();
+        cameraController.MoveToDiceZoomLocation();
     }
 
     public void MoveScoredDiceOffCamera()
@@ -441,20 +529,10 @@ public partial class GameController : Node3D
         rollableDiceCollection.diceList.ForEach(d => d.GlobalPosition = outOfPlayDiceLocation.GlobalPosition);
     }
 
-    public void BuildScoreText()
+    public static void MoveDiceTo(DiceCollection dc, Node3D node3D)
     {
-        var scoreString = "";
-        foreach(var player in activePlayerManager.players)
-        {
-            scoreString += $"{player} total score = {activePlayerManager.playerScores[player]}\n";
-        }
-        if (onLastRound)
-        {
-            scoreString += $"{lastRoundPlayerScore.Player} total score = {lastRoundPlayerScore.Score}\n";
-        }
-        scoreString += $"{activePlayerManager.GetWhoseTurnItIs()} is playing the current round.\n";
-        scoreString += $"Round score = {roundScore}";
-
-        scorePerRollLabel.Text = scoreString;
+        dc.diceList.ForEach(d => d.GlobalPosition = node3D.GlobalPosition);
     }
+
+    #endregion
 }
