@@ -137,17 +137,19 @@ public class DiceCollection{
 
     public void ResetPosition() => diceList.ForEach(x => x.Position = Vector3.Zero);
 
-    public RootDice GetDiceWithInstanceIdEqualTo(ulong objInstanceId)
+    public bool TryGetDiceWithInstanceIdEqualTo(ulong objInstanceId, out RootDice selectedDice)
     {
-        foreach(RootDice diceObj in diceList)
+        foreach (RootDice diceObj in diceList)
         {
-            if(diceObj.GetInstanceId() == objInstanceId)
+            if (diceObj.GetInstanceId() == objInstanceId)
             {
-                return diceObj;
+                selectedDice = diceObj;
+                return true;
             }
         }
 
-        return null;
+        selectedDice = null;
+        return false;
     }
 
     public IEnumerable<DiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();

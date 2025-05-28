@@ -5,6 +5,9 @@ using Godot;
 public partial class GameController : Node3D
 {
     #region Properties
+
+    [Export]
+    public bool debug = true;
     public const int ScoreToWin = 10000;
     public const int DiceAmount = 6;
 
@@ -146,64 +149,6 @@ public partial class GameController : Node3D
         }
     }
 
-    public void HandlePlayerNameSubmitted(string newText)
-    {
-        if (regularPlayerManager is null)
-        {
-            regularPlayerManager = new PlayerManager(newText);
-            playerInputLineEdit.Clear();
-            playerTurnLabel.Text = "Enter player 2 name";
-        }
-        else
-        {
-            regularPlayerManager.AddPlayer(newText);
-            playerInputLineEdit.Clear();
-            StartGame();
-        }
-    }
-
-    public void HandleMouseInput(InputEvent inputEvent)
-    {
-        if (gameStateManager.GameState == GameState.SelectDice)
-        {
-            if (inputEvent is InputEventMouseMotion mouseMotion)
-            {
-                mousePosition = mouseMotion.Position;
-            }
-            else if (inputEvent is InputEventMouseButton mouseButton)
-            {
-                var selectedDice = HandleMouseClickOnObject(
-                    MouseTools.GetCollisionIdFromMouseClick(mousePosition, mouseButton, this));
-
-                if (selectedDice is not null)
-                {
-                    if (selectedDiceCollection.diceList.Contains(selectedDice))
-                    {
-                        selectedDiceCollection = selectedDiceCollection.RemoveDice(selectedDice);
-                        scoreLabel.Text = selectedDiceCollection.CalculateScore().Score.ToString();
-                        selectedDice.ToggleSelectDice();
-                    }
-                    else
-                    {
-                        selectedDiceCollection = selectedDiceCollection.AddDice(selectedDice);
-                        scoreLabel.Text = selectedDiceCollection.CalculateScore().Score.ToString();
-                        selectedDice.ToggleSelectDice();
-                    }
-                }
-            }
-        }
-    }
-
-    public RootDice HandleMouseClickOnObject(ulong? objInstanceId)
-    {
-        if (objInstanceId == null)
-        {
-            return null;
-        }
-        var dice = rollableDiceCollection.GetDiceWithInstanceIdEqualTo(objInstanceId.Value);
-        return dice;
-    }
-
     public void HandleDicePhysics()
     {
         if (gameStateManager.GameState is GameState.RollReady)
@@ -299,15 +244,82 @@ public partial class GameController : Node3D
 
     #endregion
 
+    #region Mouse
+    public void HandleMouseInput(InputEvent inputEvent)
+    {
+        if (gameStateManager.GameState == GameState.SelectDice)
+        {
+            if (inputEvent is InputEventMouseMotion mouseMotion)
+            {
+                mousePosition = mouseMotion.Position;
+            }
+            else if (inputEvent is InputEventMouseButton mouseButton)
+            {
+                var clickedOnObject = MouseTools.GetCollisionIdFromMouseClick(mousePosition, mouseButton, this);
+                if (TryHandleMouseClickOnObject(clickedOnObject, out var selectedDice))
+                {
+                    if (selectedDiceCollection.diceList.Contains(selectedDice))
+                    {
+                        selectedDiceCollection = selectedDiceCollection.RemoveDice(selectedDice);
+                        scoreLabel.Text = selectedDiceCollection.CalculateScore().Score.ToString();
+                        selectedDice.ToggleSelectDice();
+                    }
+                    else
+                    {
+                        selectedDiceCollection = selectedDiceCollection.AddDice(selectedDice);
+                        scoreLabel.Text = selectedDiceCollection.CalculateScore().Score.ToString();
+                        selectedDice.ToggleSelectDice();
+                    }
+                }
+            }
+        }
+    }
+
+    public bool TryHandleMouseClickOnObject(ulong? objInstanceId, out RootDice clickedDice)
+    {
+        if (objInstanceId == null && rollableDiceCollection.TryGetDiceWithInstanceIdEqualTo(objInstanceId.Value, out var selectedDice))
+        {
+            clickedDice = selectedDice;
+            return true;
+        }
+        clickedDice = null;
+        return false;
+    }
+
+    #endregion
+
     #region PlayerSetup
     public void StartPlayerSetup()
     {
-        playerInputLineEdit.Editable = true;
-        playerInputLineEdit.Visible = true;
         ClearFarkle();
-        SetInstructionLabel(GameState.PlayerSetup);
-        playerTurnLabel.Text = "Enter player 1 name";
-        playerInputLineEdit.Edit();
+        if (debug)
+        {
+            regularPlayerManager = new PlayerManager(["Player1", "Player2"]);
+            StartGame();
+        }
+        else
+        {
+            playerInputLineEdit.Editable = true;
+            playerInputLineEdit.Visible = true;
+            SetInstructionLabel(GameState.PlayerSetup);
+            playerTurnLabel.Text = "Enter player 1 name";
+            playerInputLineEdit.Edit();
+        }
+    }
+    public void HandlePlayerNameSubmitted(string newText)
+    {
+        if (regularPlayerManager is null)
+        {
+            regularPlayerManager = new PlayerManager(newText);
+            playerInputLineEdit.Clear();
+            playerTurnLabel.Text = "Enter player 2 name";
+        }
+        else
+        {
+            regularPlayerManager.AddPlayer(newText);
+            playerInputLineEdit.Clear();
+            StartGame();
+        }
     }
 
     public void StartGame()

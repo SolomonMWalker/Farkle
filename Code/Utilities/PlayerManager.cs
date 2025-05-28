@@ -16,9 +16,12 @@ public class PlayerManager
         playerScores.Add(player, 0);
     }
 
-    public PlayerManager(List<string> players)
+    public PlayerManager(IEnumerable<string> ps)
     {
-        players.ForEach(p => playerScores.Add(p, 0));
+        foreach (string player in ps)
+        {
+            playerScores.Add(player, 0);
+        }
     }
 
     public PlayerManager(PlayerManager pm)
