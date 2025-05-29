@@ -6,11 +6,6 @@ public partial class GameController : Node3D
 {
     #region Properties
 
-    [Export]
-    public bool debug = true;
-    public const int ScoreToWin = 10000;
-    public const int DiceAmount = 6;
-
     private DiceCollection persistentDiceCollection, rollableDiceCollection, selectedDiceCollection,
         scoredDiceCollection;
     private CameraController cameraController;
@@ -34,11 +29,12 @@ public partial class GameController : Node3D
     public override void _Ready()
     {
         base._Ready();
-        rollableDiceCollection = new DiceCollection();
+        Configuration.SetUpConfiguration();
+        GD.Print("Config setup");
+        packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
         diceHolder = this.FindChild<Node3D>("DiceHolder");
         throwLocationBall = FindChild("DiceTable").FindChild<ThrowLocationBall>("ThrowLocationBall");
         outOfPlayDiceLocation = this.FindChild<Node3D>("OutOfPlayDiceLocation");
-        packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
         cameraController = this.FindChild<CameraController>("CameraController");
         instructionLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("Instructions");
         scoreLabel = this.FindChild<Control>("ControlParent").FindChild<Label>("Score");
@@ -49,6 +45,8 @@ public partial class GameController : Node3D
         playerInputLineEdit = this.FindChild<Control>("ControlParent").FindChild<LineEdit>("PlayerInput");
         gameStateManager = new GameStateManager();
         mousePosition = Vector2.Zero;
+        persistentDiceCollection = new DiceCollection();
+        rollableDiceCollection = new DiceCollection();
         selectedDiceCollection = new DiceCollection();
         scoredDiceCollection = new DiceCollection();
 
@@ -292,7 +290,7 @@ public partial class GameController : Node3D
     public void StartPlayerSetup()
     {
         ClearFarkle();
-        if (debug)
+        if (Configuration.ConfigValues.IsDebug)
         {
             regularPlayerManager = new PlayerManager(["Player1", "Player2"]);
             StartGame();
@@ -415,7 +413,7 @@ public partial class GameController : Node3D
 
     public bool BeginLastRoundIfPlayerAtMaxScore()
     {
-        if (!onLastRound && activePlayerManager.TryGetPlayerAtScore(ScoreToWin, out var playerScoreAtMaxScore))
+        if (!onLastRound && activePlayerManager.TryGetPlayerAtScore(Configuration.ConfigValues.ScoreToWin, out var playerScoreAtMaxScore))
         {
             onLastRound = true;
             lastRoundPlayerScore = playerScoreAtMaxScore;
@@ -484,14 +482,15 @@ public partial class GameController : Node3D
     public void CreateDiceCollection()
     {
         List<RootDice> tempDiceList = [];
-        for (int i = 0; i < DiceAmount; i++)
+        for (int i = 0; i < Configuration.ConfigValues.NumOfStartingDice; i++)
         {
             var dice = packedRootDice.Instantiate<RootDice>();
             tempDiceList.Add(dice);
         }
-        rollableDiceCollection = new DiceCollection(tempDiceList);
-        rollableDiceCollection.SetParent(diceHolder);
-        persistentDiceCollection = new DiceCollection(rollableDiceCollection.diceList);
+        persistentDiceCollection = new DiceCollection(tempDiceList);
+        persistentDiceCollection.SetParent(diceHolder);
+        persistentDiceCollection.SetDebug(Configuration.ConfigValues.IsDebug);
+        rollableDiceCollection = new DiceCollection(persistentDiceCollection);
     }
 
     public void SetDiceRotationForThrow()

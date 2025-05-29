@@ -6,7 +6,7 @@ using System.Linq;
 public class ScorableCollection{
     public ImmutableSortedSet<int> sSet;
     public Dictionary<int, int> dict;
-    public readonly IEnumerable<RootDiceFace> faces;
+    public readonly IEnumerable<DiceFace> faces;
     public readonly DiceCollection diceCollection;
 
     private ScorableCollection(DiceCollection collection)
@@ -15,7 +15,7 @@ public class ScorableCollection{
         faces = diceCollection.GetResultOfRoll();
         sSet = [.. faces.Select(r => r.Number)];
         var buildingDict = new Dictionary<int, int>();
-        foreach(RootDiceFace face in faces)
+        foreach(DiceFace face in faces)
         {
             if(buildingDict.ContainsKey(face.Number))
             {

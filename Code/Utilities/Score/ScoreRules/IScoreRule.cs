@@ -147,7 +147,7 @@ public class ThreePairScoreRule : IScoreRule
         }
 
 
-        List<RootDiceFace> usedDiceFaces = [];
+        List<DiceFace> usedDiceFaces = [];
         foreach (KeyValuePair<int, int> pair in pairs)
         {
             for (int i = 0; i < pair.Value; i++)

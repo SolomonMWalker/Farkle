@@ -2,31 +2,21 @@ using System.Collections.Generic;
 using System.Linq;
 using Godot;
 
-public class DiceFaceCollection
+public partial class DiceFaceCollection
 {
-    public IEnumerable<RootDiceFace> faces = [];
-    public DiceFaceType diceFaceType;
+    public List<DiceFace> faces = [];
 
-    public DiceFaceCollection(IEnumerable<DiceFacePlaceholder> dfPlaceholders, DiceFaceType dfType)
+    public void SetDebug(bool isDebug)
     {
-        diceFaceType = dfType;
-        faces = DiceFaceFactory.CreateDiceFaces(dfPlaceholders, dfType);
-    }
-
-    public void ReparentDiceFaces(Node3D parent)
-    {
-        foreach (var face in faces)
-        {
-            face.Reparent(face);
-        }
+        faces.ForEach(f => f.SetDebug(isDebug));
     }
 
     //Get the dice face that has the highest y-value
     //might need to change this later
-    public RootDiceFace GetResultOfRoll()
+    public DiceFace GetResultOfRoll()
     {
-        RootDiceFace faceOnTop = null;
-        foreach (RootDiceFace face in faces)
+        DiceFace faceOnTop = null;
+        foreach (DiceFace face in faces)
         {
             if (faceOnTop == null)
             {

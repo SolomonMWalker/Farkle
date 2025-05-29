@@ -20,7 +20,7 @@ public class DiceCollection{
         diceList = [.. rootDice];
     }
 
-    public DiceCollection(IEnumerable<RootDiceFace> diceFaces)
+    public DiceCollection(IEnumerable<DiceFace> diceFaces)
     {
         diceList = [.. diceFaces.Select(df => df.AssociatedDice)];
     }
@@ -96,6 +96,11 @@ public class DiceCollection{
         return diceList.All(x => x.IsDoneRolling() == true);
     }
 
+    public void SetDebug(bool isDebug)
+    {
+        diceList.ForEach(x => x.SetDebug(isDebug));
+    }
+
     public void ChangeParent(Node newParent, bool changeGlobalTransform)
     {
         diceList.ForEach(x => x.Reparent(newParent, changeGlobalTransform));
@@ -153,6 +158,6 @@ public class DiceCollection{
         return false;
     }
 
-    public IEnumerable<RootDiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
+    public IEnumerable<DiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
     public void FlashRed() => diceList.ForEach(d => d.FlashRed());
 }

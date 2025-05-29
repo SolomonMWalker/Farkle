@@ -1,27 +1,56 @@
 using Godot;
 
-public partial class RootDiceFace(DiceFaceValue diceFaceValue, Transform3D transform) : Node3D
+public partial class DiceFace() : Node3D
 {
-    protected DiceFaceValue diceFaceValue = diceFaceValue;
-    protected Label3D _label;
-    protected RootDice _associatedDice;
-    protected const DiceFaceType diceFaceType = DiceFaceType.Root;
+    [Export]
+    public int numberValue;
+
+    private bool _isDebug = false;
+    private DiceFaceValue _diceFaceValue;
+    private Label3D _label;
+    private RootDice _associatedDice;
     public RootDice AssociatedDice { get => _associatedDice; }
-    public virtual int Number => diceFaceValue.numberValue ?? 0;
+    public int Number => (_overridden ? _overrideDiceFaceValue.numberValue : _diceFaceValue.numberValue) ?? 0;
+
+    #region Debug
+
+    private bool _overridden = false;
+    private DiceFaceValue _overrideDiceFaceValue;
+    public void Override(DiceFaceValue dfValue)
+    {
+        if (_isDebug)
+        {
+            _overrideDiceFaceValue = dfValue;
+            _overridden = true;
+            SetLabelText(Number.ToString());
+        }
+    }
+
+    public void EndOverride()
+    {
+        if (_isDebug)
+        {
+            _overridden = false;
+            _overrideDiceFaceValue = null;
+            SetLabelText(Number.ToString());
+        }
+    }
+
+    #endregion
 
     public override void _Ready()
     {
         base._Ready();
-        Transform = transform;
-        _label = this.FindChild<Label3D>("Label");
         _associatedDice = GetParent<Node3D>().GetParent<RootDice>();
+        _label = this.FindChild<Label3D>("Label");
+        _diceFaceValue = new DiceFaceValue(numberValue);
+        SetLabelText(_diceFaceValue.numberValue.Value.ToString());
     }
 
-    public virtual void ChangeNumber(int newNumber)
+    public void SetDebug(bool isDebug)
     {
-        diceFaceValue.numberValue = newNumber;
-        _label.Text = Number.ToString();
+        _isDebug = isDebug;
     }
 
-    protected void SetLabelText(string text) => _label.Text = text;
+    private void SetLabelText(string text) => _label.Text = text;
 }

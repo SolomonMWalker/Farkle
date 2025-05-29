@@ -1,0 +1,15 @@
+[gd_scene load_steps=2 format=3 uid="uid://ddh56yk5fo8i"]
+
+[sub_resource type="CSharpScript" id="CSharpScript_p1gn0"]
+script/source = "using Godot;
+
+public partial class DiceFacePlaceholder : Node3D
+{
+    [Export]
+    public int diceFaceNumber = 0;
+}
+"
+
+[node name="DiceFacePlaceholder" type="Node3D"]
+script = SubResource("CSharpScript_p1gn0")
+diceFaceNumber = null
