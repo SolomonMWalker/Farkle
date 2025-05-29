@@ -6,6 +6,8 @@ public partial class GameController : Node3D
 {
     #region Properties
 
+    private const string RootDiceRelPath = "res://Scenes/root_dice.tscn";
+
     private DiceCollection persistentDiceCollection, rollableDiceCollection, selectedDiceCollection,
         scoredDiceCollection;
     private CameraController cameraController;
@@ -14,7 +16,7 @@ public partial class GameController : Node3D
     private Node3D diceHolder, outOfPlayDiceLocation;
     private ThrowLocationBall throwLocationBall;
     private PackedScene packedRootDice;
-    private Vector2 mousePosition;
+    private Vector2 mousePosition = Vector2.Zero;
     private Label instructionLabel, scoreLabel, farkleLabel, playerTurnLabel, lastRoundLabel;
     private RichTextLabel scorePerRollLabel;
     private LineEdit playerInputLineEdit;
@@ -30,7 +32,7 @@ public partial class GameController : Node3D
     {
         base._Ready();
         Configuration.SetUpConfiguration();
-        packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
+        packedRootDice = GD.Load<PackedScene>(RootDiceRelPath);
         diceHolder = this.FindChild<Node3D>("DiceHolder");
         throwLocationBall = FindChild("DiceTable").FindChild<ThrowLocationBall>("ThrowLocationBall");
         outOfPlayDiceLocation = this.FindChild<Node3D>("OutOfPlayDiceLocation");
@@ -43,7 +45,6 @@ public partial class GameController : Node3D
         scorePerRollLabel = this.FindChild<Control>("ControlParent").FindChild<RichTextLabel>("ScorePerRoll");
         playerInputLineEdit = this.FindChild<Control>("ControlParent").FindChild<LineEdit>("PlayerInput");
         gameStateManager = new GameStateManager();
-        mousePosition = Vector2.Zero;
         persistentDiceCollection = new DiceCollection();
         rollableDiceCollection = new DiceCollection();
         selectedDiceCollection = new DiceCollection();
