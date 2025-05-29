@@ -20,7 +20,7 @@ public class DiceCollection{
         diceList = [.. rootDice];
     }
 
-    public DiceCollection(IEnumerable<DiceFace> diceFaces)
+    public DiceCollection(IEnumerable<RootDiceFace> diceFaces)
     {
         diceList = [.. diceFaces.Select(df => df.AssociatedDice)];
     }
@@ -141,7 +141,8 @@ public class DiceCollection{
     {
         foreach (RootDice diceObj in diceList)
         {
-            if (diceObj.GetInstanceId() == objInstanceId)
+            if (diceObj.GetInstanceId() == objInstanceId
+                || diceObj.GetDiceFaceInstanceIds().Contains(objInstanceId))
             {
                 selectedDice = diceObj;
                 return true;
@@ -152,6 +153,6 @@ public class DiceCollection{
         return false;
     }
 
-    public IEnumerable<DiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
+    public IEnumerable<RootDiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
     public void FlashRed() => diceList.ForEach(d => d.FlashRed());
 }

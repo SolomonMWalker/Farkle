@@ -6,24 +6,24 @@ using System.Linq;
 public class ScorableCollection{
     public ImmutableSortedSet<int> sSet;
     public Dictionary<int, int> dict;
-    public readonly IEnumerable<DiceFace> faces;
+    public readonly IEnumerable<RootDiceFace> faces;
     public readonly DiceCollection diceCollection;
 
     private ScorableCollection(DiceCollection collection)
     {
         diceCollection = collection;
         faces = diceCollection.GetResultOfRoll();
-        sSet = [.. faces.Select(r => r.number)];
+        sSet = [.. faces.Select(r => r.Number)];
         var buildingDict = new Dictionary<int, int>();
-        foreach(DiceFace face in faces)
+        foreach(RootDiceFace face in faces)
         {
-            if(buildingDict.ContainsKey(face.number))
+            if(buildingDict.ContainsKey(face.Number))
             {
-                buildingDict[face.number] += 1;
+                buildingDict[face.Number] += 1;
             }
             else
             {
-                buildingDict[face.number] = 1;
+                buildingDict[face.Number] = 1;
             }
         }
         dict = buildingDict.ToDictionary();

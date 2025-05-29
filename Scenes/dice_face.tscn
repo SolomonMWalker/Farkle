@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://clbk0ioy0vgii"]
+
+[ext_resource type="Script" uid="uid://bja8by20ecpsv" path="res://Code/Scripts/DiceFace.cs" id="1_jssrg"]
+
+[node name="DiceFace" type="Node3D"]
+script = ExtResource("1_jssrg")
+
+[node name="Label" type="Label3D" parent="."]
+font_size = 75
+outline_size = 25

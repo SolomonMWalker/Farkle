@@ -1,3 +1,6 @@
+using System.Collections;
+using System.Collections.Generic;
+using System.Linq;
 using Godot;
 
 public partial class RootDice : RigidBody3D
@@ -10,7 +13,8 @@ public partial class RootDice : RigidBody3D
     private AnimationPlayer animationPlayer;
     private Node3D corner;
     private Vector3 velocityUponThrow;
-    private DiceFaceCollectionPerDice diceFaceCollection;
+    private DiceFaceType diceFaceType = DiceFaceType.Root;
+    private DiceFaceCollection diceFaceCollection;
     private int colliderId;
     private float edgelength;
     private const string RootDiceMaterialPath = "res://Resources/Materials/RootDiceMaterial.tres";
@@ -27,20 +31,24 @@ public partial class RootDice : RigidBody3D
         edgelength = HelperMethods.GetSideLengthFromHalfDiagonal(Position.DistanceTo(corner.Position));
         rootDiceMaterial = GD.Load<Material>(RootDiceMaterialPath);
         rootDiceSelectedMaterial = GD.Load<Material>(RootDiceSelectedMaterialPath);
-        rootDiceFlashRedMaterial = GD.Load<Material>(RootDiceFlashRedMaterialPath);        
+        rootDiceFlashRedMaterial = GD.Load<Material>(RootDiceFlashRedMaterialPath);
         collisionShape.Disabled = true;
         Freeze = true;
         FreezeMode = FreezeModeEnum.Static;
         selected = false;
-        SetupDiceFaces();
+        SetupDiceFaces(diceFaceType);
     }
 
-    public void SetupDiceFaces()
+    public virtual void SetupDiceFaces(DiceFaceType type)
     {
-        var diceFaceParent = FindChild("DiceFaces");
-        var diceFaces = diceFaceParent.GetChildren<DiceFace>();
-        diceFaceCollection = new ();
-        diceFaceCollection.faces = diceFaces;
+        var diceFacesParent = this.FindChild<Node3D>("DiceFaces");
+        var diceFacePlaceholders = this.FindChild<Node3D>("DiceFacePlaceholders").GetChildren<DiceFacePlaceholder>();
+        var createdFaces = DiceFaceFactory.CreateDiceFaces(diceFacePlaceholders, type);
+        diceFaceCollection = new DiceFaceCollection(diceFacePlaceholders, type)
+        {
+            faces = createdFaces
+        };
+        diceFaceCollection.ReparentDiceFaces(diceFacesParent);
     }
 
     public bool PointTooClose(Vector3 point, float margin)
@@ -61,11 +69,12 @@ public partial class RootDice : RigidBody3D
         LinearVelocity = velocityUponThrow;
     }
 
-    public bool IsDoneRolling() {
+    public bool IsDoneRolling()
+    {
         var velocityIsCloseToZero = Mathf.Abs(LinearVelocity.Length()) < 0.05;
         var angularVelocityIsClostToZero = Mathf.Abs(AngularVelocity.Length()) < 0.05;
-        var lowestFaceHeightIsCloseToTable = 
-            Mathf.Abs(diceFaceCollection.GetHeightOfLowestFace()) < (edgelength/2) + 0.05 ;
+        var lowestFaceHeightIsCloseToTable =
+            Mathf.Abs(diceFaceCollection.GetHeightOfLowestFace()) < (edgelength / 2) + 0.05;
         return velocityIsCloseToZero && angularVelocityIsClostToZero && lowestFaceHeightIsCloseToTable;
     }
 
@@ -81,13 +90,13 @@ public partial class RootDice : RigidBody3D
         Freeze = false;
     }
 
-    public void DisableCollision() {collisionShape.Disabled = true;}
-    public void EnableCollision() {collisionShape.Disabled = false;}
-    public DiceFace GetResultOfRoll() {return diceFaceCollection.GetResultOfRoll();}
+    public void DisableCollision() { collisionShape.Disabled = true; }
+    public void EnableCollision() { collisionShape.Disabled = false; }
+    public RootDiceFace GetResultOfRoll() { return diceFaceCollection.GetResultOfRoll(); }
 
     public void ToggleSelectDice()
     {
-        if(selected)
+        if (selected)
         {
             meshInstance.SetSurfaceOverrideMaterial(0, rootDiceMaterial);
             selected = false;
@@ -96,7 +105,7 @@ public partial class RootDice : RigidBody3D
         {
             meshInstance.SetSurfaceOverrideMaterial(0, rootDiceSelectedMaterial);
             selected = true;
-        }        
+        }
     }
 
     public void SelectDice()
@@ -115,4 +124,6 @@ public partial class RootDice : RigidBody3D
     {
         animationPlayer.Play("SelectedFlashRed");
     }
+
+    public List<ulong> GetDiceFaceInstanceIds() => diceFaceCollection.GetDiceFaceInstanceIds();
 }

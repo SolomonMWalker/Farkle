@@ -3,8 +3,8 @@
 [ext_resource type="PhysicsMaterial" uid="uid://d25ce7roxxajs" path="res://Resources/PhysicsMaterials/RootDicePhysicsMaterial.tres" id="1_2wn8y"]
 [ext_resource type="BoxMesh" uid="uid://078efvk0u5qi" path="res://Resources/Meshes/RootDiceMesh.tres" id="1_mx507"]
 [ext_resource type="Script" uid="uid://dk3c4j8n832mv" path="res://Code/Scripts/RootDice.cs" id="2_24xm2"]
+[ext_resource type="Script" uid="uid://8poyt1ifpg75" path="res://Code/Scripts/DiceFacePlaceholder.cs" id="4_t8ab3"]
 [ext_resource type="Material" uid="uid://18xqjmy1iq8i" path="res://Resources/Materials/RootDiceFlashRedMaterial.tres" id="5_t8ab3"]
-[ext_resource type="PackedScene" uid="uid://krk243umv7su" path="res://Scenes/DiceFace.tscn" id="5_tctqp"]
 [ext_resource type="Material" uid="uid://c626kg5uasvr6" path="res://Resources/Materials/RootDiceSelectedMaterial.tres" id="6_l4ben"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_tctqp"]
@@ -60,31 +60,39 @@ shape = SubResource("ConvexPolygonShape3D_tctqp")
 [node name="Corner" type="Node3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.2, 0.2)
 
-[node name="DiceFaces" type="Node3D" parent="."]
+[node name="DiceFacePlaceholders" type="Node3D" parent="."]
 
-[node name="DiceFaceNumber1" parent="DiceFaces" instance=ExtResource("5_tctqp")]
+[node name="DiceFace1" type="Node3D" parent="DiceFacePlaceholders"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.201)
-text = "1"
+script = ExtResource("4_t8ab3")
+diceFaceNumber = 1
 
-[node name="DiceFaceNumber2" parent="DiceFaces" instance=ExtResource("5_tctqp")]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, -0.201)
-text = "2"
+[node name="DiceFace2" type="Node3D" parent="DiceFacePlaceholders"]
+transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, -0.201)
+script = ExtResource("4_t8ab3")
+diceFaceNumber = 2
 
-[node name="DiceFaceNumber3" parent="DiceFaces" instance=ExtResource("5_tctqp")]
+[node name="DiceFace3" type="Node3D" parent="DiceFacePlaceholders"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.201, 0)
-text = "3"
+script = ExtResource("4_t8ab3")
+diceFaceNumber = 3
 
-[node name="DiceFaceNumber4" parent="DiceFaces" instance=ExtResource("5_tctqp")]
+[node name="DiceFace4" type="Node3D" parent="DiceFacePlaceholders"]
 transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, -0.201, 0)
-text = "4"
+script = ExtResource("4_t8ab3")
+diceFaceNumber = 4
 
-[node name="DiceFaceNumber5" parent="DiceFaces" instance=ExtResource("5_tctqp")]
+[node name="DiceFace5" type="Node3D" parent="DiceFacePlaceholders"]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.201, 0, 0)
-text = "5"
+script = ExtResource("4_t8ab3")
+diceFaceNumber = 5
 
-[node name="DiceFaceNumber6" parent="DiceFaces" instance=ExtResource("5_tctqp")]
+[node name="DiceFace6" type="Node3D" parent="DiceFacePlaceholders"]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -0.201, 0, 0)
-text = "6"
+script = ExtResource("4_t8ab3")
+diceFaceNumber = 6
+
+[node name="DiceFaces" type="Node3D" parent="."]
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

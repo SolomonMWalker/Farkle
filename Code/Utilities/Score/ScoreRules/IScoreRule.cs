@@ -28,7 +28,7 @@ public class SingleNumScoreRule(int num, int scoreOfOneNum) : IScoreRule
         if(scorableCollection.dict == null || !scorableCollection.dict.ContainsKey(Num)) {return new (-1, []);}
 
         var diceFaceScored = scorableCollection.faces
-            .Where(f => f.number == Num);
+            .Where(f => f.Number == Num);
         var diceFaceScoredCount = diceFaceScored.Count();
 
         if(diceFaceScoredCount > 2)
@@ -69,7 +69,7 @@ public class ThreeOrMoreOfAKindScoreRule : IScoreRule
         int score = diceNumber is 1 ? 1000 + 1000 * (highestMultiple - 3) : diceNumber * 100 + 1000 * (highestMultiple - 3);
 
         return new(score,
-            [.. scorableCollection.faces.Where(f => f.number != diceNumber).Select(f => f.AssociatedDice)]);
+            [.. scorableCollection.faces.Where(f => f.Number != diceNumber).Select(f => f.AssociatedDice)]);
     }
 }
 
@@ -128,7 +128,7 @@ public class StraightScoreRule : IScoreRule
         List<RootDice> usedDice = [];
         foreach (int number in numbersInStraight)
         {
-            usedDice.Add(scorableCollection.faces.First(f => f.number == number).AssociatedDice);
+            usedDice.Add(scorableCollection.faces.First(f => f.Number == number).AssociatedDice);
         }
         var unusedDice = scorableCollection.diceCollection.RemoveDice(usedDice).diceList;
         return new(score, [.. unusedDice]);
@@ -147,12 +147,12 @@ public class ThreePairScoreRule : IScoreRule
         }
 
 
-        List<DiceFace> usedDiceFaces = [];
+        List<RootDiceFace> usedDiceFaces = [];
         foreach (KeyValuePair<int, int> pair in pairs)
         {
             for (int i = 0; i < pair.Value; i++)
             {
-                usedDiceFaces.Add(scorableCollection.faces.First(f => f.number == pair.Key &&
+                usedDiceFaces.Add(scorableCollection.faces.First(f => f.Number == pair.Key &&
                     !usedDiceFaces.Contains(f)));
             }
         }

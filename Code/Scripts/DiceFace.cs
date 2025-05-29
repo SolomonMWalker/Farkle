@@ -1,23 +1,27 @@
 using Godot;
-using System;
 
-public partial class DiceFace : Label3D
+public partial class RootDiceFace(DiceFaceValue diceFaceValue, Transform3D transform) : Node3D
 {
-    [Export]
-    public int number;
+    protected DiceFaceValue diceFaceValue = diceFaceValue;
+    protected Label3D _label;
+    protected RootDice _associatedDice;
+    protected const DiceFaceType diceFaceType = DiceFaceType.Root;
     public RootDice AssociatedDice { get => _associatedDice; }
-    private RootDice _associatedDice;
+    public virtual int Number => diceFaceValue.numberValue ?? 0;
 
     public override void _Ready()
     {
         base._Ready();
-        number = int.Parse(Text);
+        Transform = transform;
+        _label = this.FindChild<Label3D>("Label");
         _associatedDice = GetParent<Node3D>().GetParent<RootDice>();
     }
 
-    public void ChangeNumber(int newNumber)
+    public virtual void ChangeNumber(int newNumber)
     {
-        number = newNumber;
-        Text = number.ToString();
+        diceFaceValue.numberValue = newNumber;
+        _label.Text = Number.ToString();
     }
+
+    protected void SetLabelText(string text) => _label.Text = text;
 }

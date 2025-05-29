@@ -277,7 +277,7 @@ public partial class GameController : Node3D
 
     public bool TryHandleMouseClickOnObject(ulong? objInstanceId, out RootDice clickedDice)
     {
-        if (objInstanceId == null && rollableDiceCollection.TryGetDiceWithInstanceIdEqualTo(objInstanceId.Value, out var selectedDice))
+        if (objInstanceId != null && rollableDiceCollection.TryGetDiceWithInstanceIdEqualTo(objInstanceId.Value, out var selectedDice))
         {
             clickedDice = selectedDice;
             return true;
