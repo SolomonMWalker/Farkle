@@ -1,7 +1,7 @@
 using Godot;
 
 /// <summary>
-/// 5x5 Square Tile with height of 0.1ish for building planes
+/// 1x1 Square Tile with height of 0.1ish for building planes
 /// origin at top left
 /// </summary>
 public partial class SquareTile : Node3D
