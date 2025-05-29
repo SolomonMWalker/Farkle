@@ -30,7 +30,6 @@ public partial class GameController : Node3D
     {
         base._Ready();
         Configuration.SetUpConfiguration();
-        GD.Print("Config setup");
         packedRootDice = GD.Load<PackedScene>("res://Scenes/root_dice.tscn");
         diceHolder = this.FindChild<Node3D>("DiceHolder");
         throwLocationBall = FindChild("DiceTable").FindChild<ThrowLocationBall>("ThrowLocationBall");
