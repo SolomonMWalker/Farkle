@@ -89,13 +89,6 @@ public partial class GameController : Node3D
         RunGame();
     }
 
-    public override void _PhysicsProcess(double delta)
-    {
-        base._PhysicsProcess(delta);
-
-        HandleDicePhysics();
-    }
-
     public override void _Input(InputEvent @event)
     {
         base._Input(@event);
@@ -144,15 +137,6 @@ public partial class GameController : Node3D
             case GameState.GameOver:
                 HandleGameOverState();
                 break;
-        }
-    }
-
-    public void HandleDicePhysics()
-    {
-        if (gameStateManager.GameState is GameState.RollReady)
-        {
-            rollableDiceCollection.diceList.ForEach(
-                x => x.GlobalPosition = throwLocationBall.throwLocation.GlobalPosition);
         }
     }
 
@@ -524,25 +508,26 @@ public partial class GameController : Node3D
 
     public void ThrowDice()
     {
+        MoveRollableDiceToThrowLocation();
         rollableDiceCollection.TurnOn();
         rollableDiceCollection.ThrowDice();
         throwLocationBall.StopAnimation();
         cameraController.MoveToDiceZoomLocation();
     }
 
+    public void MoveRollableDiceToThrowLocation()
+    {
+        rollableDiceCollection.SetGlobalPosition(throwLocationBall.throwLocation.GlobalPosition);
+    }
+
     public void MoveScoredDiceOffCamera()
     {
-        scoredDiceCollection.diceList.ForEach(d => d.GlobalPosition = outOfPlayDiceLocation.GlobalPosition);
+        rollableDiceCollection.SetGlobalPosition(outOfPlayDiceLocation.GlobalPosition);
     }
 
     public void MoveRollableDiceOffCamera()
     {
-        rollableDiceCollection.diceList.ForEach(d => d.GlobalPosition = outOfPlayDiceLocation.GlobalPosition);
-    }
-
-    public static void MoveDiceTo(DiceCollection dc, Node3D node3D)
-    {
-        dc.diceList.ForEach(d => d.GlobalPosition = node3D.GlobalPosition);
+        rollableDiceCollection.SetGlobalPosition(outOfPlayDiceLocation.GlobalPosition);
     }
 
     #endregion

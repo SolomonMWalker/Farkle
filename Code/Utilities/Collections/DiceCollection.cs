@@ -101,6 +101,11 @@ public class DiceCollection{
         diceList.ForEach(x => x.SetDebug(isDebug));
     }
 
+    public void SetGlobalPosition(Vector3 globalPosition)
+    {
+        diceList.ForEach(x => x.GlobalPosition = globalPosition);
+    }
+
     public void ChangeParent(Node newParent, bool changeGlobalTransform)
     {
         diceList.ForEach(x => x.Reparent(newParent, changeGlobalTransform));
