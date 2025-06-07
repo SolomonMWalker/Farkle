@@ -359,13 +359,14 @@ public partial class GameController : Node3D
     #endregion
 
     #region PlayersTurnsAndScore
+
     public bool TryAdvanceTurn()
     {
-        if (onLastRound && !activePlayerManager.TryAdvanceTurnOnLastRound(out _))
+        if (onLastRound && !activePlayerManager.CanAdvanceTurnOnLastRound())
         {
             return false;
         }
-        if (BeginLastRoundIfPlayerAtMaxScore())
+        if (TryBeginLastRoundAndAdvanceTurn())
         {
             return true;
         }
@@ -395,7 +396,11 @@ public partial class GameController : Node3D
         return true;
     }
 
-    public bool BeginLastRoundIfPlayerAtMaxScore()
+    /// <summary>
+    /// Checks if a player is at max score, and if they are, begin the last round and advance the turn to the next player
+    /// </summary>
+    /// <returns></returns>
+    public bool TryBeginLastRoundAndAdvanceTurn()
     {
         if (!onLastRound && activePlayerManager.TryGetPlayerAtScore(Configuration.ConfigValues.ScoreToWin, out var playerScoreAtMaxScore))
         {

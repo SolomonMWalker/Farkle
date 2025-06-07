@@ -71,17 +71,7 @@ public class PlayerManager
         return players[currentPlayerTurnIndex];
     }
 
-    public bool TryAdvanceTurnOnLastRound(out string nextPlayer)
-    {
-        if (GetIncrementedCurrentPlayerTurnIndex() == lastRoundStartingIndex)
-        {
-            nextPlayer = null;
-            return false;
-        }
-
-        nextPlayer = AdvanceTurn();
-        return true;
-    }
+    public bool CanAdvanceTurnOnLastRound() => GetIncrementedCurrentPlayerTurnIndex() != lastRoundStartingIndex;
 
     public string AdvanceTurn()
     {
