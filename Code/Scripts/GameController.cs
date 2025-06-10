@@ -89,7 +89,7 @@ public partial class GameController : Node3D
         RunGame();
     }
 
-    public override void _Input(InputEvent @event)
+    public override void _UnhandledInput(InputEvent @event)
     {
         base._Input(@event);
         HandleMouseInput(@event);
