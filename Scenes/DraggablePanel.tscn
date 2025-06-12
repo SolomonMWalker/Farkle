@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://c6vewi1cidg0h"]
+
+[ext_resource type="Script" uid="uid://copmj3ksdv55x" path="res://Code/Scripts/DraggablePanel.cs" id="1_625gy"]
+
+[node name="DraggablePanel" type="PanelContainer"]
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("1_625gy")
