@@ -36,4 +36,5 @@ public partial class DiceFaceCollection
     }
 
     public List<ulong> GetDiceFaceInstanceIds() => [.. faces.Select(f => f.GetInstanceId())];
+    public void EndOverrides() => faces.ForEach(f => f.EndOverride());
 }

@@ -4,9 +4,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Godot;
 
-public class DiceCollection{
+public class DiceCollection
+{
     public ImmutableList<RootDice> diceList;
-    public CalculatedScoreResult CalculateScoreResult { get => _calculatedScoreResult;}
+    public CalculatedScoreResult CalculateScoreResult { get => _calculatedScoreResult; }
     private CalculatedScoreResult _calculatedScoreResult = null;
 
     //Constructors
@@ -46,20 +47,20 @@ public class DiceCollection{
 
     public DiceCollection RemoveDice(RootDice dice)
     {
-        if(!diceList.Contains(dice)){return this;}
+        if (!diceList.Contains(dice)) { return this; }
 
         List<RootDice> tempDiceList = [.. diceList];
         tempDiceList.Remove(dice);
         return new DiceCollection(tempDiceList);
     }
-    
+
     public DiceCollection RemoveDice(IEnumerable<RootDice> dice) => new([.. diceList.Where(d => !dice.Contains(d))]);
     public DiceCollection RemoveDice(DiceCollection dc) => RemoveDice(dc.diceList);
 
     //Scoring methods
     public CalculatedScoreResult CalculateScore()
     {
-        if(diceList.IsEmpty){return new (-1, null);}
+        if (diceList.IsEmpty) { return new(-1, null); }
         _calculatedScoreResult = DiceCollectionScore.CalculateScore(this);
         return _calculatedScoreResult;
     }
@@ -69,7 +70,7 @@ public class DiceCollection{
 
     public int Count()
     {
-        if(diceList == null || diceList.IsEmpty)
+        if (diceList == null || diceList.IsEmpty)
         {
             return 0;
         }
@@ -81,9 +82,9 @@ public class DiceCollection{
 
     public bool PointTooClose(Vector3 point, float margin)
     {
-        foreach(RootDice dice in diceList)
+        foreach (RootDice dice in diceList)
         {
-            if(dice.PointTooClose(point, margin))
+            if (dice.PointTooClose(point, margin))
             {
                 return true;
             }
@@ -126,7 +127,7 @@ public class DiceCollection{
         diceList.ForEach(x => x.TurnOn());
     }
 
-     public void TurnOff()
+    public void TurnOff()
     {
         diceList.ForEach(x => x.TurnOff());
     }
@@ -165,4 +166,5 @@ public class DiceCollection{
 
     public IEnumerable<DiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
     public void FlashRed() => diceList.ForEach(d => d.FlashRed());
+    public void EndOverrides() => diceList.ForEach(d => d.EndOverride());
 }

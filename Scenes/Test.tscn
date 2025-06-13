@@ -133,11 +133,13 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 size_flags_horizontal = 6
+mouse_filter = 1
 
 [node name="Instructions" type="Label" parent="GameController/ControlParent"]
 layout_mode = 0
 offset_right = 343.0
 offset_bottom = 193.0
+mouse_filter = 1
 autowrap_mode = 3
 
 [node name="Score" type="Label" parent="GameController/ControlParent"]
@@ -149,6 +151,7 @@ offset_left = 2.0
 offset_top = -35.544
 offset_right = 345.0
 offset_bottom = 35.456
+mouse_filter = 1
 
 [node name="OnLastRound" type="Label" parent="GameController/ControlParent"]
 layout_mode = 1
@@ -159,6 +162,7 @@ offset_top = -35.5
 offset_right = 343.0
 offset_bottom = 35.5
 grow_vertical = 2
+mouse_filter = 1
 
 [node name="ScorePerRoll" type="RichTextLabel" parent="GameController/ControlParent"]
 layout_mode = 1
@@ -168,6 +172,7 @@ anchor_right = 1.0
 offset_left = -194.0
 offset_bottom = 277.0
 grow_horizontal = 0
+mouse_filter = 1
 
 [node name="FarkleLabel" type="Label" parent="GameController/ControlParent"]
 layout_direction = 1
@@ -183,6 +188,7 @@ offset_right = 46.0
 offset_bottom = 11.5
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 1
 horizontal_alignment = 1
 
 [node name="PlayerTurn" type="Label" parent="GameController/ControlParent"]
@@ -194,6 +200,7 @@ offset_left = -20.0
 offset_right = 20.0
 offset_bottom = 23.0
 grow_horizontal = 2
+mouse_filter = 1
 
 [node name="PlayerInput" type="LineEdit" parent="GameController/ControlParent"]
 layout_mode = 1
@@ -204,3 +211,4 @@ anchor_bottom = 1.0
 offset_top = -31.0
 grow_horizontal = 2
 grow_vertical = 0
+mouse_filter = 1

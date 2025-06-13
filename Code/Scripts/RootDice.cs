@@ -18,6 +18,7 @@ public partial class RootDice : RigidBody3D
     public Node3D DiceFacesParent { get; }
     private Vector3 velocityUponThrow;
     private DiceFaceCollection diceFaceCollection;
+    public DiceFace ResultOfRoll { get; private set; }
     private bool _isDebug = false, _isInitialized = false;
     public bool IsDebug { get; }
     public bool IsInitialized { get; }
@@ -27,11 +28,11 @@ public partial class RootDice : RigidBody3D
     public override void _Ready()
     {
         base._Ready();
-        collisionShape = this.FindChild<CollisionShape3D>("CollisionShape3D");
-        meshInstance = this.FindChild<MeshInstance3D>("MeshInstance3D");
-        corner = this.FindChild<Node3D>("Corner");
-        diceFacesParent = this.FindChild<Node3D>("DiceFaces");
-        animationPlayer = this.FindChild<AnimationPlayer>("AnimationPlayer");
+        collisionShape = this.GetChildByName<CollisionShape3D>("CollisionShape3D");
+        meshInstance = this.GetChildByName<MeshInstance3D>("MeshInstance3D");
+        corner = this.GetChildByName<Node3D>("Corner");
+        diceFacesParent = this.GetChildByName<Node3D>("DiceFaces");
+        animationPlayer = this.GetChildByName<AnimationPlayer>("AnimationPlayer");
         edgelength = HelperMethods.GetSideLengthFromHalfDiagonal(Position.DistanceTo(corner.Position));
         rootDiceMaterial = GD.Load<Material>(RootDiceMaterialPath);
         rootDiceSelectedMaterial = GD.Load<Material>(RootDiceSelectedMaterialPath);
@@ -42,7 +43,7 @@ public partial class RootDice : RigidBody3D
         selected = false;
         diceFaceCollection = new DiceFaceCollection
         {
-            faces = [.. diceFacesParent.GetChildren<DiceFace>()]
+            faces = [.. diceFacesParent.GetChildrenOfType<DiceFace>()]
         };
     }
 
@@ -93,7 +94,11 @@ public partial class RootDice : RigidBody3D
 
     public void DisableCollision() { collisionShape.Disabled = true; }
     public void EnableCollision() { collisionShape.Disabled = false; }
-    public DiceFace GetResultOfRoll() { return diceFaceCollection.GetResultOfRoll(); }
+    public DiceFace GetResultOfRoll()
+    {
+        ResultOfRoll = diceFaceCollection.GetResultOfRoll();
+        return ResultOfRoll;
+    }
 
     public void ToggleSelectDice()
     {
@@ -127,4 +132,5 @@ public partial class RootDice : RigidBody3D
     }
 
     public List<ulong> GetDiceFaceInstanceIds() => diceFaceCollection.GetDiceFaceInstanceIds();
+    public void EndOverride() => diceFaceCollection.EndOverrides();
 }

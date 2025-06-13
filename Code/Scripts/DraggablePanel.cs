@@ -3,12 +3,21 @@ using System;
 
 public partial class DraggablePanel : PanelContainer
 {
+    [Export]
+    public Control controlToDrag = null;
     private DraggableModule _draggableModule = null;
 
     public override void _Ready()
     {
         base._Ready();
-        _draggableModule = new DraggableModule(this);
+        if (controlToDrag is null)
+        {
+            _draggableModule = new DraggableModule(this);
+        }
+        else
+        {
+            _draggableModule = new DraggableModule(controlToDrag);
+        }        
     }
 
     public void SetDraggableControl(Control control)

@@ -1,0 +1,80 @@
+using Godot;
+using System;
+using System.Collections.Generic;
+
+public partial class DebugMenuDiceTab : MarginContainer
+{
+    private const string _diceEntrySceneRelPath = "res://Scenes/DebugMenuDiceTabEntry.tscn";
+    private PackedScene _diceEntryPScene;
+    private GameController gController;
+    private List<DebugMenuDiceTabEntry> DiceEntries { get; set; } = [];
+    public DiceCollection DiceCollection { get; private set; } = new DiceCollection();
+
+    [Export]
+    public VBoxContainer diceMenuVBox;
+    [Export]
+    public Button overrideButton;
+    [Export]
+    public Button endOverrideButton;
+
+    public override void _Ready()
+    {
+        base._Ready();
+        _diceEntryPScene = GD.Load<PackedScene>(_diceEntrySceneRelPath);
+        overrideButton.ButtonDown += OverrideResultOfRollDiceFaces;
+        endOverrideButton.ButtonDown += EndOverride;
+    }
+
+    public void Initialize(GameController gameController)
+    {
+        gController = gameController;
+    }
+
+    public void AddDiceEntries(DiceCollection diceCollection)
+    {
+        AddDiceEntries(diceCollection.diceList);
+    }
+
+    public void AddDiceEntries(IEnumerable<RootDice> dice)
+    {
+        foreach (RootDice d in dice)
+        {
+            AddDiceEntry(d);
+        }
+    }
+
+    public void AddDiceEntry(RootDice dice)
+    {
+        DiceCollection = DiceCollection.AddDice(dice);
+        var diceEntryScene = _diceEntryPScene.Instantiate<DebugMenuDiceTabEntry>();
+        GD.Print(diceEntryScene.ToString());
+        DiceEntries.Add(diceEntryScene);
+        diceMenuVBox.AddChild(diceEntryScene);
+        diceEntryScene.Initialize(dice);
+    }
+
+    public void OverrideResultOfRollDiceFaces()
+    {
+        if (gController.GameStateManager.GameState != GameState.SelectDice) { return; }
+        foreach (var entry in DiceEntries)
+        {
+            var topDiceFace = entry.Dice.ResultOfRoll;
+            topDiceFace.EndOverride();
+            var overrideScore = int.Parse(entry.GetOverrideDiceFaceValue());
+            topDiceFace.Override(new DiceFaceValue(overrideScore));
+        }
+        gController.RescoreSelectedDice();
+    }
+
+    public void EndOverride()
+    {
+        foreach (var entry in DiceEntries)
+        {
+            entry.Dice.EndOverride();
+        }
+        if (gController.GameStateManager.GameState is GameState.SelectDice)
+        {
+            gController.RescoreSelectedDice();
+        }
+    }
+}

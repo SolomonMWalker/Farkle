@@ -4,13 +4,18 @@ using Godot;
 
 public static class NodeExtensions
 {
-    public static IEnumerable<T> GetChildren<T>(this Node node) where T: Node
+    public static Node GetChildByName(this Node node, string name)
     {
-        return node.GetChildren().OfType<T>().ToList();
+        return node.GetChildren().FirstOrDefault(c => c.Name.Equals(name));
     }
 
-    public static T FindChild<T>(this Node node, string name) where T: Node
+    public static IEnumerable<T> GetChildrenOfType<T>(this Node node) where T : Node
     {
-        return node.GetChildren().OfType<T>().FirstOrDefault(x => x.Name.Equals(name));
+        return [.. node.GetChildren().OfType<T>()];
+    }
+
+    public static T GetChildByName<T>(this Node node, string name) where T : Node
+    {
+        return node.GetChildrenOfType<T>().FirstOrDefault(x => x.Name.Equals(name));
     }
 }

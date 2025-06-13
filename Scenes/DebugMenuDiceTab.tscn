@@ -1,0 +1,46 @@
+[gd_scene load_steps=3 format=3 uid="uid://cu8h71snlrnrh"]
+
+[ext_resource type="Script" uid="uid://crq0ynx48s1iw" path="res://Code/Scripts/DebugMenuDiceTab.cs" id="1_5liw8"]
+[ext_resource type="Texture2D" uid="uid://bum43vi0k8n46" path="res://Resources/Images/Circle.png" id="2_riufa"]
+
+[node name="DebugMenuDiceTab" type="MarginContainer" node_paths=PackedStringArray("overrideButton", "endOverrideButton")]
+custom_minimum_size = Vector2(100, 50)
+offset_right = 20.0
+offset_bottom = 50.0
+script = ExtResource("1_5liw8")
+overrideButton = NodePath("VBoxContainer/OverrideContainer/HBoxContainer/OverrideButton")
+endOverrideButton = NodePath("VBoxContainer/EndOverrideContainer/HBoxContainer/EndOverrideButton")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 2
+alignment = 1
+
+[node name="OverrideContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/OverrideContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer/OverrideContainer/HBoxContainer"]
+layout_mode = 2
+text = "Begin Override"
+
+[node name="OverrideButton" type="Button" parent="VBoxContainer/OverrideContainer/HBoxContainer"]
+layout_mode = 2
+icon = ExtResource("2_riufa")
+
+[node name="EndOverrideContainer" type="MarginContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="HBoxContainer" type="HBoxContainer" parent="VBoxContainer/EndOverrideContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="VBoxContainer/EndOverrideContainer/HBoxContainer"]
+layout_mode = 2
+text = "End Override"
+
+[node name="EndOverrideButton" type="Button" parent="VBoxContainer/EndOverrideContainer/HBoxContainer"]
+layout_mode = 2
+icon = ExtResource("2_riufa")

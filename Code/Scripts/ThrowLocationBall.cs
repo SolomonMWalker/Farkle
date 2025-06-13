@@ -15,8 +15,8 @@ public partial class ThrowLocationBall : MeshInstance3D
     {
         base._Ready();
         startingPosition = GlobalPosition;
-        throwLocation = this.FindChild<Node3D>("ThrowLocation");
-        diceHolder = throwLocation.FindChild<Node3D>("DiceHolder");
+        throwLocation = this.GetChildByName<Node3D>("ThrowLocation");
+        diceHolder = throwLocation.GetChildByName<Node3D>("DiceHolder");
     }
 
     public void Animate()

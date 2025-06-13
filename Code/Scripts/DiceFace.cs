@@ -42,7 +42,7 @@ public partial class DiceFace() : Node3D
     {
         base._Ready();
         _associatedDice = GetParent<Node3D>().GetParent<RootDice>();
-        _label = this.FindChild<Label3D>("Label");
+        _label = this.GetChildByName<Label3D>("Label");
         _diceFaceValue = new DiceFaceValue(numberValue);
         SetLabelText(_diceFaceValue.numberValue.Value.ToString());
     }
