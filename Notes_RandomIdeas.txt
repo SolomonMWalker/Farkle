@@ -1,0 +1,2 @@
+If dice fall off the map, they normally are removed from scoring
+    I can add a relic that rerolls dice that fall off the map and add a mult to that round's score

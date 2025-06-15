@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://cu8h71snlrnrh"]
 
-[ext_resource type="Script" uid="uid://crq0ynx48s1iw" path="res://Code/Scripts/DebugMenuDiceTab.cs" id="1_5liw8"]
+[ext_resource type="Script" uid="uid://crq0ynx48s1iw" path="res://Code/Scripts/Debug/DebugMenuDiceTab.cs" id="1_5liw8"]
 [ext_resource type="Texture2D" uid="uid://bum43vi0k8n46" path="res://Resources/Images/Circle.png" id="2_riufa"]
 
 [node name="DebugMenuDiceTab" type="MarginContainer" node_paths=PackedStringArray("overrideButton", "endOverrideButton")]

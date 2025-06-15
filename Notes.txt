@@ -1,3 +1,44 @@
 Game Mechanics
     Score Card with limited entries
         can score different ways as rewards through game, but must remove other scoring options
+    Game progression
+        Each stage has a score requirement
+            player must reach that score requirement in a certain number of "score tries" called rounds
+                score try = record a score or farkle
+            Each stage, the player also has a certain number of rerolls
+                1 reroll for 1 dice
+        Every certain number of stages (unsure of exact number), there will be a "boss" battle
+            "boss" is a particular gimmick that makes the stage more interesting/challenging
+                Could be score limitation, stage shape change, stage obstacle limitation, etc.
+                    ?? What should the boss visibility be in the run? (should they see all the bosses at the beginning?)
+        Inbetween cetain number of stages (unsure of exact number, could be between every one Balatro-style) there will be a shop where you can buy items
+            Could be relics (change how the game works), new dice (replace old dice in most cases), new score mechanics, new obstacles, etc.
+                I'm thinking to have a shop inbetween each stage, but the style of shop could be random
+                    Should allow players to see the upcoming shops so that they can strategize their run
+        Should there be special events?
+            Where would they be?
+            They'd have to be tied to the context of the game.
+        Hidden shops
+            put special doors in the wall or special obstacles that, when hit, open up special shop options
+                These could give items that come with heavy pros and heavy cons
+        Currency
+            Types?
+                money - use in shops
+                    get through playing stages, random obstacles in stages, and selling at shops
+                Keys - open up hidden shops
+                    gotten in shops or by hitting special obstacles that can pop up in a stage
+                rerolls - allow rerolls of single dice in each stage (reset at each stage)
+                    get a certain number at the start of the game, can get more through items
+                rounds - determines the amount of score entries or farkles a player can make per round
+                    get a certain number at the start of the game, can get more through items
+                # of score rules - determine how many ways you can score (slots in score card)
+                    get a certain number at the start of the game, can get more through items
+                # of dice - how many dice you have on you when you start each stage
+                    get a certain number at the start of the game, can get more through items
+                # of obstacle slots - determines how many obstacles you can place
+                    each obstacle can take up 1 or more slots
+                    get a certain number at the start of the game, can get more through items
+                MAYBE # of faces per dice
+
+
+        

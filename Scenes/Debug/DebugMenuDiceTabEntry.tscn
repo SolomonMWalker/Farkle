@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b6il7niua3yog"]
 
-[ext_resource type="Script" uid="uid://ddfvcvwb4rejk" path="res://Code/Scripts/DebugMenuDiceTabEntry.cs" id="1_qvbj2"]
+[ext_resource type="Script" uid="uid://ddfvcvwb4rejk" path="res://Code/Scripts/Debug/DebugMenuDiceTabEntry.cs" id="1_qvbj2"]
 
 [node name="DebugDiceEntry" type="MarginContainer"]
 custom_minimum_size = Vector2(130, 32)
