@@ -8,7 +8,7 @@ public partial class GameController : Node3D
     #region Properties
 
     private const string RootDiceRelPath = "res://Scenes/root_dice.tscn";
-    private const string DebugMenuRelPath = "res://Scenes/DebugMenu.tscn";
+    private const string DebugMenuRelPath = "res://Scenes/Debug/DebugMenu.tscn";
 
     public DebugMenu DebugMenu { get; private set; }
     private DiceCollection persistentDiceCollection, rollableDiceCollection, selectedDiceCollection,
@@ -272,7 +272,7 @@ public partial class GameController : Node3D
 
                     if (Configuration.ConfigValues.IsDebug)
                     {
-                        DebugMenu.AddDice(selectedDice);
+                        DebugMenu.SetNewDiceCollection(selectedDiceCollection);
                     }
                 }
             }

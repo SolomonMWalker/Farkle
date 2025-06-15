@@ -1,10 +1,11 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class DebugMenuDiceTab : MarginContainer
 {
-    private const string _diceEntrySceneRelPath = "res://Scenes/DebugMenuDiceTabEntry.tscn";
+    private const string _diceEntrySceneRelPath = "res://Scenes/Debug/DebugMenuDiceTabEntry.tscn";
     private PackedScene _diceEntryPScene;
     private GameController gController;
     private List<DebugMenuDiceTabEntry> DiceEntries { get; set; } = [];
@@ -28,6 +29,27 @@ public partial class DebugMenuDiceTab : MarginContainer
     public void Initialize(GameController gameController)
     {
         gController = gameController;
+    }
+
+    public void SetNewDiceCollection(DiceCollection diceCollection)
+    {
+        DeleteDiceEntries();
+        DiceCollection = new DiceCollection(diceCollection);
+        foreach (RootDice d in DiceCollection.diceList)
+        {
+            var diceEntryScene = _diceEntryPScene.Instantiate<DebugMenuDiceTabEntry>();
+            //GD.Print(diceEntryScene.ToString());
+            DiceEntries.Add(diceEntryScene);
+            diceMenuVBox.AddChild(diceEntryScene);
+            diceEntryScene.Initialize(d);
+        }
+    }
+
+    public void DeleteDiceEntries()
+    {
+        if (DiceEntries is null || DiceEntries.Count == 0) { return; }
+        DiceEntries.ForEach(e => e.QueueFree());
+        DiceEntries = [];
     }
 
     public void AddDiceEntries(DiceCollection diceCollection)

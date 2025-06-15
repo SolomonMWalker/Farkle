@@ -20,6 +20,7 @@ public partial class DebugMenu : MarginContainer
         DiceTab.Initialize(gc);
     }
 
+    public void SetNewDiceCollection(DiceCollection dc) => DiceTab.SetNewDiceCollection(dc);
     public void AddDice(RootDice dice) => DiceTab.AddDiceEntry(dice);
     public void AddDice(DiceCollection dc) => DiceTab.AddDiceEntries(dc);
     public void AddDice(IEnumerable<RootDice> dice) => DiceTab.AddDiceEntries(dice);
