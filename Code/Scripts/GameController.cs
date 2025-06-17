@@ -105,13 +105,13 @@ public partial class GameController : Node3D
                 //do nothing here
                 break;
             case GameState.PreRoll:
-                if (Input.IsActionJustPressed("space"))
+                if (Input.IsActionJustPressed("Accept"))
                 {
                     TryProgressState();
                 }
                 break;
             case GameState.RollReady:
-                if (Input.IsActionJustPressed("space"))
+                if (Input.IsActionJustPressed("Accept"))
                 {
                     TryProgressState();
                 }
@@ -145,7 +145,7 @@ public partial class GameController : Node3D
             {
                 GameOver();
             }
-            else if (Input.IsActionJustPressed("space"))
+            else if (Input.IsActionJustPressed("Accept"))
             {
                 ClearFarkle();
                 DiceManager.ResetAllDice();
@@ -165,7 +165,7 @@ public partial class GameController : Node3D
                 TryProgressState();
             }
         }
-        else if (Input.IsActionJustPressed("space") && TryRecordScore())
+        else if (Input.IsActionJustPressed("Accept") && TryRecordScore())
         {
             var scoredDiceCount = DiceManager.ScoredDiceCollection.Count() + DiceManager.SelectedDiceCollection.Count();
             if (scoredDiceCount == DiceManager.PersistentDiceCollection.Count())
@@ -180,7 +180,7 @@ public partial class GameController : Node3D
             cameraController.MoveToUserPerspectiveLocation();
             TryProgressState();
         }
-        else if (Input.IsActionJustPressed("enter"))
+        else if (Input.IsActionJustPressed("Confirm"))
         {
             var scoredDiceCount = DiceManager.ScoredDiceCollection.Count() + DiceManager.SelectedDiceCollection.Count();
             if (scoredDiceCount == DiceManager.PersistentDiceCollection.Count())
@@ -216,7 +216,7 @@ public partial class GameController : Node3D
 
     public void HandleGameOverState()
     {
-        if (Input.IsActionJustPressed("space"))
+        if (Input.IsActionJustPressed("Accept"))
         {
             TryProgressState();
         }
