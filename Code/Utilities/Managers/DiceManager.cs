@@ -78,7 +78,7 @@ public class DiceManager
         }
     }
 
-    public void ReadyDiceForRoll() //turn off dice, set rotation and velocity
+    public void ReadyDiceForThrow() //turn off dice, set rotation and velocity
     {
         RollableDiceCollection.TurnOff();
         SetDiceRotationForThrow();
@@ -90,8 +90,6 @@ public class DiceManager
         MoveRollableDiceToThrowLocation();
         RollableDiceCollection.TurnOn();
         RollableDiceCollection.ThrowDice();
-        //throwLocationBall.StopAnimation();
-        //cameraController.MoveToDiceZoomLocation();
     }
 
     public bool TryGetSelectedDiceScore(out int score)
