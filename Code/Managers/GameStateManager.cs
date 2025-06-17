@@ -72,7 +72,6 @@ public class GameStateManager
 
     public void AddOnStateEnterOrExitAction(bool enter, GameState gameState, Action action)
     {
-        GD.Print($"add {action.Method.Name}");
         var actionDict = enter ? OnStateEnterActions : OnStateExitActions;
 
         actionDict[gameState].Add(action);

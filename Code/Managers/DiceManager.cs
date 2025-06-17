@@ -131,7 +131,7 @@ public class DiceManager
 
     public bool TryHandleMouseButtonInputForDiceSelect(InputEventMouseButton mouseButtonEvent)
     {
-        var clickedOnObjectInstanceId = MouseTools.GetCollisionIdFromMouseClick(mouseButtonEvent.Position, mouseButtonEvent, diceHolder);
+        var clickedOnObjectInstanceId = HelperMethods.GetCollisionIdFromMouseClick(mouseButtonEvent, diceHolder);
         if (clickedOnObjectInstanceId is not null && TryGetRollableDiceWithInstanceId(clickedOnObjectInstanceId, out var clickedDice))
         {
             if (SelectedDiceCollection.diceList.Contains(clickedDice))

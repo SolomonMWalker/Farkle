@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
 using Godot;
 
 public partial class GameController : Node3D
