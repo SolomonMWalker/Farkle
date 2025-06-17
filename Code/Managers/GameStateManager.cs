@@ -38,12 +38,6 @@ public class GameStateManager
         return gameState;
     }
 
-    public GameState StartPlayerSetup()
-    {
-        ChangeState(GameState.PlayerSetup);
-        return gameState;
-    }
-
     public GameState ProgressState()
     {
         
@@ -110,7 +104,6 @@ public class GameStateManager
 
 public enum GameState{
     Instantiated,
-    PlayerSetup,
     GameOver,
     PreRoll,
     RollReady,

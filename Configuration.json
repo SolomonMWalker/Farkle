@@ -1,5 +1,5 @@
 {
-    "IsDebug": true,
+    "IsDebug": false,
     "ScoreToWin": 10000,
     "NumOfStartingDice": 6
 }

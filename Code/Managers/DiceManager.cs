@@ -12,16 +12,14 @@ public class DiceManager
     public DiceCollection SelectedDiceCollection { get; private set; } = new();
     public DiceCollection ScoredDiceCollection { get; private set; } = new();
 
-    private Label scoreLabel;
     private Node3D diceHolder, outOfPlayDiceLocation, throwLocationNode;
     private PackedScene packedRootDice;
 
-    public DiceManager(Node3D diceHolder, Node3D outOfPlayDiceLocation, Node3D throwLocationNode, Label scoreLabel)
+    public DiceManager(Node3D diceHolder, Node3D outOfPlayDiceLocation, Node3D throwLocationNode)
     {
         this.diceHolder = diceHolder;
         this.outOfPlayDiceLocation = outOfPlayDiceLocation;
         this.throwLocationNode = throwLocationNode;
-        this.scoreLabel = scoreLabel;
         packedRootDice = GD.Load<PackedScene>(RootDiceRelPath);
         CreateDiceCollection();
     }
@@ -92,28 +90,6 @@ public class DiceManager
         RollableDiceCollection.ThrowDice();
     }
 
-    public bool TryGetSelectedDiceScore(out int score)
-    {
-        score = 0;
-        if (SelectedDiceCollection.Count() == 0)
-        {
-            //Do nothing, maybe tell the user to select some scoring dice
-            return false;
-        }
-
-        SelectedDiceCollection.CalculateScore();
-        if (SelectedDiceCollection.HasUnusedScoreDice() ||
-            SelectedDiceCollection.CalculateScoreResult.Score == -1)
-        {
-            SelectedDiceCollection.CalculateScoreResult.UnusedDice.ToList()
-                .ForEach(d => d.FlashRed());
-            return false;
-        }
-        scoreLabel.Text = "";
-        score = SelectedDiceCollection.CalculateScoreResult.Score;
-        return true;
-    }
-
     public void MoveRollableDiceToThrowLocation()
     {
         RollableDiceCollection.SetGlobalPosition(throwLocationNode.GlobalPosition);
@@ -163,14 +139,6 @@ public class DiceManager
     }
     
     #region Debug
-
-    public void RescoreSelectedDice()
-    {
-        if (Configuration.ConfigValues.IsDebug)
-        {
-            SelectedDiceCollection.CalculateScore();
-        }
-    }
 
     public void EndOverride() => PersistentDiceCollection.EndOverrides();
 

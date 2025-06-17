@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 
 public interface IScoreRule{
-    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection);
+    public ScoreWithUnusedDice GetScore(ScorableCollection scorableCollection);
 }
 
 public class SingleNumScoreRule(int num, int scoreOfOneNum) : IScoreRule
@@ -23,7 +23,7 @@ public class SingleNumScoreRule(int num, int scoreOfOneNum) : IScoreRule
         return scoreRules;
     }
 
-    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection)
+    public ScoreWithUnusedDice GetScore(ScorableCollection scorableCollection)
     {
         if(scorableCollection.dict == null || !scorableCollection.dict.ContainsKey(Num)) {return new (-1, []);}
 
@@ -52,7 +52,7 @@ public class SingleNumScoreRule(int num, int scoreOfOneNum) : IScoreRule
 
 public class ThreeOrMoreOfAKindScoreRule : IScoreRule
 {
-    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection)
+    public ScoreWithUnusedDice GetScore(ScorableCollection scorableCollection)
     {
         if (scorableCollection.dict == null) { return new(-1, null); }
 
@@ -75,7 +75,7 @@ public class ThreeOrMoreOfAKindScoreRule : IScoreRule
 
 public class StraightScoreRule : IScoreRule
 {
-    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection)
+    public ScoreWithUnusedDice GetScore(ScorableCollection scorableCollection)
     {
         (int start, int length) longestStraightStartAndLength = (0, 0);
 
@@ -137,7 +137,7 @@ public class StraightScoreRule : IScoreRule
 
 public class ThreePairScoreRule : IScoreRule
 {
-    public CalculatedScoreResult GetScore(ScorableCollection scorableCollection)
+    public ScoreWithUnusedDice GetScore(ScorableCollection scorableCollection)
     {
         var pairs = scorableCollection.dict.Where(d => d.Value == 2).ToDictionary();
 

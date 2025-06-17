@@ -91,7 +91,7 @@ public partial class DebugMenuDiceTab : MarginContainer
             var overrideScore = int.Parse(entry.GetOverrideDiceFaceValue());
             topDiceFace.Override(new DiceFaceValue(overrideScore));
         }
-        gController.DiceManager.RescoreSelectedDice();
+        gController.RescoreSelectedDice();
     }
 
     public void EndOverride()
@@ -102,7 +102,7 @@ public partial class DebugMenuDiceTab : MarginContainer
         }
         if (gController.GameStateManager.GameState is GameState.SelectDice)
         {
-            gController.DiceManager.RescoreSelectedDice();
+            gController.RescoreSelectedDice();
         }
     }
 }

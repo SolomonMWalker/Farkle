@@ -7,8 +7,8 @@ using Godot;
 public class DiceCollection
 {
     public ImmutableList<RootDice> diceList;
-    public CalculatedScoreResult CalculateScoreResult { get => _calculatedScoreResult; }
-    private CalculatedScoreResult _calculatedScoreResult = null;
+    public ScoreWithUnusedDice CalculateScoreResult { get => _calculatedScoreResult; }
+    private ScoreWithUnusedDice _calculatedScoreResult = null;
 
     //Constructors
     public DiceCollection()
@@ -18,7 +18,8 @@ public class DiceCollection
 
     public DiceCollection(IEnumerable<RootDice> rootDice)
     {
-        diceList = [.. rootDice];
+        if(rootDice.Count() == 0) { diceList = []; }
+        else {diceList = [.. rootDice];}        
     }
 
     public DiceCollection(IEnumerable<DiceFace> diceFaces)
@@ -58,12 +59,12 @@ public class DiceCollection
     public DiceCollection RemoveDice(DiceCollection dc) => RemoveDice(dc.diceList);
 
     //Scoring methods
-    public CalculatedScoreResult CalculateScore()
-    {
-        if (diceList.IsEmpty) { return new(-1, null); }
-        _calculatedScoreResult = DiceCollectionScore.CalculateScore(this);
-        return _calculatedScoreResult;
-    }
+    // public ScoreWithUnusedDice CalculateScore()
+    // {
+    //     if (diceList.IsEmpty) { return new(-1, null); }
+    //     _calculatedScoreResult = DiceCollectionScore.CalculateScore(this);
+    //     return _calculatedScoreResult;
+    // }
 
     //Get properties of Dice
     public bool HasUnusedScoreDice() => _calculatedScoreResult.UnusedDice.Count() > 0;

@@ -142,17 +142,6 @@ offset_bottom = 193.0
 mouse_filter = 1
 autowrap_mode = 3
 
-[node name="Score" type="Label" parent="GameController/ControlParent"]
-layout_mode = 1
-anchors_preset = -1
-anchor_top = 0.328
-anchor_bottom = 0.328
-offset_left = 2.0
-offset_top = -35.544
-offset_right = 345.0
-offset_bottom = 35.456
-mouse_filter = 1
-
 [node name="OnLastRound" type="Label" parent="GameController/ControlParent"]
 layout_mode = 1
 anchors_preset = 4
@@ -164,7 +153,7 @@ offset_bottom = 35.5
 grow_vertical = 2
 mouse_filter = 1
 
-[node name="ScorePerRoll" type="RichTextLabel" parent="GameController/ControlParent"]
+[node name="Score" type="RichTextLabel" parent="GameController/ControlParent"]
 layout_mode = 1
 anchors_preset = 1
 anchor_left = 1.0
@@ -190,25 +179,3 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 horizontal_alignment = 1
-
-[node name="PlayerTurn" type="Label" parent="GameController/ControlParent"]
-layout_mode = 1
-anchors_preset = 5
-anchor_left = 0.5
-anchor_right = 0.5
-offset_left = -20.0
-offset_right = 20.0
-offset_bottom = 23.0
-grow_horizontal = 2
-mouse_filter = 1
-
-[node name="PlayerInput" type="LineEdit" parent="GameController/ControlParent"]
-layout_mode = 1
-anchors_preset = 12
-anchor_top = 1.0
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_top = -31.0
-grow_horizontal = 2
-grow_vertical = 0
-mouse_filter = 1
