@@ -1,7 +1,5 @@
 using Godot;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 
 public partial class DebugMenuDiceTab : MarginContainer
 {
@@ -31,6 +29,12 @@ public partial class DebugMenuDiceTab : MarginContainer
         gController = gameController;
     }
 
+    public void ResetDiceCollection()
+    {
+        DiceCollection = new DiceCollection();
+        DeleteDiceEntries();        
+    }
+
     public void SetNewDiceCollection(DiceCollection diceCollection)
     {
         DeleteDiceEntries();
@@ -38,7 +42,6 @@ public partial class DebugMenuDiceTab : MarginContainer
         foreach (RootDice d in DiceCollection.diceList)
         {
             var diceEntryScene = _diceEntryPScene.Instantiate<DebugMenuDiceTabEntry>();
-            //GD.Print(diceEntryScene.ToString());
             DiceEntries.Add(diceEntryScene);
             diceMenuVBox.AddChild(diceEntryScene);
             diceEntryScene.Initialize(d);
@@ -48,7 +51,10 @@ public partial class DebugMenuDiceTab : MarginContainer
     public void DeleteDiceEntries()
     {
         if (DiceEntries is null || DiceEntries.Count == 0) { return; }
-        DiceEntries.ForEach(e => e.QueueFree());
+        foreach (var child in DiceEntries)
+        {
+            child.QueueFree();
+        }
         DiceEntries = [];
     }
 
@@ -85,7 +91,7 @@ public partial class DebugMenuDiceTab : MarginContainer
             var overrideScore = int.Parse(entry.GetOverrideDiceFaceValue());
             topDiceFace.Override(new DiceFaceValue(overrideScore));
         }
-        gController.RescoreSelectedDice();
+        gController.DiceManager.RescoreSelectedDice();
     }
 
     public void EndOverride()
@@ -96,7 +102,7 @@ public partial class DebugMenuDiceTab : MarginContainer
         }
         if (gController.GameStateManager.GameState is GameState.SelectDice)
         {
-            gController.RescoreSelectedDice();
+            gController.DiceManager.RescoreSelectedDice();
         }
     }
 }

@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Xml;
+using Godot;
 
 public class GameStateManager
 {
@@ -23,11 +25,11 @@ public class GameStateManager
         }        
     }
 
-    private void ChangeState(GameState gameState)
+    private void ChangeState(GameState state)
     {
         RunOnStateExitActions(gameState);
-        this.gameState = gameState;
-        RunOnStateEnterActions(gameState);
+        gameState = state;
+        RunOnStateEnterActions(state);
     }
 
     public GameState StartGame()
@@ -70,6 +72,7 @@ public class GameStateManager
 
     public void AddOnStateEnterOrExitAction(bool enter, GameState gameState, Action action)
     {
+        GD.Print($"add {action.Method.Name}");
         var actionDict = enter ? OnStateEnterActions : OnStateExitActions;
 
         actionDict[gameState].Add(action);
