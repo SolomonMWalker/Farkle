@@ -19,10 +19,13 @@ public class UiManager
         ScoreLabel = UiParent.GetChildByName<RichTextLabel>("Score");
     }
 
-    public void BuildAndSetScoreText(int selectedDiceScore, int currentRoundScore, int currentStageScore)
+    public void BuildAndSetScoreText(int selectedDiceScore, int currentRoundScore, int currentStageScore,
+    int totalStages, int stageNumber)
     {
         ScoreLabel.Text =
         $"""
+        Total Stages = {totalStages}
+        Stage number = {stageNumber}
         Stage score = {currentStageScore}
         Round score = {currentRoundScore}
         Selected dice score = {selectedDiceScore}

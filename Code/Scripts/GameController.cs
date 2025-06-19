@@ -189,8 +189,7 @@ public partial class GameController : Node3D
                 if (DiceManager.TryHandleMouseButtonInputForDiceSelect(mouseButtonEvent))
                 {
                     var score = ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection);
-                    UiManager.BuildAndSetScoreText(ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection).Score,
-                    RoundManager.RoundScore, StageManager.StageScore);
+                    BuildAndSetScoreText();
 
                     if (Configuration.ConfigValues.IsDebug)
                     {
@@ -226,7 +225,7 @@ public partial class GameController : Node3D
         if (scoreResult.Scored)
         {
             RoundManager.AddToRoundScore(scoreResult.Score);
-            UiManager.BuildAndSetScoreText(0, RoundManager.RoundScore, StageManager.StageScore);
+            BuildAndSetScoreText();
             return true;
         }
 
@@ -246,7 +245,7 @@ public partial class GameController : Node3D
         {
             RoundManager.AddToRoundScore(scoreResult.Score);
             StageManager.AddToStageScore(RoundManager.RoundScore);
-            UiManager.BuildAndSetScoreText(0, RoundManager.RoundScore, StageManager.StageScore);
+            BuildAndSetScoreText();
             return true;
         }
         return false;
@@ -294,10 +293,11 @@ public partial class GameController : Node3D
         cameraController.MoveToDiceZoomLocation();
     }
 
-    public void RescoreSelectedDice()
+    public void BuildAndSetScoreText()
     {
         UiManager.BuildAndSetScoreText(ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection).Score,
-            RoundManager.RoundScore, StageManager.StageScore);
+            RoundManager.RoundScore, StageManager.StageScore, StageManager.GetNumberOfStages(),
+            StageManager.GetCurrentStageNumber());
     }
 
     #endregion
