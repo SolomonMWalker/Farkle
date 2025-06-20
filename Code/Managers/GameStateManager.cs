@@ -34,6 +34,7 @@ public class GameStateManager
 
     public GameState StartGame()
     {
+        ClearFarkle();
         ChangeState(GameState.PreRoll);
         return gameState;
     }
@@ -60,7 +61,11 @@ public class GameStateManager
         return selectDiceSubstate;
     }
 
-    public GameState GameOver() => gameState = GameState.GameOver;
+    public GameState GameOver()
+    {
+        gameState = GameState.GameOver;
+        return gameState;
+    }
 
     public SelectDiceSubstate GetSelectDiceSubstate => selectDiceSubstate;
 

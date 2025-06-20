@@ -43,7 +43,7 @@ public partial class GameController : Node3D
 
         SetupGameStateEnterExitActions();
 
-        GameStateManager.StartGame();
+        StartGame();
     }
 
     public void SetupGameStateEnterExitActions()
@@ -152,9 +152,29 @@ public partial class GameController : Node3D
         }
         else if (Input.IsActionJustPressed("Confirm") && TrySubmitRoundScore())
         {
-            DiceManager.ResetAllDice();
-            cameraController.MoveToUserPerspectiveLocation();
-            TryProgressState();
+            if (StageManager.IsStageScoreHigherThanScoreToWin())
+            {
+                GD.Print("Stage score is higher than score to win.");
+                RoundManager.Reset();
+                if (!StageManager.TryGoToNextStage())
+                {
+                    GameOver("You won!");
+                }
+            }
+            else if (!RoundManager.TrySubtractScoreAttempt(1))
+            {
+                GD.Print("No more score attempts.");
+                GameOver("You ran out of score attempts and lost this stage.");
+            }
+            
+            if (GameStateManager.GameState != GameState.GameOver)
+            {
+                GD.Print("Moving to next round.");
+                BuildAndSetScoreText();
+                DiceManager.ResetAllDice();
+                cameraController.MoveToUserPerspectiveLocation();
+                TryProgressState();
+            }            
         }
     }
 
@@ -162,7 +182,7 @@ public partial class GameController : Node3D
     {
         if (Input.IsActionJustPressed("Accept"))
         {
-            TryProgressState();
+            StartGame();
         }
     }
 
@@ -171,7 +191,7 @@ public partial class GameController : Node3D
         if (GameStateManager.GameState is not GameState.GameOver)
         {
             GameStateManager.ProgressState();
-            UiManager.SetInstructionLabel(GameStateManager.GameState);
+            UiManager.SetInstructionLabel(GameStateManager.GameState, GameStateManager.GetSelectDiceSubstate);
             return true;
         }
         return false;
@@ -188,9 +208,7 @@ public partial class GameController : Node3D
             {
                 if (DiceManager.TryHandleMouseButtonInputForDiceSelect(mouseButtonEvent))
                 {
-                    var score = ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection);
                     BuildAndSetScoreText();
-
                     if (Configuration.ConfigValues.IsDebug)
                     {
                         DebugMenu.SetNewDiceCollection(DiceManager.SelectedDiceCollection);
@@ -206,7 +224,14 @@ public partial class GameController : Node3D
 
     public void StartGame()
     {
+        StageManager.Reset();
+        RoundManager.Reset();
+        ClearFarkle();
+        DiceManager.ResetAllDice();
+        cameraController.MoveToUserPerspectiveLocation();
         GameStateManager.StartGame();
+        BuildAndSetScoreText();
+        UiManager.SetInstructionLabel(GameStateManager.GameState, GameStateManager.GetSelectDiceSubstate);
     }
 
     #endregion
@@ -229,6 +254,7 @@ public partial class GameController : Node3D
             return true;
         }
 
+        //implicitly no dice scored
         DiceManager.SelectedDiceCollection.FlashRed();
         return false;
     }
@@ -240,6 +266,7 @@ public partial class GameController : Node3D
         if (scoreResult.ResultType is CalculateScoreResultType.HasUnusedScoreDice)
         {
             scoreResult.UnusedDice.FlashRed();
+            return false;
         }
         if (scoreResult.Scored)
         {
@@ -248,12 +275,16 @@ public partial class GameController : Node3D
             BuildAndSetScoreText();
             return true;
         }
+        DiceManager.SelectedDiceCollection.FlashRed();
         return false;
     }
 
-    public void GameOver()
+    public void GameOver(string extraMessage = null)
     {
+        BuildAndSetScoreText();
         GameStateManager.GameOver();
+        UiManager.SetInstructionLabel(GameStateManager.GameState, GameStateManager.GetSelectDiceSubstate, extraMessage);
+        DiceManager.ResetAllDice();
     }
 
     public void PreSelectDiceFarkleCheck()
@@ -273,14 +304,17 @@ public partial class GameController : Node3D
     public void Farkle()
     {
         GameStateManager.Farkle();
-        RoundManager.Farkle();
+        if (!RoundManager.TryToFarkle())
+        {
+            GameOver("You Farkled your last score attempt and lost this stage.");
+        }
         UiManager.Farkle();
     }
 
     public void ClearFarkle()
     {
         GameStateManager.ClearFarkle();
-        UiManager.Farkle();
+        UiManager.ClearFarkle();
     }
 
     #endregion
@@ -295,8 +329,13 @@ public partial class GameController : Node3D
 
     public void BuildAndSetScoreText()
     {
-        UiManager.BuildAndSetScoreText(ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection).Score,
-            RoundManager.RoundScore, StageManager.StageScore, StageManager.GetNumberOfStages(),
+        UiManager.BuildAndSetScoreText(
+            ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection).Score,
+            RoundManager.RoundScore,
+            RoundManager.ScoreAttemptsLeft,
+            StageManager.StageScore,
+            StageManager.GetCurrentStageScoreToWin(),
+            StageManager.GetNumberOfStages(),
             StageManager.GetCurrentStageNumber());
     }
 

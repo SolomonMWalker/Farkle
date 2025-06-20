@@ -4,7 +4,6 @@ using System.Linq;
 public class ScoreManager
 {
     public readonly ScoreRuleCollection scoreRules = ScoreRuleCollection.GetDefaultRules();
-
     private ScoreWithUnusedDice CalculateScore(DiceCollection collection)
     {
         var scorableResult = ScorableCollection.NewScorableCollection(collection);

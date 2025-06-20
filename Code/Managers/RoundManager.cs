@@ -1,8 +1,11 @@
 public class RoundManager
 {
+    private const int StartingScoreAttemptsLeft = 1;
+    private const int StartingRetriesLeft = 5;
+
     public int RoundScore { get; private set; } = 0;
-    public int ScoreAttemptsLeft { get; private set; } = 3;
-    public int RetriesLeft { get; private set; } = 5;
+    public int ScoreAttemptsLeft { get; private set; } = StartingScoreAttemptsLeft;
+    public int RetriesLeft { get; private set; } = StartingRetriesLeft;
 
     public int AddToRoundScore(int scoreToAdd)
     {
@@ -10,14 +13,21 @@ public class RoundManager
         return RoundScore;
     }
 
-    public int SubtractScoreAttempt(int amount)
+    public bool TrySubtractScoreAttempt(int amount)
     {
         ScoreAttemptsLeft -= amount;
-        return ScoreAttemptsLeft;
+        if (ScoreAttemptsLeft <= 0)
+        {
+            return false;
+        }
+        return true;
     }
 
-    public void Farkle()
+    public bool TryToFarkle() => TrySubtractScoreAttempt(1);
+    public void Reset()
     {
-        SubtractScoreAttempt(1);
+        RoundScore = 0;
+        ScoreAttemptsLeft = StartingScoreAttemptsLeft;
+        RetriesLeft = StartingRetriesLeft;
     }
 }

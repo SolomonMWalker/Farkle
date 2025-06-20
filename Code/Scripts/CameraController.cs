@@ -6,6 +6,7 @@ public partial class CameraController : Node3D
     private Node3D userPerspectiveCameraLocation, diceZoomCameraLocation;
     private Camera3D camera;
     private AnimationPlayer animationPlayer;
+    private CameraState cameraState = CameraState.UserPerspective;
 
     public override void _Ready()
     {
@@ -21,16 +22,30 @@ public partial class CameraController : Node3D
 
     public void MoveToUserPerspectiveLocation()
     {
-        animationPlayer.Play("Camera_MoveTo_UserPerspective");
+        if (cameraState != CameraState.UserPerspective)
+        {
+            animationPlayer.Play("Camera_MoveTo_UserPerspective");
+            cameraState = CameraState.UserPerspective;
+        }        
     }
 
     public void MoveToDiceZoomLocation()
     {
-        animationPlayer.Play("Camera_MoveTo_DiceZoom");
+        if (cameraState != CameraState.DiceZoom)
+        {
+            animationPlayer.Play("Camera_MoveTo_DiceZoom");
+            cameraState = CameraState.DiceZoom;
+        }        
     }
 
     public bool IsAnimationPlaying()
     {
         return animationPlayer.IsPlaying();
     }
+}
+
+public enum CameraState
+{
+    UserPerspective,
+    DiceZoom
 }

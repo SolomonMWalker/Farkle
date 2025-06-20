@@ -2,6 +2,8 @@ using System.Collections.Generic;
 
 public class StageManager
 {
+    private const int NumOfStages = 1;
+
     public int StageScore { get; private set; } = 0;
     public int CurrentStageIndex { get; private set; } = 0;
     public List<Stage> Stages { get; private set; } = [];
@@ -13,9 +15,9 @@ public class StageManager
 
     public void SetUpTestStages()
     {
-        for (int i = 1; i <= 2; i++)
+        for (int i = 1; i <= NumOfStages; i++)
         {
-            Stages.Add(new Stage(i, 1000));
+            Stages.Add(new Stage(i, 20000));
         }
     }
 
@@ -30,9 +32,18 @@ public class StageManager
         if (CurrentStageIndex + 1 <= (Stages.Count - 1))
         {
             CurrentStageIndex += 1;
+            StageScore = 0;
             return true;
         }
         return false;
+    }
+
+    public void Reset()
+    {
+        Stages = [];
+        SetUpTestStages();
+        StageScore = 0;
+        CurrentStageIndex = 0;
     }
 
     public Stage GetCurrentStage() => Stages[CurrentStageIndex];
