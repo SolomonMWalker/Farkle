@@ -58,7 +58,7 @@ public partial class GameController : Node3D
             ThrowDice,
         ]);
         GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.SelectDice, [
-            PreSelectDiceFarkleCheck,
+            AddDiceLeftOnTableToRollableDiceCollection, PreSelectDiceFarkleCheck,
         ]);
 
         if (Configuration.ConfigValues.IsDebug)
@@ -135,6 +135,17 @@ public partial class GameController : Node3D
             cameraController.MoveToUserPerspectiveLocation();
             TryProgressState();
         }
+        if (Input.IsActionJustPressed("RerollSingular") && DiceManager.SelectedDiceCollection.Count() > 0 
+            && StageManager.TryRerollSingleDice(DiceManager.SelectedDiceCollection.Count()))
+        {
+            DiceManager.RerollSelectedDice();
+            cameraController.MoveToUserPerspectiveLocation();
+            TryProgressState();
+        }
+        else if (Input.IsActionJustPressed("RerollAll"))
+        {
+            
+        }
         else if (Input.IsActionJustPressed("Accept") && TryAddToRoundScore())
         {
             var scoredDiceCount = DiceManager.ScoredDiceCollection.Count() + DiceManager.SelectedDiceCollection.Count();
@@ -161,12 +172,12 @@ public partial class GameController : Node3D
                     GameOver("You won!");
                 }
             }
-            else if (!RoundManager.TrySubtractScoreAttempt(1))
+            else if (!StageManager.TryToUseScoreAttempt())
             {
                 GD.Print("No more score attempts.");
                 GameOver("You ran out of score attempts and lost this stage.");
             }
-            
+
             if (GameStateManager.GameState != GameState.GameOver)
             {
                 GD.Print("Moving to next round.");
@@ -174,7 +185,7 @@ public partial class GameController : Node3D
                 DiceManager.ResetAllDice();
                 cameraController.MoveToUserPerspectiveLocation();
                 TryProgressState();
-            }            
+            }
         }
     }
 
@@ -295,6 +306,8 @@ public partial class GameController : Node3D
         }
     }
 
+    public void AddDiceLeftOnTableToRollableDiceCollection() => DiceManager.AddDiceLeftOnTableToRollableDiceCollection();
+
     public bool DidRolledDiceFarkle()
     {
         var score = ScoreManager.TryGetScore(DiceManager.RollableDiceCollection);
@@ -304,7 +317,7 @@ public partial class GameController : Node3D
     public void Farkle()
     {
         GameStateManager.Farkle();
-        if (!RoundManager.TryToFarkle())
+        if (!StageManager.TryToFarkle())
         {
             GameOver("You Farkled your last score attempt and lost this stage.");
         }
@@ -332,11 +345,12 @@ public partial class GameController : Node3D
         UiManager.BuildAndSetScoreText(
             ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection).Score,
             RoundManager.RoundScore,
-            RoundManager.ScoreAttemptsLeft,
+            StageManager.ScoreAttemptsLeft,
             StageManager.StageScore,
             StageManager.GetCurrentStageScoreToWin(),
             StageManager.GetNumberOfStages(),
-            StageManager.GetCurrentStageNumber());
+            StageManager.GetCurrentStageNumber(),
+            StageManager.RetriesLeft);
     }
 
     #endregion

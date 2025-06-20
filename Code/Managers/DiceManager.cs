@@ -11,6 +11,7 @@ public class DiceManager
     public DiceCollection RollableDiceCollection { get; private set; } = new();
     public DiceCollection SelectedDiceCollection { get; private set; } = new();
     public DiceCollection ScoredDiceCollection { get; private set; } = new();
+    private DiceCollection DiceLeftOnTableCollection { get; set; } = new();
 
     private Node3D diceHolder, outOfPlayDiceLocation, throwLocationNode;
     private PackedScene packedRootDice;
@@ -57,7 +58,21 @@ public class DiceManager
         MoveScoredDiceOffCamera();
         MoveRollableDiceOffCamera();
         SelectedDiceCollection = new DiceCollection();
-    }    
+    }
+
+    public void RerollSelectedDice()
+    {
+        SelectedDiceCollection.Unselect();
+        DiceLeftOnTableCollection = RollableDiceCollection.RemoveDice(SelectedDiceCollection);
+        RollableDiceCollection = SelectedDiceCollection;
+        SelectedDiceCollection = new DiceCollection();
+    }
+
+    public void AddDiceLeftOnTableToRollableDiceCollection()
+    {
+        RollableDiceCollection = RollableDiceCollection.AddDice(DiceLeftOnTableCollection);
+        DiceLeftOnTableCollection = new DiceCollection();
+    }
 
     public void SetDiceRotationForThrow()
     {
@@ -83,26 +98,37 @@ public class DiceManager
         SetDiceVelocityForThrow();
     }
 
-    public void ThrowDice()
+    public void ThrowDice(DiceCollection dc = null)
     {
-        MoveRollableDiceToThrowLocation();
-        RollableDiceCollection.TurnOn();
-        RollableDiceCollection.ThrowDice();
+        dc ??= RollableDiceCollection;
+        MoveDiceCollectionToThrowLocation(dc);
+        dc.TurnOn();
+        dc.ThrowDice();
+    }
+
+    private void MoveDiceCollectionToThrowLocation(DiceCollection dc)
+    {
+        dc.SetGlobalPosition(throwLocationNode.GlobalPosition);
     }
 
     public void MoveRollableDiceToThrowLocation()
     {
-        RollableDiceCollection.SetGlobalPosition(throwLocationNode.GlobalPosition);
+        MoveDiceCollectionToThrowLocation(RollableDiceCollection);
+    }
+
+    private void MoveDiceCollectionOffCamera(DiceCollection dc)
+    {
+        dc.SetGlobalPosition(outOfPlayDiceLocation.GlobalPosition);
     }
 
     public void MoveScoredDiceOffCamera()
     {
-        ScoredDiceCollection.SetGlobalPosition(outOfPlayDiceLocation.GlobalPosition);
+        MoveDiceCollectionOffCamera(ScoredDiceCollection);
     }
 
     public void MoveRollableDiceOffCamera()
     {
-        RollableDiceCollection.SetGlobalPosition(outOfPlayDiceLocation.GlobalPosition);
+        MoveDiceCollectionOffCamera(RollableDiceCollection);
     }
 
     public bool TryHandleMouseButtonInputForDiceSelect(InputEventMouseButton mouseButtonEvent)

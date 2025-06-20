@@ -19,8 +19,18 @@ public class UiManager
         ScoreLabel = UiParent.GetChildByName<RichTextLabel>("Score");
     }
 
-    public void BuildAndSetScoreText(int selectedDiceScore, int currentRoundScore, int roundAttemptsLeft, int currentStageScore, int currentStageScoreToWin,
-    int totalStages, int stageNumber)
+    public void Farkle() => FarkleLabel.Text = "You Farkled";
+    public void ClearFarkle() => FarkleLabel.Text = "";
+
+    public void BuildAndSetScoreText(
+        int selectedDiceScore,
+        int currentRoundScore,
+        int roundAttemptsLeft,
+        int currentStageScore,
+        int currentStageScoreToWin,
+        int totalStages,
+        int stageNumber,
+        int retriesLeft)
     {
         ScoreLabel.Text =
         $"""
@@ -29,6 +39,7 @@ public class UiManager
         Stage score to win = {currentStageScoreToWin}
         Stage score = {currentStageScore}
         Round Attempts Left = {roundAttemptsLeft}
+        Retries Left = {retriesLeft}
         Round score = {currentRoundScore}
         Selected dice score = {selectedDiceScore}
         """;
@@ -53,7 +64,4 @@ public class UiManager
             InstructionLabel.Text = InstructionLabel.Text + $"\n{extraMessage}";
         }
     }
-
-    public void Farkle() => FarkleLabel.Text = "You Farkled";
-    public void ClearFarkle() => FarkleLabel.Text = "";
 }

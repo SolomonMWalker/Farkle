@@ -18,8 +18,8 @@ public class DiceCollection
 
     public DiceCollection(IEnumerable<RootDice> rootDice)
     {
-        if(rootDice.Count() == 0) { diceList = []; }
-        else {diceList = [.. rootDice];}        
+        if (rootDice.Count() == 0) { diceList = []; }
+        else { diceList = [.. rootDice]; }
     }
 
     public DiceCollection(IEnumerable<DiceFace> diceFaces)
@@ -168,4 +168,5 @@ public class DiceCollection
     public IEnumerable<DiceFace> GetResultOfRoll() => diceList.Select(d => d.GetResultOfRoll()).ToList();
     public void FlashRed() => diceList.ForEach(d => d.FlashRed());
     public void EndOverrides() => diceList.ForEach(d => d.EndOverride());
+    public void Unselect() => diceList.ForEach(d => d.UnselectDice());
 }
