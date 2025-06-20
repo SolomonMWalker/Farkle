@@ -4,7 +4,7 @@ public class StageManager
 {
     private const int NumOfStages = 1;
     private const int StartingScoreAttemptsLeft = 4;
-    private const int StartingRetriesLeft = 6;
+    private const int StartingRetriesLeft = 100;
     private const int RetriesUsedToRerollOneDice = 1;
     private const int RetriesUsedToRerollAllDice = 3;
 
@@ -42,7 +42,7 @@ public class StageManager
     public bool TryToUseScoreAttempt() => TrySubtractScoreAttempt(1);
     public bool TryToFarkle() => TrySubtractScoreAttempt(1);
     public bool TryRerollSingleDice(int numberOfDice) => TrySubtractRetries(numberOfDice);
-    public bool TryRerollAllDice => TrySubtractRetries(3);
+    public bool TryRerollAllDice() => TrySubtractRetries(3);
 
     public Stage GetCurrentStage() => Stages[CurrentStageIndex];
     public int GetCurrentStageScoreToWin() => Stages[CurrentStageIndex].ScoreToWin;

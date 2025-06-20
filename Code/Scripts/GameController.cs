@@ -49,7 +49,7 @@ public partial class GameController : Node3D
     public void SetupGameStateEnterExitActions()
     {
         GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.PreRoll, [
-            DiceManager.ReadyDiceForThrow,
+            DiceManager.ReadyRollableDiceForThrow,
         ]);
         GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.RollReady, [
             throwLocationBall.Animate,
@@ -58,7 +58,7 @@ public partial class GameController : Node3D
             ThrowDice,
         ]);
         GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.SelectDice, [
-            AddDiceLeftOnTableToRollableDiceCollection, PreSelectDiceFarkleCheck,
+            DiceManager.AddDiceLeftOnTableToRollableDiceCollection, PreSelectDiceFarkleCheck,
         ]);
 
         if (Configuration.ConfigValues.IsDebug)
@@ -135,16 +135,21 @@ public partial class GameController : Node3D
             cameraController.MoveToUserPerspectiveLocation();
             TryProgressState();
         }
-        if (Input.IsActionJustPressed("RerollSingular") && DiceManager.SelectedDiceCollection.Count() > 0 
+        else if (Input.IsActionJustPressed("RerollSingular") && DiceManager.SelectedDiceCollection.Count() > 0 
             && StageManager.TryRerollSingleDice(DiceManager.SelectedDiceCollection.Count()))
         {
             DiceManager.RerollSelectedDice();
+            BuildAndSetScoreText();
             cameraController.MoveToUserPerspectiveLocation();
             TryProgressState();
         }
-        else if (Input.IsActionJustPressed("RerollAll"))
+        else if (Input.IsActionJustPressed("RerollAll") && StageManager.TryRerollAllDice())
         {
-            
+            GD.Print("Try to reroll all dice");
+            DiceManager.RerollAllDice();
+            BuildAndSetScoreText();
+            cameraController.MoveToUserPerspectiveLocation();
+            TryProgressState();
         }
         else if (Input.IsActionJustPressed("Accept") && TryAddToRoundScore())
         {

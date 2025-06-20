@@ -51,10 +51,9 @@ public class DiceManager
     public void ResetUnscoredDice()
     {
         RollableDiceCollection = RollableDiceCollection.RemoveDice(SelectedDiceCollection);
-
         ScoredDiceCollection = ScoredDiceCollection.AddDice(SelectedDiceCollection);
         ScoredDiceCollection.TurnOff();
-        ScoredDiceCollection.diceList.ForEach(d => d.UnselectDice());
+        ScoredDiceCollection.Unselect();
         MoveScoredDiceOffCamera();
         MoveRollableDiceOffCamera();
         SelectedDiceCollection = new DiceCollection();
@@ -62,10 +61,18 @@ public class DiceManager
 
     public void RerollSelectedDice()
     {
-        SelectedDiceCollection.Unselect();
+        PersistentDiceCollection.Unselect();
         DiceLeftOnTableCollection = RollableDiceCollection.RemoveDice(SelectedDiceCollection);
         RollableDiceCollection = SelectedDiceCollection;
         SelectedDiceCollection = new DiceCollection();
+        MoveRollableDiceOffCamera();
+    }
+
+    public void RerollAllDice()
+    {
+        PersistentDiceCollection.Unselect();
+        SelectedDiceCollection = new DiceCollection();
+        MoveRollableDiceOffCamera();
     }
 
     public void AddDiceLeftOnTableToRollableDiceCollection()
@@ -74,28 +81,35 @@ public class DiceManager
         DiceLeftOnTableCollection = new DiceCollection();
     }
 
-    public void SetDiceRotationForThrow()
+    public void SetDiceRotationForThrow(DiceCollection dc = null)
     {
-        foreach (RootDice dice in RollableDiceCollection.diceList)
+        if(dc is null) { dc = RollableDiceCollection; }
+        foreach (RootDice dice in dc.diceList)
         {
             dice.Rotate(HelperMethods.GetRandomVector3().Normalized(), GD.Randf() * (2 * Mathf.Pi));
         }
     }
 
-    public void SetDiceVelocityForThrow()
+    public void SetDiceVelocityForThrow(DiceCollection dc = null)
     {
+        if(dc is null) { dc = RollableDiceCollection; }
         var baseVelocity = new Vector3(0, 0, -1) * 6;
-        foreach (RootDice dice in RollableDiceCollection.diceList)
+        foreach (RootDice dice in dc.diceList)
         {
             dice.SetVelocityUponThrow(HelperMethods.FuzzyUpVector3(baseVelocity, 0.5f));
         }
     }
 
-    public void ReadyDiceForThrow() //turn off dice, set rotation and velocity
+    private void ReadyDiceCollectionForThrow(DiceCollection dc)
     {
-        RollableDiceCollection.TurnOff();
-        SetDiceRotationForThrow();
-        SetDiceVelocityForThrow();
+        dc.TurnOff();
+        SetDiceRotationForThrow(dc);
+        SetDiceVelocityForThrow(dc);
+    }
+
+    public void ReadyRollableDiceForThrow() //turn off dice, set rotation and velocity
+    {
+        ReadyDiceCollectionForThrow(RollableDiceCollection);
     }
 
     public void ThrowDice(DiceCollection dc = null)
