@@ -11,6 +11,7 @@ public partial class GameController : Node3D
     private CameraController cameraController;
     public GameStateManager GameStateManager { get; private set; }
     private ThrowLocationBall throwLocationBall;
+    public PlayerManager PlayerManager { get; private set; }
     public DiceManager DiceManager { get; private set; }
     public ScoreManager ScoreManager { get; private set; }
     public RoundManager RoundManager { get; private set; }
@@ -27,7 +28,9 @@ public partial class GameController : Node3D
         throwLocationBall = FindChild("DiceTable").GetChildByName<ThrowLocationBall>("ThrowLocationBall");
         UiManager = new UiManager(this.GetChildByName<Control>("ControlParent"));
         GameStateManager = new GameStateManager();
-        DiceManager = new DiceManager(this.GetChildByName<Node3D>("DiceHolder"),
+        PlayerManager = new PlayerManager();
+        DiceManager = new DiceManager( PlayerManager,
+            this.GetChildByName<Node3D>("DiceHolder"),
             this.GetChildByName<Node3D>("OutOfPlayDiceLocation"),
             throwLocationBall.throwLocation);
         ScoreManager = new ScoreManager();
@@ -168,7 +171,7 @@ public partial class GameController : Node3D
         else if (Input.IsActionJustPressed("Accept") && TryAddToRoundScore())
         {
             var scoredDiceCount = DiceManager.ScoredDiceCollection.Count() + DiceManager.SelectedDiceCollection.Count();
-            if (scoredDiceCount == DiceManager.PersistentDiceCollection.Count())
+            if (scoredDiceCount == PlayerManager.DiceCollection.Count())
             {
                 DiceManager.ResetAllDice();
             }
@@ -378,7 +381,6 @@ public partial class GameController : Node3D
     {
         //ripped from https://gameidea.org/2024/12/13/making-a-health-bar-and-health-system-in-godot/
         var screenPos = cameraController.GetCamera().UnprojectPosition(throwLocationBall.GlobalPosition);
-        GD.Print($"new position is {screenPos}");
         UiManager.StartThrowForceBar(screenPos);
     }
 

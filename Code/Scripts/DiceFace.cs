@@ -44,12 +44,8 @@ public partial class DiceFace() : Node3D
         _associatedDice = GetParent<Node3D>().GetParent<RootDice>();
         _label = this.GetChildByName<Label3D>("Label");
         _diceFaceValue = new DiceFaceValue(numberValue);
+        _isDebug = Configuration.ConfigValues.IsDebug;
         SetLabelText(_diceFaceValue.numberValue.Value.ToString());
-    }
-
-    public void SetDebug(bool isDebug)
-    {
-        _isDebug = isDebug;
     }
 
     private void SetLabelText(string text) => _label.Text = text;

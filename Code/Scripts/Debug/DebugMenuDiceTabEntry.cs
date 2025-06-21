@@ -2,6 +2,7 @@ using Godot;
 
 public partial class DebugMenuDiceTabEntry : MarginContainer
 {
+    private bool Clickable { get; set; } = true;
     public RootDice Dice { get; private set; }
     private Label DiceLabel { get; set; }
     private LineEdit DiceFaceEdit { get; set; }
@@ -14,7 +15,6 @@ public partial class DebugMenuDiceTabEntry : MarginContainer
         DiceFaceEdit = hBoxContainer.GetChild<LineEdit>(1);
     }
 
-
     public void Initialize(RootDice dice)
     {
         Dice = dice;
@@ -23,4 +23,21 @@ public partial class DebugMenuDiceTabEntry : MarginContainer
     }
 
     public string GetOverrideDiceFaceValue() => DiceFaceEdit.Text;
+    public void SetClickable(bool clickable)
+    {
+        Clickable = clickable;
+        MouseFilterEnum mFilter;
+        if (Clickable)
+        {
+            mFilter = MouseFilterEnum.Pass;
+        }
+        else
+        {
+            mFilter = MouseFilterEnum.Ignore;
+        }
+
+        MouseFilter = mFilter;
+        DiceLabel.MouseFilter = mFilter;
+        DiceFaceEdit.MouseFilter = mFilter;
+    }
 }

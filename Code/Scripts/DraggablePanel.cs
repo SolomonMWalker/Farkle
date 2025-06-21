@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 public partial class DraggablePanel : PanelContainer
 {
@@ -16,13 +15,8 @@ public partial class DraggablePanel : PanelContainer
         }
         else
         {
-            _draggableModule = new DraggableModule(controlToDrag);
+            _draggableModule = new DraggableModule(controlToDrag, this);
         }        
-    }
-
-    public void SetDraggableControl(Control control)
-    {
-        _draggableModule = new DraggableModule(control);
     }
 
     public override void _GuiInput(InputEvent @event)

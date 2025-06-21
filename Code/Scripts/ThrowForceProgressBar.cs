@@ -41,7 +41,7 @@ public partial class ThrowForceProgressBar : ProgressBar
     public void BarProcess(double delta)
     {
         var amountToChangeInSec = MaxValue / TimeToFillUpBarInSec;
-        var newValue = Value;
+        double newValue;
         if (isIncreasing)
         {
             newValue = Value + (amountToChangeInSec * delta);

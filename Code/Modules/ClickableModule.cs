@@ -2,8 +2,7 @@ using Godot;
 
 public partial class ClickableModule
 {
-    protected Control _affectedControl;
-    public Control AffectedControl { get => _affectedControl; }
+    public Control ControlToClick { get; private set; }
     private bool _isMouseInControl = false;
     public bool IsMouseInControl { get => _isMouseInControl; }
     private bool _clicked = false;
@@ -11,41 +10,41 @@ public partial class ClickableModule
     private Vector2 _vectorFromClickedToPosition = Vector2.Zero;
     public Vector2 VectorFromClickedToPosition { get => _vectorFromClickedToPosition; }
 
-    public ClickableModule(Control affectedControl)
+    public ClickableModule(Control controlToClick)
     {
-        _affectedControl = affectedControl;
-        AffectedControl.MouseEntered += MouseEnteredControl;
-        AffectedControl.MouseExited += MouseExitedControl;
+        ControlToClick = controlToClick;
+        ControlToClick.MouseEntered += MouseEnteredControl;
+        ControlToClick.MouseExited += MouseExitedControl;
     }
 
     public virtual void CheckInput(InputEvent @event)
     {
         CheckControlJustClicked(@event);
-        CheckControlStillClicked(@event);
+        CheckControlStillClicked();
     }
 
     public bool CheckControlJustClicked(InputEvent @event)
     {
         if (!Clicked && IsMouseInControl && @event is InputEventMouseButton mouseEvent && (int)mouseEvent.ButtonIndex is 1)
         {
-            if (Input.IsActionJustPressed("click"))
+            if (Input.IsActionJustPressed("Click"))
             {
                 _clicked = true;
-                _vectorFromClickedToPosition = AffectedControl.GlobalPosition - mouseEvent.GlobalPosition;
+                _vectorFromClickedToPosition = ControlToClick.GlobalPosition - mouseEvent.GlobalPosition;
                 return true;
             }
         }
         return false;
     }
 
-    public bool CheckControlStillClicked(InputEvent @event)
+    public bool CheckControlStillClicked()
     {
         if (!Clicked)
         {
             ResetVectorFromClickedToPosition();
             return false;
         }
-        if (!Input.IsActionPressed("click"))
+        if (!Input.IsActionPressed("Click"))
         {
             _clicked = false;
             ResetVectorFromClickedToPosition();

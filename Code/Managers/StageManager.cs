@@ -54,7 +54,7 @@ public class StageManager
     {
         for (int i = 1; i <= NumOfStages; i++)
         {
-            Stages.Add(new Stage(i, 20000));
+            Stages.Add(new Stage(i, Configuration.ConfigValues.ScoreToWin));
         }
     }
 

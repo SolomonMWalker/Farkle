@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 public partial class RootDice : RigidBody3D
@@ -7,8 +6,12 @@ public partial class RootDice : RigidBody3D
     private const string RootDiceMaterialPath = "res://Resources/Materials/RootDiceMaterial.tres";
     private const string RootDiceSelectedMaterialPath = "res://Resources/Materials/RootDiceSelectedMaterial.tres";
     private const string RootDiceFlashRedMaterialPath = "res://Resources/Materials/RootDiceFlashRedMaterial.tres";
+    private const string RootDiceRelPath = "res://Scenes/root_dice.tscn";
+    private static PackedScene packedRootDice = null;
 
     public bool selected;
+    public bool temporary;
+    public RootDice AssociatedPermanentDice { get; private set; } = null;
 
     private CollisionShape3D collisionShape;
     private MeshInstance3D meshInstance;
@@ -21,9 +24,19 @@ public partial class RootDice : RigidBody3D
     public DiceFace ResultOfRoll { get; private set; }
     private bool _isDebug = false, _isInitialized = false;
     public bool IsDebug { get; }
-    public bool IsInitialized { get; }
     private int colliderId;
     private float edgelength;
+
+    public static RootDice InstantiateRootDice()
+    {
+        packedRootDice ??= GD.Load<PackedScene>(RootDiceRelPath);
+        return packedRootDice.Instantiate<RootDice>();
+    }
+
+    public virtual RootDice DeepCopy()
+    {
+        return InstantiateRootDice();
+    }
 
     public override void _Ready()
     {
@@ -37,6 +50,8 @@ public partial class RootDice : RigidBody3D
         rootDiceMaterial = GD.Load<Material>(RootDiceMaterialPath);
         rootDiceSelectedMaterial = GD.Load<Material>(RootDiceSelectedMaterialPath);
         rootDiceFlashRedMaterial = GD.Load<Material>(RootDiceFlashRedMaterialPath);
+        _isDebug = Configuration.ConfigValues.IsDebug;
+        temporary = false;
         collisionShape.Disabled = true;
         Freeze = true;
         FreezeMode = FreezeModeEnum.Static;
@@ -45,12 +60,6 @@ public partial class RootDice : RigidBody3D
         {
             faces = [.. diceFacesParent.GetChildrenOfType<DiceFace>()]
         };
-    }
-
-    public void SetDebug(bool isDebug)
-    {
-        _isDebug = isDebug;
-        diceFaceCollection.SetDebug(isDebug);
     }
 
     public bool PointTooClose(Vector3 point, float margin)

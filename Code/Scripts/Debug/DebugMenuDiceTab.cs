@@ -8,6 +8,7 @@ public partial class DebugMenuDiceTab : MarginContainer
     private GameController gController;
     private List<DebugMenuDiceTabEntry> DiceEntries { get; set; } = [];
     public DiceCollection DiceCollection { get; private set; } = new DiceCollection();
+    private bool Clickable { get; set; } = true;
 
     [Export]
     public VBoxContainer diceMenuVBox;
@@ -32,7 +33,7 @@ public partial class DebugMenuDiceTab : MarginContainer
     public void ResetDiceCollection()
     {
         DiceCollection = new DiceCollection();
-        DeleteDiceEntries();        
+        DeleteDiceEntries();
     }
 
     public void SetNewDiceCollection(DiceCollection diceCollection)
@@ -104,5 +105,21 @@ public partial class DebugMenuDiceTab : MarginContainer
         {
             gController.BuildAndSetScoreText();
         }
+    }
+
+    public void SetClickable(bool clickable)
+    {
+        Clickable = clickable;
+        MouseFilterEnum mFilter;
+        if (Clickable)
+        {
+            mFilter = MouseFilterEnum.Pass;
+        }
+        else
+        {
+            mFilter = MouseFilterEnum.Ignore;
+        }
+
+        MouseFilter = mFilter;
     }
 }

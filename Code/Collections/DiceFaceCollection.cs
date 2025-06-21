@@ -6,11 +6,6 @@ public partial class DiceFaceCollection
 {
     public List<DiceFace> faces = [];
 
-    public void SetDebug(bool isDebug)
-    {
-        faces.ForEach(f => f.SetDebug(isDebug));
-    }
-
     //Get the dice face that has the highest y-value
     //might need to change this later
     public DiceFace GetResultOfRoll()

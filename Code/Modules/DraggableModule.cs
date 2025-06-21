@@ -1,8 +1,17 @@
 using Godot;
 
-public partial class DraggableModule(Control affectedControl) : ClickableModule(affectedControl)
+public partial class DraggableModule : ClickableModule
 {
+    public Control DraggableControl { get; private set; }
     private Vector2 _drag = Vector2.Zero;
+    public DraggableModule(Control affectedControl) : base(affectedControl)
+    {
+        DraggableControl = affectedControl;   
+    }
+    public DraggableModule(Control affectedControl, Control controlToClick) : base(controlToClick)
+    {
+        DraggableControl = affectedControl;
+    }
 
     public override void CheckInput(InputEvent @event)
     {
@@ -14,7 +23,7 @@ public partial class DraggableModule(Control affectedControl) : ClickableModule(
     public void DragAffectedControl()
     {
         if (_drag == Vector2.Zero) { return; }
-        AffectedControl.SetPosition(AffectedControl.Position + VectorFromClickedToPosition + _drag);
+        DraggableControl.SetPosition(DraggableControl.Position + VectorFromClickedToPosition + _drag);
         _drag = Vector2.Zero;
     }
 

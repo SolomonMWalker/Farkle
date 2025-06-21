@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using System.Collections.Immutable;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Godot;
 
@@ -10,6 +9,38 @@ public class DiceCollection
     public ScoreWithUnusedDice CalculateScoreResult { get => _calculatedScoreResult; }
     private ScoreWithUnusedDice _calculatedScoreResult = null;
 
+    public static DiceCollection InstantiateDiceCollection(int size)
+    {
+        List<RootDice> tempList = [];
+        for (int i = 0; i < size; i++)
+        {
+            tempList.Add(RootDice.InstantiateRootDice());
+        }
+        return new DiceCollection(tempList);
+    }
+
+    public static DiceCollection DeepCopyDiceCollection(DiceCollection dc) => DeepCopyDiceCollection(dc.diceList);
+
+    public static DiceCollection DeepCopyDiceCollection(IEnumerable<RootDice> dice)
+    {
+        List<RootDice> tempList = [];
+        foreach (var d in dice)
+        {
+            tempList.Add(d.DeepCopy());
+        }
+        return new DiceCollection(tempList);
+    }
+
+    public static List<RootDice> DeepCopyRootDiceEnumerable(IEnumerable<RootDice> dice)
+    {
+        List<RootDice> tempList = [];
+        foreach (var d in dice)
+        {
+            tempList.Add(d.DeepCopy());
+        }
+        return tempList;
+    }
+
     //Constructors
     public DiceCollection()
     {
@@ -18,7 +49,7 @@ public class DiceCollection
 
     public DiceCollection(IEnumerable<RootDice> rootDice)
     {
-        if (rootDice.Count() == 0) { diceList = []; }
+        if (!rootDice.Any()) { diceList = []; }
         else { diceList = [.. rootDice]; }
     }
 
@@ -57,6 +88,27 @@ public class DiceCollection
 
     public DiceCollection RemoveDice(IEnumerable<RootDice> dice) => new([.. diceList.Where(d => !dice.Contains(d))]);
     public DiceCollection RemoveDice(DiceCollection dc) => RemoveDice(dc.diceList);
+    private void DeleteAllDice()
+    {
+        diceList.ForEach(d => d.QueueFree());
+        diceList = [];
+    }
+
+    public void DeleteAllDiceAndReplaceWithDeepCopy(DiceCollection dc)
+    {
+        DeleteAllDice();
+        _calculatedScoreResult = null;
+        diceList = [.. DeepCopyRootDiceEnumerable(dc.diceList)];
+    }
+
+    public void DeleteAllTemporaryDice()
+    {
+        if(!diceList.Any(d => d.temporary)) { return; }
+        List<RootDice> temporaryDice = [.. diceList.Where(d => d.temporary == true)];
+        diceList = [.. diceList.Where(d => d.temporary == false)];
+        temporaryDice.ForEach(d => d.QueueFree());        
+    }
+
 
     public bool HasUnusedScoreDice() => _calculatedScoreResult.UnusedDice.Count() > 0;
 
@@ -87,11 +139,6 @@ public class DiceCollection
     public bool IsDoneRolling()
     {
         return diceList.All(x => x.IsDoneRolling() == true);
-    }
-
-    public void SetDebug(bool isDebug)
-    {
-        diceList.ForEach(x => x.SetDebug(isDebug));
     }
 
     public void SetGlobalPosition(Vector3 globalPosition)
