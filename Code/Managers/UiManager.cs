@@ -10,6 +10,7 @@ public class UiManager
     public Label FarkleLabel { get; private set; }
     public Label LastRoundLabel { get; private set; }
     public RichTextLabel ScoreLabel { get; private set; }
+    public ThrowForceProgressBar ThrowForceProgressBar { get; private set; }
     public UiManager(Control uiParent)
     {
         UiParent = uiParent;
@@ -17,6 +18,7 @@ public class UiManager
         FarkleLabel = UiParent.GetChildByName<Label>("FarkleLabel");
         LastRoundLabel = UiParent.GetChildByName<Label>("OnLastRound");
         ScoreLabel = UiParent.GetChildByName<RichTextLabel>("Score");
+        ThrowForceProgressBar = UiParent.GetChildByName<ThrowForceProgressBar>("ThrowForceProgressBar");
     }
 
     public void Farkle() => FarkleLabel.Text = "You Farkled";
@@ -51,7 +53,7 @@ public class UiManager
         {
             (GameState.Instantiated, _) => "Press space to start game.",
             (GameState.PreRoll, _) => "Press space to find rolling position.",
-            (GameState.RollReady, _) => "Press space to select rolling position and roll dice.",
+            (GameState.FindRollPosition, _) => "Press space to select rolling position and roll dice.",
             (GameState.Rolling, _) => "Wait for dice to finish rolling.",
             (GameState.SelectDice, SelectDiceSubstate.SelectingDice) => "Select dice with the mouse. Press space to enter your score and roll again. Press enter to submit your score. If all six die are scored, you must press space to roll again.",
             (GameState.SelectDice, SelectDiceSubstate.Farkled) => "You Farkled. Press Space to Continue.",
@@ -64,4 +66,9 @@ public class UiManager
             InstructionLabel.Text = InstructionLabel.Text + $"\n{extraMessage}";
         }
     }
+
+    public void StartThrowForceBar(Vector2 position) => ThrowForceProgressBar.Start(position);
+
+    public void EndThrowForceBar() => ThrowForceProgressBar.End();
+    public double GetThrowForceBarValue() => ThrowForceProgressBar.Value;
 }

@@ -1,7 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Xml;
-using Godot;
 
 public class GameStateManager
 {
@@ -10,7 +8,8 @@ public class GameStateManager
     private SelectDiceSubstate selectDiceSubstate = SelectDiceSubstate.SelectingDice;
     private readonly GameState[] stateProgression = [
         GameState.PreRoll,
-        GameState.RollReady,
+        GameState.FindRollPosition,
+        GameState.FindRollStrength,
         GameState.Rolling,
         GameState.SelectDice,
         GameState.ExitDiceZoomAnimation
@@ -111,7 +110,8 @@ public enum GameState{
     Instantiated,
     GameOver,
     PreRoll,
-    RollReady,
+    FindRollPosition,
+    FindRollStrength,
     Rolling,
     SelectDice,
     ExitDiceZoomAnimation,

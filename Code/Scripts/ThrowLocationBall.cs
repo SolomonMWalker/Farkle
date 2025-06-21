@@ -7,6 +7,7 @@ public partial class ThrowLocationBall : MeshInstance3D
     public int dicePerThrow = 6;
     public Node3D throwLocation;
     public Node3D diceHolder;
+    public Control control;
 
     private Tween tween;
     private Vector3 startingPosition;
@@ -17,6 +18,7 @@ public partial class ThrowLocationBall : MeshInstance3D
         startingPosition = GlobalPosition;
         throwLocation = this.GetChildByName<Node3D>("ThrowLocation");
         diceHolder = throwLocation.GetChildByName<Node3D>("DiceHolder");
+        control = this.GetChildByName<Control>("Control");
     }
 
     public void Animate()
@@ -25,22 +27,26 @@ public partial class ThrowLocationBall : MeshInstance3D
         tween = CreateTween();
         tween.SetLoops();
         tween.TweenProperty(
-            this, 
-            "position:x", 
+            this,
+            "position:x",
             startingPosition.X + width,
-            3
+            2.5
          );
-         tween.TweenProperty(
-            this, 
-            "position:x", 
-            startingPosition.X,
-            3
-         );
+        tween.TweenProperty(
+           this,
+           "position:x",
+           startingPosition.X,
+           2.5
+        );
     }
 
     public void StopAnimation()
     {
-        tween?.Stop();
+        tween?.Stop();        
+    }
+
+    public void ResetPositon()
+    {
         Position = startingPosition;
     }
 }

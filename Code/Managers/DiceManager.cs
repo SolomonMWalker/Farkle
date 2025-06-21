@@ -92,12 +92,14 @@ public class DiceManager
 
     public void SetDiceVelocityForThrow(DiceCollection dc = null)
     {
-        if(dc is null) { dc = RollableDiceCollection; }
-        var baseVelocity = new Vector3(0, 0, -1) * 6;
-        foreach (RootDice dice in dc.diceList)
-        {
-            dice.SetVelocityUponThrow(HelperMethods.FuzzyUpVector3(baseVelocity, 0.5f));
-        }
+        dc ??= RollableDiceCollection;
+        dc.SetVelocityForThrow();
+    }
+
+    public void MultiplyVelocityByThrowForceValue(double throwForce, DiceCollection dc = null)
+    {
+        dc ??= RollableDiceCollection;
+        dc.MultiplyVelocityByThrowForceValue(throwForce);
     }
 
     private void ReadyDiceCollectionForThrow(DiceCollection dc)
@@ -175,6 +177,15 @@ public class DiceManager
             return true;
         }
         clickedDice = null;
+        return false;
+    }
+
+    public bool AreAllDiceBeingSubmittedForScore()
+    {
+        if (ScoredDiceCollection.Count() + SelectedDiceCollection.Count() >= PersistentDiceCollection.Count())
+        {
+            return true;
+        }
         return false;
     }
     

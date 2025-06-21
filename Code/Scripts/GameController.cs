@@ -33,7 +33,7 @@ public partial class GameController : Node3D
         ScoreManager = new ScoreManager();
         RoundManager = new RoundManager();
         StageManager = new StageManager();
-        
+
         if (Configuration.ConfigValues.IsDebug)
         {
             DebugMenu = GD.Load<PackedScene>(DebugMenuRelPath).Instantiate<DebugMenu>();
@@ -51,11 +51,17 @@ public partial class GameController : Node3D
         GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.PreRoll, [
             DiceManager.ReadyRollableDiceForThrow,
         ]);
-        GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.RollReady, [
+        GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.FindRollPosition, [
             throwLocationBall.Animate,
         ]);
+        GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.FindRollStrength, [
+            throwLocationBall.StopAnimation, StartThrowForceBar,
+        ]);
+        GameStateManager.AddOnStateEnterOrExitAction(enter: false, GameState.FindRollStrength, [
+            UiManager.EndThrowForceBar, 
+        ]);
         GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.Rolling, [
-            ThrowDice,
+            ThrowDice, throwLocationBall.ResetPositon,
         ]);
         GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.SelectDice, [
             DiceManager.AddDiceLeftOnTableToRollableDiceCollection, PreSelectDiceFarkleCheck,
@@ -100,9 +106,16 @@ public partial class GameController : Node3D
                     TryProgressState();
                 }
                 break;
-            case GameState.RollReady:
+            case GameState.FindRollPosition:
                 if (Input.IsActionJustPressed("Accept"))
                 {
+                    TryProgressState();
+                }
+                break;
+            case GameState.FindRollStrength:
+                if (Input.IsActionJustPressed("Accept"))
+                {
+                    DiceManager.MultiplyVelocityByThrowForceValue(UiManager.GetThrowForceBarValue());
                     TryProgressState();
                 }
                 break;
@@ -132,10 +145,11 @@ public partial class GameController : Node3D
         if (GameStateManager.GetSelectDiceSubstate is SelectDiceSubstate.Farkled && Input.IsActionJustPressed("Accept"))
         {
             ClearFarkle();
+            DiceManager.ResetAllDice();
             cameraController.MoveToUserPerspectiveLocation();
             TryProgressState();
         }
-        else if (Input.IsActionJustPressed("RerollSingular") && DiceManager.SelectedDiceCollection.Count() > 0 
+        else if (Input.IsActionJustPressed("RerollSingular") && DiceManager.SelectedDiceCollection.Count() > 0
             && StageManager.TryRerollSingleDice(DiceManager.SelectedDiceCollection.Count()))
         {
             DiceManager.RerollSelectedDice();
@@ -277,6 +291,11 @@ public partial class GameController : Node3D
 
     public bool TrySubmitRoundScore()
     {
+        if (DiceManager.AreAllDiceBeingSubmittedForScore())
+        {
+            DiceManager.SelectedDiceCollection.FlashRed();
+            return false;
+        }
         var scoreResult = ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection);
 
         if (scoreResult.ResultType is CalculateScoreResultType.HasUnusedScoreDice)
@@ -311,8 +330,6 @@ public partial class GameController : Node3D
         }
     }
 
-    public void AddDiceLeftOnTableToRollableDiceCollection() => DiceManager.AddDiceLeftOnTableToRollableDiceCollection();
-
     public bool DidRolledDiceFarkle()
     {
         var score = ScoreManager.TryGetScore(DiceManager.RollableDiceCollection);
@@ -341,7 +358,6 @@ public partial class GameController : Node3D
     public void ThrowDice()
     {
         DiceManager.ThrowDice();
-        throwLocationBall.StopAnimation();
         cameraController.MoveToDiceZoomLocation();
     }
 
@@ -356,6 +372,14 @@ public partial class GameController : Node3D
             StageManager.GetNumberOfStages(),
             StageManager.GetCurrentStageNumber(),
             StageManager.RetriesLeft);
+    }
+
+    public void StartThrowForceBar()
+    {
+        //ripped from https://gameidea.org/2024/12/13/making-a-health-bar-and-health-system-in-godot/
+        var screenPos = cameraController.GetCamera().UnprojectPosition(throwLocationBall.GlobalPosition);
+        GD.Print($"new position is {screenPos}");
+        UiManager.StartThrowForceBar(screenPos);
     }
 
     #endregion

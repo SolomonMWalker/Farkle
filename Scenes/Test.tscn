@@ -1,8 +1,9 @@
-[gd_scene load_steps=11 format=3 uid="uid://bm24t8vu2m5tm"]
+[gd_scene load_steps=12 format=3 uid="uid://bm24t8vu2m5tm"]
 
 [ext_resource type="Script" uid="uid://dijluwumyer0g" path="res://Code/Scripts/GameController.cs" id="1_aq4fw"]
 [ext_resource type="PackedScene" uid="uid://bumu5lp3edko4" path="res://Scenes/dice_table.tscn" id="1_njov2"]
 [ext_resource type="Script" uid="uid://chg753s0anfd6" path="res://Code/Scripts/CameraController.cs" id="2_0dy5s"]
+[ext_resource type="Script" uid="uid://dn5tcp3l4r5dt" path="res://Code/Scripts/ThrowForceProgressBar.cs" id="4_f2nln"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_njov2"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -179,3 +180,12 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 1
 horizontal_alignment = 1
+
+[node name="ThrowForceProgressBar" type="ProgressBar" parent="GameController/ControlParent"]
+visible = false
+layout_mode = 0
+offset_right = 31.0
+offset_bottom = 109.0
+max_value = 1.0
+fill_mode = 3
+script = ExtResource("4_f2nln")

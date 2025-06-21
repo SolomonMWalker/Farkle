@@ -58,15 +58,6 @@ public class DiceCollection
     public DiceCollection RemoveDice(IEnumerable<RootDice> dice) => new([.. diceList.Where(d => !dice.Contains(d))]);
     public DiceCollection RemoveDice(DiceCollection dc) => RemoveDice(dc.diceList);
 
-    //Scoring methods
-    // public ScoreWithUnusedDice CalculateScore()
-    // {
-    //     if (diceList.IsEmpty) { return new(-1, null); }
-    //     _calculatedScoreResult = DiceCollectionScore.CalculateScore(this);
-    //     return _calculatedScoreResult;
-    // }
-
-    //Get properties of Dice
     public bool HasUnusedScoreDice() => _calculatedScoreResult.UnusedDice.Count() > 0;
 
     public int Count()
@@ -116,6 +107,23 @@ public class DiceCollection
     public void SetParent(Node newParent)
     {
         diceList.ForEach(x => newParent.AddChild(x));
+    }
+
+    public void SetVelocityForThrow()
+    {
+        var baseVelocity = new Vector3(0, 0, -1) * 5;
+        foreach (RootDice dice in diceList)
+        {
+            dice.SetVelocityUponThrow(HelperMethods.FuzzyUpVector3(baseVelocity, 0.5f));
+        }
+    }
+
+    public void MultiplyVelocityByThrowForceValue(double throwForceValue)
+    {
+        foreach (RootDice dice in diceList)
+        {
+            dice.MultiplyVelocityByThrowForceValue(throwForceValue);
+        }
     }
 
     public void ThrowDice()

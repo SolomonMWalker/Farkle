@@ -29,5 +29,5 @@ width = 12
 height = 12
 
 [node name="ThrowLocationBall" parent="." instance=ExtResource("3_mv1pc")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.6, 1.5, 5.2)
-width = 9.2
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4, 1.5, 5.2)
+width = 8.0

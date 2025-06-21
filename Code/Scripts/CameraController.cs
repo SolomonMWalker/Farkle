@@ -26,7 +26,7 @@ public partial class CameraController : Node3D
         {
             animationPlayer.Play("Camera_MoveTo_UserPerspective");
             cameraState = CameraState.UserPerspective;
-        }        
+        }
     }
 
     public void MoveToDiceZoomLocation()
@@ -35,13 +35,15 @@ public partial class CameraController : Node3D
         {
             animationPlayer.Play("Camera_MoveTo_DiceZoom");
             cameraState = CameraState.DiceZoom;
-        }        
+        }
     }
 
     public bool IsAnimationPlaying()
     {
         return animationPlayer.IsPlaying();
     }
+
+    public Camera3D GetCamera() => camera;
 }
 
 public enum CameraState

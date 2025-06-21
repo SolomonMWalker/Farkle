@@ -66,6 +66,8 @@ public partial class RootDice : RigidBody3D
         velocityUponThrow = velocity;
     }
 
+    public void MultiplyVelocityByThrowForceValue(double throwForceValue) => velocityUponThrow = velocityUponThrow * (float)throwForceValue;
+
     public void Throw()
     {
         LinearVelocity = velocityUponThrow;
