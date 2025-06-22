@@ -14,10 +14,10 @@ public partial class DebugMenu : MarginContainer
     {
         base._Ready();
         MenuContentsContainer = (PanelContainer)FindChild("*MenuContentsContainer");
-        GD.Print($"Is MenuContainer null {MenuContentsContainer}");
         DiceTab = (DebugMenuDiceTab)MenuContentsContainer.FindChild("*DiceTab");
         MinimizeButton = (Button)FindChild("*MinimizeButton");
         MinimizeButton.Pressed += MinimizeButtonPressed;
+        MinimizeButtonPressed();
     }
 
     public void Initialize(GameController gc)

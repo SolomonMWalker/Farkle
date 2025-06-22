@@ -1,5 +1,5 @@
-using System.Collections.Generic;
 using Godot;
+using System;
 
 public partial class GameController : Node3D
 {
@@ -36,6 +36,7 @@ public partial class GameController : Node3D
         ScoreManager = new ScoreManager();
         RoundManager = new RoundManager();
         StageManager = new StageManager();
+
 
         if (Configuration.ConfigValues.IsDebug)
         {

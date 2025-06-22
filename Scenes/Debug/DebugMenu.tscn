@@ -31,6 +31,7 @@ controlToDrag = NodePath("../../../..")
 
 [node name="MinimizeButton" type="Button" parent="VBoxContainer/TopBarContainer/HBoxContainer"]
 layout_mode = 2
+focus_mode = 0
 icon = ExtResource("3_vyru5")
 
 [node name="MenuContentsContainer" type="PanelContainer" parent="VBoxContainer"]
