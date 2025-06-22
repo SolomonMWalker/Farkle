@@ -69,6 +69,10 @@ public partial class GameController : Node3D
         GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.SelectDice, [
             DiceManager.AddDiceLeftOnTableToRollableDiceCollection, PreSelectDiceFarkleCheck,
         ]);
+        GameStateManager.AddOnStateEnterOrExitAction(enter: false, GameState.SelectDice, [
+            DiceManager.UnselectAllDice,
+        ]);
+        
 
         if (Configuration.ConfigValues.IsDebug)
         {

@@ -1,0 +1,92 @@
+[gd_scene load_steps=11 format=3 uid="uid://62f0kedptxc3"]
+
+[ext_resource type="PhysicsMaterial" uid="uid://d25ce7roxxajs" path="res://Resources/PhysicsMaterials/RootDicePhysicsMaterial.tres" id="1_14yqd"]
+[ext_resource type="Script" uid="uid://dk3c4j8n832mv" path="res://Code/Scripts/RootDice.cs" id="2_as7et"]
+[ext_resource type="BoxMesh" uid="uid://078efvk0u5qi" path="res://Resources/Meshes/RootDiceMesh.tres" id="3_62b0c"]
+[ext_resource type="PackedScene" uid="uid://clbk0ioy0vgii" path="res://Scenes/dice_face.tscn" id="4_rp3gx"]
+[ext_resource type="Material" uid="uid://18xqjmy1iq8i" path="res://Resources/Materials/RootDiceFlashRedMaterial.tres" id="5_fyjep"]
+[ext_resource type="Material" uid="uid://c626kg5uasvr6" path="res://Resources/Materials/RootDiceSelectedMaterial.tres" id="6_qdgg8"]
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_tctqp"]
+points = PackedVector3Array(-0.2, -0.2, -0.2, 0.199991, 0.2, 0.2, 0.199991, 0.2, -0.2, 0.199991, -0.2, 0.2, -0.2, 0.2, 0.2, 0.199991, -0.2, -0.2, -0.2, 0.2, -0.2, -0.2, -0.2, 0.2)
+
+[sub_resource type="Animation" id="Animation_sqtwq"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:surface_material_override/0")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [null]
+}
+
+[sub_resource type="Animation" id="Animation_1dacq"]
+resource_name = "SelectedFlashRed"
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MeshInstance3D:surface_material_override/0")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.2, 0.4, 0.6),
+"transitions": PackedFloat32Array(1, 1, 1, 1),
+"update": 1,
+"values": [ExtResource("5_fyjep"), ExtResource("6_qdgg8"), ExtResource("5_fyjep"), ExtResource("6_qdgg8")]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_unksr"]
+_data = {
+&"RESET": SubResource("Animation_sqtwq"),
+&"SelectedFlashRed": SubResource("Animation_1dacq")
+}
+
+[node name="RootDice" type="RigidBody3D"]
+physics_material_override = ExtResource("1_14yqd")
+gravity_scale = 1.5
+script = ExtResource("2_as7et")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("3_62b0c")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_tctqp")
+
+[node name="Corner" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.2, 0.2, 0.2)
+
+[node name="DiceFaces" type="Node3D" parent="."]
+
+[node name="DiceFace1" parent="DiceFaces" instance=ExtResource("4_rp3gx")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0.201)
+numberValue = 1
+
+[node name="DiceFace2" parent="DiceFaces" instance=ExtResource("4_rp3gx")]
+transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, -0.201)
+numberValue = 2
+
+[node name="DiceFace3" parent="DiceFaces" instance=ExtResource("4_rp3gx")]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0.201, 0)
+numberValue = 3
+
+[node name="DiceFace4" parent="DiceFaces" instance=ExtResource("4_rp3gx")]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, -0.201, 0)
+numberValue = 4
+
+[node name="DiceFace5" parent="DiceFaces" instance=ExtResource("4_rp3gx")]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0.201, 0, 0)
+numberValue = 5
+
+[node name="DiceFace6" parent="DiceFaces" instance=ExtResource("4_rp3gx")]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, -0.201, 0, 0)
+numberValue = 6
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+&"": SubResource("AnimationLibrary_unksr")
+}

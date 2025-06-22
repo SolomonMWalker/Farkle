@@ -2,12 +2,15 @@ using Godot;
 
 public partial class DiceFace() : Node3D
 {
+    private const string DiceFaceTextureFolder = "res://Resources/Textures/DiceFaces/";
+
     [Export]
     public int numberValue;
 
     private bool _isDebug = false;
+    private Sprite3D sprite3D;
+    private DiceFaceTextureColor color = DiceFaceTextureColor.Black;
     private DiceFaceValue _diceFaceValue;
-    private Label3D _label;
     private RootDice _associatedDice;
     public RootDice AssociatedDice { get => _associatedDice; }
     public int Number => (_overridden ? _overrideDiceFaceValue.numberValue : _diceFaceValue.numberValue) ?? 0;
@@ -22,7 +25,7 @@ public partial class DiceFace() : Node3D
         {
             _overrideDiceFaceValue = dfValue;
             _overridden = true;
-            SetLabelText(Number.ToString());
+            LoadTexture();
         }
     }
 
@@ -32,7 +35,7 @@ public partial class DiceFace() : Node3D
         {
             _overridden = false;
             _overrideDiceFaceValue = null;
-            SetLabelText(Number.ToString());
+            LoadTexture();
         }
     }
 
@@ -42,11 +45,22 @@ public partial class DiceFace() : Node3D
     {
         base._Ready();
         _associatedDice = GetParent<Node3D>().GetParent<RootDice>();
-        _label = this.GetChildByName<Label3D>("Label");
+        sprite3D = this.GetChildByName<Sprite3D>("Sprite3D");
         _diceFaceValue = new DiceFaceValue(numberValue);
         _isDebug = Configuration.ConfigValues.IsDebug;
-        SetLabelText(_diceFaceValue.numberValue.Value.ToString());
+        LoadTexture();
     }
 
-    private void SetLabelText(string text) => _label.Text = text;
+    public void LoadTexture()
+    {
+        sprite3D.Texture = GD.Load<Texture2D>(DiceFaceTextureFolder + $"PixelOldSchool/{Number}.png");
+        sprite3D.TextureFilter = BaseMaterial3D.TextureFilterEnum.Nearest;
+        sprite3D.Modulate = Colors.Black;
+    }
+}
+
+public enum DiceFaceTextureColor
+{
+    White,
+    Black
 }

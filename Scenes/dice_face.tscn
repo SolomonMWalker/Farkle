@@ -5,6 +5,4 @@
 [node name="DiceFace" type="Node3D"]
 script = ExtResource("1_jssrg")
 
-[node name="Label" type="Label3D" parent="."]
-font_size = 75
-outline_size = 25
+[node name="Sprite3D" type="Sprite3D" parent="."]
