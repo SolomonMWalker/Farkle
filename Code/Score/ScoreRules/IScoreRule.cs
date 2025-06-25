@@ -139,6 +139,11 @@ public class ThreePairScoreRule : IScoreRule
 {
     public ScoreWithUnusedDice GetScore(ScorableCollection scorableCollection)
     {
+        if (scorableCollection.faces.Count() < 6)
+        {
+            return new(-1, []);
+        }
+
         var pairs = scorableCollection.dict.Where(d => d.Value == 2).ToDictionary();
 
         if (pairs.Keys.Count < 3)
@@ -146,15 +151,10 @@ public class ThreePairScoreRule : IScoreRule
             return new(-1, []);
         }
 
-
         List<DiceFace> usedDiceFaces = [];
         foreach (KeyValuePair<int, int> pair in pairs)
         {
-            for (int i = 0; i < pair.Value; i++)
-            {
-                usedDiceFaces.Add(scorableCollection.faces.First(f => f.Number == pair.Key &&
-                    !usedDiceFaces.Contains(f)));
-            }
+            usedDiceFaces.AddRange([.. scorableCollection.faces.Where(f => f.Number == pair.Key).Take(2)]);
         }
 
         var unusedDice = scorableCollection.diceCollection.RemoveDice(

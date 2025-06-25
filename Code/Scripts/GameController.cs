@@ -379,12 +379,12 @@ public partial class GameController : Node3D
         UiManager.BuildAndSetScoreText(
             ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection).Score,
             RoundManager.RoundScore,
-            PlayerManager.ScoreTriesPerRound,
+            RoundManager.CurrentScoreTries,
             StageManager.StageScore,
             StageManager.GetCurrentStageScoreToWin(),
             StageManager.GetNumberOfStages(),
             StageManager.GetCurrentStageNumber(),
-            PlayerManager.RerollsPerStage);
+            StageManager.CurrentRerolls);
     }
 
     public void StartThrowForceBar()
