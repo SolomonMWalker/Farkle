@@ -27,5 +27,7 @@ public static class Configuration
 public record ConfigValues(
     bool IsDebug,
     int ScoreToWin,
-    int NumOfStartingDice
+    int NumOfStartingDice,
+    int ScoreTriesPerRound,
+    int RerollsPerStage
 );

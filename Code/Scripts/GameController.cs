@@ -33,9 +33,9 @@ public partial class GameController : Node3D
             this.GetChildByName<Node3D>("DiceHolder"),
             this.GetChildByName<Node3D>("OutOfPlayDiceLocation"),
             throwLocationBall.throwLocation);
+        StageManager = new StageManager(PlayerManager);
+        RoundManager = new RoundManager(PlayerManager);
         ScoreManager = new ScoreManager();
-        RoundManager = new RoundManager();
-        StageManager = new StageManager();
 
 
         if (Configuration.ConfigValues.IsDebug)
@@ -153,6 +153,7 @@ public partial class GameController : Node3D
         if (GameStateManager.GetSelectDiceSubstate is SelectDiceSubstate.Farkled && Input.IsActionJustPressed("Accept"))
         {
             ClearFarkle();
+            BuildAndSetScoreText();
             DiceManager.ResetAllDice();
             cameraController.MoveToUserPerspectiveLocation();
             TryProgressState();
@@ -199,7 +200,7 @@ public partial class GameController : Node3D
                     GameOver("You won!");
                 }
             }
-            else if (!StageManager.TryToUseScoreAttempt())
+            else if (!RoundManager.TryToUseScoreAttempt())
             {
                 GD.Print("No more score attempts.");
                 GameOver("You ran out of score attempts and lost this stage.");
@@ -347,9 +348,13 @@ public partial class GameController : Node3D
     public void Farkle()
     {
         GameStateManager.Farkle();
-        if (!StageManager.TryToFarkle())
+        if (!RoundManager.TryToFarkle())
         {
             GameOver("You Farkled your last score attempt and lost this stage.");
+        }
+        else
+        {
+            RoundManager.StartNewRound();
         }
         UiManager.Farkle();
     }
@@ -374,12 +379,12 @@ public partial class GameController : Node3D
         UiManager.BuildAndSetScoreText(
             ScoreManager.TryGetScore(DiceManager.SelectedDiceCollection).Score,
             RoundManager.RoundScore,
-            StageManager.ScoreAttemptsLeft,
+            PlayerManager.ScoreTriesPerRound,
             StageManager.StageScore,
             StageManager.GetCurrentStageScoreToWin(),
             StageManager.GetNumberOfStages(),
             StageManager.GetCurrentStageNumber(),
-            StageManager.RetriesLeft);
+            PlayerManager.RerollsPerStage);
     }
 
     public void StartThrowForceBar()
