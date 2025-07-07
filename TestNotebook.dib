@@ -1,0 +1,238 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"name":"csharp","languageName":"csharp"},{"name":"fsharp","languageName":"F#","aliases":["f#","fs"]},{"name":"html","languageName":"HTML"},{"name":"http","languageName":"HTTP"},{"name":"javascript","languageName":"JavaScript","aliases":["js"]},{"name":"mermaid","languageName":"Mermaid"},{"name":"pwsh","languageName":"PowerShell","aliases":["powershell"]},{"name":"value"}]}}
+
+#!csharp
+
+public class ScorableDiceCollection
+{
+    public List<int> winningDiceFaces = [];
+    public HashSet<int> fSet = [];
+    public Dictionary<int, int> facesWithFrequency = [];
+
+    public ScorableDiceCollection(List<int> winningFaces)
+    {
+        winningDiceFaces = winningFaces;
+        fSet = winningDiceFaces.ToHashSet<int>();
+        foreach(int face in winningDiceFaces)
+        {
+            if(facesWithFrequency.ContainsKey(face))
+            {
+                facesWithFrequency[face] = facesWithFrequency[face] + 1;
+            }
+            else
+            {
+                facesWithFrequency[face] = 1;
+            }
+        }
+    }
+}
+
+public record ScoreResult
+{
+    public int score;
+    public ScoreType scoreType;
+    public int diceInvolved;
+
+    public static ScoreResult NoScore(ScoreType scoreType)
+    {
+        return new ScoreResult{
+            score = 0,
+            scoreType = scoreType,
+            diceInvolved = 0
+        };
+    }
+}
+
+public static int GetRandomIntFromList(List<int> l)
+{
+    var rand = new Random();
+    return l[rand.Next(0, l.Count)];
+}
+
+public record SequentialSetDetails(int StartingFace, int Length);
+
+public static SequentialSetDetails GetSetSequentialDetails(HashSet<int> set)
+{
+    List<int> sortedList = [.. set];
+    sortedList.Sort();
+    int? previousNum = null;
+    (int start, int length) longestStraight = (0, 0);
+    (int start, int length) currentStraight = (0, 0);
+    for(int i = 0; i < sortedList.Count; i++)
+    {
+        //if first in sequence, start current straight and set current num to previous num
+        if(i == 0)
+        {
+            currentStraight = (sortedList[i], 1);
+            previousNum = sortedList[i];
+        }
+        //else, if currentNum is previousNum + 1, add 1 to currentStraight length
+        else if(sortedList[i] == previousNum + 1)
+        {
+            currentStraight.length = currentStraight.length + 1;
+            previousNum = sortedList[i];
+        }
+        //else, straight is over, so take current straight, compare to longest, and start new straight
+        else
+        {
+            if(currentStraight.length > longestStraight.length)
+            {
+                longestStraight = currentStraight;
+            }
+            currentStraight = (sortedList[i], 1);
+            previousNum = sortedList[i];
+        }
+    }
+
+    //final check for straight continued on last value
+    if(currentStraight.length > longestStraight.length)
+    {
+        longestStraight = currentStraight;
+    }
+
+    return new SequentialSetDetails(longestStraight.start, longestStraight.length);
+}
+
+public enum ScoreType
+{
+    SingleOne,
+    SingleFive,
+    ThreeOrMoreOfAKind,
+    Straight,
+    ThreeOrMorePair
+}
+
+public interface IScoreRule
+{
+    public ScoreResult GetScore(ScorableDiceCollection scorableCollection);
+}
+
+public class SingleOneScoreRule : IScoreRule
+{
+    public ScoreResult GetScore(ScorableDiceCollection scorableCollection)
+    {
+        if(!scorableCollection.facesWithFrequency.ContainsKey(1)) { return ScoreResult.NoScore(ScoreType.SingleOne); }
+        return new ScoreResult{
+            score = scorableCollection.facesWithFrequency[1] * 100,
+            scoreType = ScoreType.SingleOne,
+            diceInvolved = scorableCollection.facesWithFrequency[1]
+        };
+    }
+}
+
+public class SingleFiveScoreRule : IScoreRule
+{
+    public ScoreResult GetScore(ScorableDiceCollection scorableCollection)
+    {
+        if(!scorableCollection.facesWithFrequency.ContainsKey(5)) { return ScoreResult.NoScore(ScoreType.SingleFive); }
+        return new ScoreResult{
+            score = scorableCollection.facesWithFrequency[5] * 50,
+            scoreType = ScoreType.SingleFive,
+            diceInvolved = scorableCollection.facesWithFrequency[5]
+        };
+    }
+}
+
+public class ThreeOrMoreOfAKindScoreRule : IScoreRule
+{
+    public ScoreResult GetScore(ScorableDiceCollection scorableCollection)
+    {
+        var facesWith3OrMoreFreq = scorableCollection.facesWithFrequency.Where(x => x.Value >= 3);
+
+        if(!facesWith3OrMoreFreq.Any()) {return ScoreResult.NoScore(ScoreType.ThreeOrMoreOfAKind);}
+
+        int score = 0;
+        foreach(var kv in facesWith3OrMoreFreq)
+        {
+            int initialScore;
+            if(kv.Key == 1)
+            {
+                initialScore = 1000;
+            }
+            else
+            {
+                initialScore = kv.Key * 100;
+            }
+
+            score += initialScore + 1000 * (kv.Key - 3);
+        }
+
+        int diceInvolved = facesWith3OrMoreFreq.Select(x => x.Value).Sum();
+
+        return new ScoreResult{
+            score = score,
+            scoreType = ScoreType.ThreeOrMoreOfAKind,
+            diceInvolved = diceInvolved
+        };
+    }
+}
+
+public class StraightScoreRule : IScoreRule
+{
+    public ScoreResult GetScore(ScorableDiceCollection scorableCollection)
+    {
+        var setDetails = GetSetSequentialDetails(scorableCollection.fSet);
+        if(setDetails.Length < 5) { return ScoreResult.NoScore(ScoreType.Straight); }
+        return new ScoreResult{
+            score = 1500 + (setDetails.Length - 5) * 500, 
+            scoreType = ScoreType.Straight,
+            diceInvolved = setDetails.Length
+        };
+    }
+}
+
+public class ThreeOrMorePairScoreRule : IScoreRule
+{
+    public ScoreResult GetScore(ScorableDiceCollection scorableCollection)
+    {
+        var pairs = scorableCollection.facesWithFrequency.Where(x => x.Value == 2);
+        if(pairs.Count() < 3) { return ScoreResult.NoScore(ScoreType.ThreeOrMorePair); }
+        return new ScoreResult{
+            score = 1500 + (pairs.Count() - 3) * 1000, 
+            scoreType = ScoreType.ThreeOrMorePair,
+            diceInvolved = pairs.Select(p => p.Value).Sum()
+        };
+    }
+}
+
+public static List<IScoreRule> scoreRules = [
+    new SingleOneScoreRule(), new SingleFiveScoreRule(), new ThreeOrMoreOfAKindScoreRule(),
+    new StraightScoreRule(), new ThreeOrMorePairScoreRule()
+];
+
+public ScoreResult GetScore(ScorableDiceCollection dc)
+{
+    ScoreResult highestScore = null;
+    foreach(var rule in scoreRules)
+    {
+        var score = rule.GetScore(dc);
+        if(highestScore is null || score.score > highestScore.score) {highestScore = score;}
+    }
+    return highestScore;
+}
+
+#!csharp
+
+//test with six faces between 1 and 6
+List<int> faceValues = [1,2,3,4,5,6];
+int numOfDice = 6;
+int testRuns = 10000;
+List<ScoreResult> results = [];
+for(int i = 0; i < testRuns; i++)
+{
+    List<int> winningFaces = [];
+    for(int j = 0; j < numOfDice; j++)
+    {
+        winningFaces.Add(GetRandomIntFromList(faceValues));
+    }
+    var dc = new ScorableDiceCollection(winningFaces);
+    results.Add(GetScore(dc));
+}
+var average = results.Select(r => r.score).Average();
+var resultsNoZeros = results.Where(r => r.score > 0);
+Console.WriteLine($"Results average = {results.Select(r => r.score).Average()}");
+Console.WriteLine($"Results with no score = {results.Where(r => r.score == 0).Count()}");
+Console.WriteLine($"Results average no zeros = {resultsNoZeros.Select(r => r.score).Average()}");
+Console.WriteLine($"Results above avg no zeros = {resultsNoZeros.Where(r => r.score >= average).Count()}");
+Console.WriteLine($"Results below avg no zeros = {resultsNoZeros.Where(r => r.score < average).Count()}");
