@@ -5,7 +5,7 @@ public partial class GameController : Node3D
 {
     #region Properties
 
-    private const string DebugMenuRelPath = "res://Scenes/Debug/DebugMenu.tscn";
+    private const string DebugMenuRelPath = "res://Scenes/Debug/debug_menu.tscn";
 
     public DebugMenu DebugMenu { get; private set; }
     private CameraController cameraController;

@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3 uid="uid://bwyenjx26onyg"]
+
+[ext_resource type="Script" uid="uid://dxu2lhi7t7h8j" path="res://Code/Scripts/TableGraph.cs" id="1_dyk35"]
+
+[node name="TableGraph" type="Node3D"]
+script = ExtResource("1_dyk35")
+width = 16
+height = 16
+
+[node name="Tiles" type="Node3D" parent="."]

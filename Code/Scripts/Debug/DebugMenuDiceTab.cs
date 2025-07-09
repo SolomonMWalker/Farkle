@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public partial class DebugMenuDiceTab : MarginContainer
 {
-    private const string _diceEntrySceneRelPath = "res://Scenes/Debug/DebugMenuDiceTabEntry.tscn";
+    private const string _diceEntrySceneRelPath = "res://Scenes/Debug/debug_menu_dice_tab_entry.tscn";
     private PackedScene _diceEntryPScene;
     private GameController gController;
     private List<DebugMenuDiceTabEntry> DiceEntries { get; set; } = [];

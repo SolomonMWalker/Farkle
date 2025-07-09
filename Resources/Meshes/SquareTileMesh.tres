@@ -1,4 +1,7 @@
-[gd_resource type="BoxMesh" load_steps=0 format=3 uid="uid://cugpp5q1gxvtb"]
+[gd_resource type="BoxMesh" load_steps=2 format=3 uid="uid://cugpp5q1gxvtb"]
+
+[ext_resource type="Material" uid="uid://jp2p13yy5ap2" path="res://Resources/Materials/SquareTileMaterial.tres" id="1_27q3p"]
 
 [resource]
+material = ExtResource("1_27q3p")
 size = Vector3(1, 0.05, 1)

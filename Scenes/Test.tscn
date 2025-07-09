@@ -1,9 +1,9 @@
 [gd_scene load_steps=12 format=3 uid="uid://bm24t8vu2m5tm"]
 
-[ext_resource type="Script" uid="uid://dijluwumyer0g" path="res://Code/Scripts/GameController.cs" id="1_aq4fw"]
-[ext_resource type="PackedScene" uid="uid://bumu5lp3edko4" path="res://Scenes/dice_table.tscn" id="1_njov2"]
-[ext_resource type="Script" uid="uid://chg753s0anfd6" path="res://Code/Scripts/CameraController.cs" id="2_0dy5s"]
-[ext_resource type="Script" uid="uid://dn5tcp3l4r5dt" path="res://Code/Scripts/ThrowForceProgressBar.cs" id="4_f2nln"]
+[ext_resource type="Script" uid="uid://dijluwumyer0g" path="res://Code/Scripts/GameController.cs" id="1_ys1qc"]
+[ext_resource type="Script" uid="uid://chg753s0anfd6" path="res://Code/Scripts/CameraController.cs" id="2_35xla"]
+[ext_resource type="PackedScene" uid="uid://bumu5lp3edko4" path="res://Scenes/dice_table.tscn" id="3_i3aeo"]
+[ext_resource type="Script" uid="uid://dn5tcp3l4r5dt" path="res://Code/Scripts/ThrowForceProgressBar.cs" id="4_5wyu1"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_njov2"]
 sky_horizon_color = Color(0.662243, 0.671743, 0.686743, 1)
@@ -97,10 +97,10 @@ light_angular_distance = 20.0
 directional_shadow_mode = 0
 
 [node name="GameController" type="Node3D" parent="."]
-script = ExtResource("1_aq4fw")
+script = ExtResource("1_ys1qc")
 
 [node name="CameraController" type="Node3D" parent="GameController"]
-script = ExtResource("2_0dy5s")
+script = ExtResource("2_35xla")
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="GameController/CameraController"]
 deterministic = true
@@ -118,7 +118,7 @@ transform = Transform3D(1, 0, 0, 0, 0.0348995, 0.999391, 0, -0.999391, 0.0348995
 transform = Transform3D(1, 0, 0, 0, 0.406734, 0.913546, 0, -0.913546, 0.406734, 0, 7.15, 4.485)
 near = 0.005
 
-[node name="DiceTable" parent="GameController" instance=ExtResource("1_njov2")]
+[node name="DiceTable" parent="GameController" instance=ExtResource("3_i3aeo")]
 
 [node name="DiceHolder" type="Node3D" parent="GameController"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 100)
@@ -188,4 +188,4 @@ offset_right = 31.0
 offset_bottom = 109.0
 max_value = 1.0
 fill_mode = 3
-script = ExtResource("4_f2nln")
+script = ExtResource("4_5wyu1")

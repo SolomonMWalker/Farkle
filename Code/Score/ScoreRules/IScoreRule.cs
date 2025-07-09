@@ -159,6 +159,6 @@ public class ThreePairScoreRule : IScoreRule
 
         var unusedDice = scorableCollection.diceCollection.RemoveDice(
             usedDiceFaces.Select(f => f.AssociatedDice)).diceList;
-        return new(1500, [.. unusedDice]);
+        return new(1500 + 500 * (pairs.Keys.Count - 3), [.. unusedDice]);
     }
 }
