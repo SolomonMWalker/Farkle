@@ -36,10 +36,10 @@ public static class HelperMethods
     {
         return new Vector3(GD.Randf() * coefficient, GD.Randf() * coefficient, GD.Randf() * coefficient);
     }
-    
+
     public static ulong? GetCollisionIdFromMouseClick(InputEventMouseButton mouseButtonEvent, Node3D node)
     {
-        if(mouseButtonEvent.Pressed is false && mouseButtonEvent.ButtonIndex is MouseButton.Left)
+        if (mouseButtonEvent.Pressed is false && mouseButtonEvent.ButtonIndex is MouseButton.Left)
         {
             return GetCollidingObjectFromOriginRay(node, mouseButtonEvent.Position);
         }
@@ -58,11 +58,13 @@ public static class HelperMethods
 
         //https://docs.godotengine.org/en/stable/tutorials/physics/ray-casting.html
         var result = space.IntersectRay(queryParams);
-        if(result.Count > 0)
+        if (result.Count > 0)
         {
             return (ulong)result["collider_id"];
         }
 
         return null;
     }
+
+    public static Vector2 GetScreenPositionOfGlobalPosition3D(Vector3 globalPosition, Camera3D mainCamera) => mainCamera.UnprojectPosition(globalPosition);
 }

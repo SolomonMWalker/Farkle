@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://b508cagfycrcn"]
 
-[ext_resource type="Script" uid="uid://0vv1qbcbw6c1" path="res://SquareTilePlane.cs" id="1_nbf56"]
+[ext_resource type="Script" uid="uid://0vv1qbcbw6c1" path="res://Code/Scripts/Old/SquareTilePlane.cs" id="1_nbf56"]
 
 [node name="SquareTilePlane" type="Node3D"]
 script = ExtResource("1_nbf56")

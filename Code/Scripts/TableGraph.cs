@@ -25,7 +25,7 @@ public partial class TableGraph : Node3D
             throw new Exception();
         }
 
-        TilesParent = (Node3D) FindChild("Tiles");
+        TilesParent = (Node3D)FindChild("Tiles");
 
         GraphTilePackedScene = GD.Load<PackedScene>(GraphTilePath);
         GraphInitialSetup();
