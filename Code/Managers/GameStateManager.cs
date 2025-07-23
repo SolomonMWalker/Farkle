@@ -6,6 +6,8 @@ public class GameStateManager
     private GameState gameState = GameState.Instantiated;
     private Dictionary<GameState, List<Action>> OnStateEnterActions = [], OnStateExitActions = [];
     private SelectDiceSubstate selectDiceSubstate = SelectDiceSubstate.SelectingDice;
+    private List<string> _states = ["Instantiated","GameOver","PreRoll","FindRollPosition","FindRollStrength",
+        "Rolling","SelectDice","ExitDiceZoomAnimation"];
     private readonly GameState[] stateProgression = [
         GameState.PreRoll,
         GameState.FindRollPosition,
