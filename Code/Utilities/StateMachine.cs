@@ -12,16 +12,17 @@ public class StateMachine
     {
         StateMachineName = stateMachineName;
         AddState(initialStateName);
-        _currentState = GetStateByName(initialStateName);
+        TryGetStateByName(initialStateName, out var initialState);
+        _currentState = initialState;
     }
 
-    public string GetCurrentState() => _currentState.Name;
+    public State GetCurrentState() => _currentState;
 
     public bool TryChangeState(string nextStateName)
     {
-        if (!_currentState.NextStates.Select(s => s.Name).Contains(nextStateName)) { return false; }
+        if (!TryGetStateByName(nextStateName, out var nextState)) { return false; }
         _currentState.ExitActions.ForEach(a => a());
-        _currentState = GetStateByName(nextStateName);
+        _currentState = nextState;
         _currentState.EnterActions.ForEach(a => a());
         return true;
     }
@@ -36,39 +37,50 @@ public class StateMachine
 
     public void AddState(string name)
     {
-        if (GetStateByName(name) != null) { return; }
-        _states.Add(new(name, [], [], [], []));
+        if (TryGetStateByName(name, out _)) { return; }
+        _states.Add(new(name, [], []));
     }
 
     public bool TryCreateStateLinkage(string fromStateName, string toStateName)
     {
-        var fromState = GetStateByName(fromStateName);
-        var toState = GetStateByName(toStateName);
-
-        if (fromState == null || toState == null) { return false; }
-
+        if ( fromStateName.Equals(toStateName) ||
+            !TryGetStateByName(fromStateName, out var fromState) ||
+            !TryGetStateByName(toStateName, out var toState)
+        ) { return false; }
         fromState.NextStates.Add(toState);
+        return true;
+    }
+
+    public bool TryRemoveStateLinkage(string fromStateName, string toStateName)
+    {
+        if (!TryGetStateByName(fromStateName, out var fromState) || !TryGetStateByName(toStateName, out var toState)) { return false; }
+        fromState.NextStates.Remove(toState);
         return true;
     }
 
     public void AddEnterStateAction(string stateName, Action action)
     {
-        var state = GetStateByName(stateName);
-        if (state == null) { return; }
+        if (!TryGetStateByName(stateName, out var state)) { return; }
         state.EnterActions.Add(action);
     }
 
     public void AddExitStateAction(string stateName, Action action)
     {
-        var state = GetStateByName(stateName);
-        if (state == null) { return; }
+        if (!TryGetStateByName(stateName, out var state)) { return; }
         state.ExitActions.Add(action);
     }
 
-    private State GetStateByName(string name)
+    public bool TryChangeStateSubState(string stateName, string newSubState)
     {
-        return _states.Any(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ?
+        if (!TryGetStateByName(stateName, out var state)) { return false; }
+        return state.TrySetSubState(newSubState);        
+    }
+
+    public bool TryGetStateByName(string name, out State state)
+    {
+        state = _states.Any(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) ?
             _states.First(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase)) : null;
+        return state != null;
     }
 }
 
@@ -76,35 +88,33 @@ public class State
 {
     public string Name { get; set; }
     public List<State> NextStates { get; set; }
-    public List<State> SubStates { get; set; }
+    public List<string> SubStates { get; set; }
     public List<Action> EnterActions { get; set; }
     public List<Action> ExitActions { get; set; }
-    private StateMachine SubStateMachine { get; set; }
+    private int _currentSubState = -1;
 
-    public State(string name, List<State> nextStates, List<string> subStates, List<Action> enterActions, List<Action> exitActions)
+    public State(string name, List<State> nextStates, List<string> subStates = null)
     {
         Name = name;
         NextStates = nextStates;
-        EnterActions = enterActions;
-        ExitActions = exitActions;
+        EnterActions = [];
+        ExitActions = [];
 
-        if (subStates != null && subStates.Count > 0)
-        {
-            SubStateMachine = new StateMachine(name + "SubStateMachine", subStates[0]);
-            foreach (string subState in subStates)
-            {
-                SubStateMachine.AddState(subState);
-            }
-            foreach (string subState in subStates)
-            {
-                var otherSubStates = subStates.Where(s => s != subState);
-                foreach (string otherSubState in otherSubStates)
-                {
-                    SubStateMachine.TryCreateStateLinkage(subState, otherSubState);
-                }
-            }
-        }
+        if (subStates != null && subStates.Count > 0) { _currentSubState = 0; }
+    }
 
-        //create method to change substates
+    public bool TryGetSubstate(out string subState)
+    {
+        subState = "";
+        if (SubStates is null || SubStates.Count == 0) { return false; }
+        subState = SubStates[_currentSubState];
+        return true;
+    }
+
+    public bool TrySetSubState(string subState)
+    {
+        if (SubStates is null || !SubStates.Contains(subState)) { return false; }
+        _currentSubState = SubStates.IndexOf(subState);
+        return true;
     }
 }

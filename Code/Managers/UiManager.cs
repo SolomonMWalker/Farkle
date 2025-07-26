@@ -56,7 +56,7 @@ public class UiManager
             (GameState.FindRollPosition, _) => "Press space to select rolling position and roll dice.",
             (GameState.Rolling, _) => "Wait for dice to finish rolling.",
             (GameState.SelectDice, SelectDiceSubstate.SelectingDice) => "Select dice with the mouse. Press space to enter your score and roll again. Press enter to submit your score. If all six die are scored, you must press space to roll again.",
-            (GameState.SelectDice, SelectDiceSubstate.Farkled) => "You Farkled. Press Space to Continue.",
+            (GameState.SelectDice, SelectDiceSubstate.FarkledNotGameOver) => "You Farkled. Press Space to Continue.",
             (GameState.GameOver, _) => "Game Over! Press space to play a new game.",
             _ => ""
         };

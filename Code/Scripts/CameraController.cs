@@ -29,7 +29,7 @@ public partial class CameraController : Node3D
         }
     }
 
-    public void MoveToDiceZoomLocation()
+    public void MoveToTableZoomLocation()
     {
         if (cameraState != CameraState.DiceZoom)
         {

@@ -1,126 +1,179 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
+using Godot;
 
 public class GameStateManager
 {
-    private GameState gameState = GameState.Instantiated;
-    private Dictionary<GameState, List<Action>> OnStateEnterActions = [], OnStateExitActions = [];
-    private SelectDiceSubstate selectDiceSubstate = SelectDiceSubstate.SelectingDice;
-    private List<string> _states = ["Instantiated","GameOver","PreRoll","FindRollPosition","FindRollStrength",
-        "Rolling","SelectDice","ExitDiceZoomAnimation"];
-    private readonly GameState[] stateProgression = [
-        GameState.PreRoll,
-        GameState.FindRollPosition,
-        GameState.FindRollStrength,
-        GameState.Rolling,
-        GameState.SelectDice,
-        GameState.ExitDiceZoomAnimation
-    ];
+    public static readonly List<GameState> CameraZoomGameStates = [GameState.TableZoomAnimation, GameState.UserPerspectiveZoomAnimation];
+    private bool _isPostCameraZoomStateSet = false;
+    private GameState _postCameraZoomState;
+    private StateMachine _gameStateMachine;
 
     public GameStateManager()
     {
-        foreach (GameState gs in Enum.GetValues(typeof(GameState)))
+        _gameStateMachine = new StateMachine("GameStateMachine", GameState.Instantiated.ToString());
+        var gameStates = Enum.GetNames(typeof(GameState)).ToList();
+        gameStates.Remove(GameState.Instantiated.ToString());
+        foreach (var state in gameStates)
         {
-            OnStateEnterActions.Add(gs, []);
-            OnStateExitActions.Add(gs, []);
-        }        
+            _gameStateMachine.AddState(state);
+        }
+
+        //Create select dice substates
+        _gameStateMachine.TryGetStateByName(GameState.SelectDice.ToString(), out var selectDiceSubstate);
+        selectDiceSubstate.SubStates = [SelectDiceSubstate.SelectingDice.ToString(), SelectDiceSubstate.FarkledGameOver.ToString(),
+            SelectDiceSubstate.FarkledNotGameOver.ToString()];
+
+        //Normal game states
+
+        //Instantiated to Preroll
+        TryCreateStateLinkage(GameState.Instantiated, GameState.PreRoll);
+
+        //Preroll to FindRollPosition or TableZoomAnimation
+        TryCreateStateLinkage(GameState.PreRoll, GameState.FindRollPosition);
+        TryCreateStateLinkage(GameState.PreRoll, GameState.TableZoomAnimation);
+
+        //FindRollPosition to FindRollStrength or Preroll
+        TryCreateStateLinkage(GameState.FindRollPosition, GameState.FindRollStrength);
+        TryCreateStateLinkage(GameState.FindRollPosition, GameState.PreRoll);
+
+        //FindRollStrength to ThrowDice or Preroll
+        TryCreateStateLinkage(GameState.FindRollStrength, GameState.ThrowDice);
+        TryCreateStateLinkage(GameState.FindRollStrength, GameState.PreRoll);
+
+        //ThrowDice to TableZoomAnimation
+        TryCreateStateLinkage(GameState.ThrowDice, GameState.TableZoomAnimation);
+
+        //Rolling to SelectDice
+        TryCreateStateLinkage(GameState.Rolling, GameState.SelectDice);
+
+        //TableZoomAnimation to SelectDice or SetTable or GameOver
+        TryCreateStateLinkage(GameState.TableZoomAnimation, GameState.Rolling);
+        TryCreateStateLinkage(GameState.TableZoomAnimation, GameState.SetTable);
+        TryCreateStateLinkage(GameState.TableZoomAnimation, GameState.GameOver);
+
+        //SetTable to UserPerspectiveZoomAnimation
+        TryCreateStateLinkage(GameState.SetTable, GameState.UserPerspectiveZoomAnimation);
+
+        //SelectDice to UserPerspectiveZoomAnimation or GameOver
+        TryCreateStateLinkage(GameState.SelectDice, GameState.UserPerspectiveZoomAnimation);
+        TryCreateStateLinkage(GameState.SelectDice, GameState.GameOver);
+
+        //UserPerspectiveZoomAnimation to PreRoll
+        TryCreateStateLinkage(GameState.UserPerspectiveZoomAnimation, GameState.PreRoll);
+
+        //GameOver to UserPerspectiveZoomAnimation
+        TryCreateStateLinkage(GameState.GameOver, GameState.UserPerspectiveZoomAnimation);
     }
 
-    private void ChangeState(GameState state)
+    private bool TryCreateStateLinkage(GameState fromState, GameState toState)
     {
-        RunOnStateExitActions(gameState);
-        gameState = state;
-        RunOnStateEnterActions(state);
+        if (!_gameStateMachine.TryCreateStateLinkage(fromState.ToString(), toState.ToString()))
+        {
+            GD.PrintErr($"Could not create state linkage from state {fromState} to state {toState}.");
+            return false;
+        }
+        return true;
     }
 
-    public GameState StartGame()
+    public GameState GetCurrentGameState() => Enum.Parse<GameState>(_gameStateMachine.GetCurrentState().Name);
+
+    public bool TryProgressState(GameState nextState)
     {
-        ClearFarkle();
-        ChangeState(GameState.PreRoll);
-        return gameState;
+        if (!_gameStateMachine.TryChangeState(nextState.ToString()))
+        {
+            GD.PrintErr($"Can't progress from state {GetCurrentGameState()} to state {nextState}.");
+            return false;
+        }
+        return true;
     }
 
-    public GameState ProgressState()
+    public bool TryProgressStateWithCameraZoomBetween(GameState cameraZoomState, GameState nextState)
     {
-        
-        var stateIndexInProgression = Array.IndexOf(stateProgression, gameState);
-        ChangeState(stateProgression[(stateIndexInProgression + 1) % stateProgression.Length]);
-        return gameState;
+        if (!CameraZoomGameStates.Contains(cameraZoomState) || CameraZoomGameStates.Contains(nextState))
+        {
+            GD.PrintErr($"Can't progress from state {GetCurrentGameState()} to state {nextState} with a camera zoom state of {cameraZoomState} in between.");
+            return false;
+        }
+        _postCameraZoomState = nextState;
+        _isPostCameraZoomStateSet = true;
+        return TryProgressState(cameraZoomState);
     }
 
-    public GameState GameState => gameState;
-
-    public SelectDiceSubstate Farkle()
+    public GameState GetAndErasePostCameraZoomState()
     {
-        selectDiceSubstate = SelectDiceSubstate.Farkled;
-        return selectDiceSubstate;
+        if (_isPostCameraZoomStateSet == false)
+        {
+            GD.PrintErr($"Trying to use post-camera-zoom game state, but its not set.");
+        }
+        _isPostCameraZoomStateSet = false;
+        return _postCameraZoomState;
     }
 
-    public SelectDiceSubstate ClearFarkle()
+    public void Farkle(bool isGameOver)
     {
-        selectDiceSubstate = SelectDiceSubstate.SelectingDice;
-        return selectDiceSubstate;
+        var farkleSubState = isGameOver ? SelectDiceSubstate.FarkledGameOver : SelectDiceSubstate.FarkledNotGameOver;
+        _gameStateMachine.TryChangeStateSubState(GameState.SelectDice.ToString(), farkleSubState.ToString());
     }
 
-    public GameState GameOver()
+    public void ClearFarkle()
     {
-        gameState = GameState.GameOver;
-        return gameState;
+        _gameStateMachine.TryChangeStateSubState(GameState.SelectDice.ToString(), SelectDiceSubstate.SelectingDice.ToString());
     }
 
-    public SelectDiceSubstate GetSelectDiceSubstate => selectDiceSubstate;
-
-    public void AddOnStateEnterOrExitAction(bool enter, GameState gameState, Action action)
+    public SelectDiceSubstate GetSelectDiceSubstate()
     {
-        var actionDict = enter ? OnStateEnterActions : OnStateExitActions;
-
-        actionDict[gameState].Add(action);
+        _gameStateMachine.TryGetStateByName(GameState.SelectDice.ToString(), out var selectDiceState);
+        selectDiceState.TryGetSubstate(out var subState);
+        return Enum.Parse<SelectDiceSubstate>(subState);
     }
 
-    public void AddOnStateEnterOrExitAction(bool enter, GameState gameState, IEnumerable<Action> actions)
+    public void AddOnStateEnterOrExitAction(EnterOrExit enterOrExit, GameState gameState, Action action)
+    {
+        if (enterOrExit == EnterOrExit.Enter)
+        {
+            _gameStateMachine.AddEnterStateAction(gameState.ToString(), action);
+        }
+        else
+        {
+            _gameStateMachine.AddExitStateAction(gameState.ToString(), action);
+        }
+    }
+
+    public void AddOnStateEnterOrExitAction(EnterOrExit enterOrExit, GameState gameState, IEnumerable<Action> actions)
     {
         foreach (Action action in actions)
         {
-            AddOnStateEnterOrExitAction(enter, gameState, action);
-        }
-    }
-
-    public void RunOnStateEnterActions(GameState gameState)
-    {
-        if (OnStateEnterActions.TryGetValue(gameState, out List<Action> actionList))
-        {
-            foreach (Action action in actionList)
-            {
-                action();
-            }
-        }
-    }
-
-    public void RunOnStateExitActions(GameState gameState)
-    {
-        if (OnStateExitActions.TryGetValue(gameState, out List<Action> actionList))
-        {
-            foreach (Action action in actionList)
-            {
-                action();
-            }
+            AddOnStateEnterOrExitAction(enterOrExit, gameState, action);
         }
     }
 }
 
-public enum GameState{
+public enum GameState
+{
     Instantiated,
     GameOver,
     PreRoll,
     FindRollPosition,
     FindRollStrength,
+    ThrowDice,
     Rolling,
+    TableZoomAnimation,
     SelectDice,
-    ExitDiceZoomAnimation,
+    UserPerspectiveZoomAnimation,
+    SetTable,
 }
 
 public enum SelectDiceSubstate
 {
-    Farkled,
+    FarkledGameOver,
+    FarkledNotGameOver,
     SelectingDice,
+}
+
+public enum EnterOrExit
+{
+    Enter,
+    Exit
 }

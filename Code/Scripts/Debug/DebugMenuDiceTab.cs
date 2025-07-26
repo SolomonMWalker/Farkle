@@ -84,7 +84,7 @@ public partial class DebugMenuDiceTab : MarginContainer
 
     public void OverrideResultOfRollDiceFaces()
     {
-        if (gController.GameStateManager.GameState != GameState.SelectDice) { return; }
+        if (gController.GameStateManager.GetCurrentGameState() != GameState.SelectDice) { return; }
         foreach (var entry in DiceEntries)
         {
             var topDiceFace = entry.Dice.ResultOfRoll;
@@ -101,7 +101,7 @@ public partial class DebugMenuDiceTab : MarginContainer
         {
             entry.Dice.EndOverride();
         }
-        if (gController.GameStateManager.GameState is GameState.SelectDice)
+        if (gController.GameStateManager.GetCurrentGameState() is GameState.SelectDice)
         {
             gController.BuildAndSetScoreText();
         }

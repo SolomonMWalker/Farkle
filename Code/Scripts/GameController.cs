@@ -1,5 +1,4 @@
 using Godot;
-using System;
 
 public partial class GameController : Node3D
 {
@@ -29,7 +28,7 @@ public partial class GameController : Node3D
         UiManager = new UiManager(this.GetChildByName<Control>("ControlParent"));
         GameStateManager = new GameStateManager();
         PlayerManager = new PlayerManager();
-        DiceManager = new DiceManager( PlayerManager,
+        DiceManager = new DiceManager(PlayerManager,
             this.GetChildByName<Node3D>("DiceHolder"),
             this.GetChildByName<Node3D>("OutOfPlayDiceLocation"),
             throwLocationBall.throwLocation);
@@ -48,36 +47,42 @@ public partial class GameController : Node3D
         SetupGameStateEnterExitActions();
 
         StartGame();
+        TryProgressState(GameState.PreRoll);
     }
 
     public void SetupGameStateEnterExitActions()
     {
-        GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.PreRoll, [
+        GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Enter, GameState.TableZoomAnimation, [
+            cameraController.MoveToTableZoomLocation
+        ]);
+        GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Enter, GameState.UserPerspectiveZoomAnimation, [
+            cameraController.MoveToUserPerspectiveLocation
+        ]);   
+        GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Enter, GameState.PreRoll, [
             DiceManager.ReadyRollableDiceForThrow,
         ]);
-        GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.FindRollPosition, [
+        GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Enter, GameState.FindRollPosition, [
             throwLocationBall.Animate,
         ]);
-        GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.FindRollStrength, [
+        GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Enter, GameState.FindRollStrength, [
             throwLocationBall.StopAnimation, StartThrowForceBar,
         ]);
-        GameStateManager.AddOnStateEnterOrExitAction(enter: false, GameState.FindRollStrength, [
+        GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Exit, GameState.FindRollStrength, [
             UiManager.EndThrowForceBar, 
         ]);
-        GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.Rolling, [
+        GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Enter, GameState.ThrowDice, [
             ThrowDice, throwLocationBall.ResetPositon,
         ]);
-        GameStateManager.AddOnStateEnterOrExitAction(enter: true, GameState.SelectDice, [
+        GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Enter, GameState.SelectDice, [
             DiceManager.AddDiceLeftOnTableToRollableDiceCollection, PreSelectDiceFarkleCheck,
         ]);
-        GameStateManager.AddOnStateEnterOrExitAction(enter: false, GameState.SelectDice, [
+        GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Exit, GameState.SelectDice, [
             DiceManager.UnselectAllDice,
-        ]);
-        
+        ]);       
 
         if (Configuration.ConfigValues.IsDebug)
         {
-            GameStateManager.AddOnStateEnterOrExitAction(enter: false, GameState.SelectDice, [
+            GameStateManager.AddOnStateEnterOrExitAction(enterOrExit: EnterOrExit.Exit, GameState.SelectDice, [
                 DiceManager.EndOverride, DebugMenu.ResetDiceCollection,
             ]);
         }
@@ -104,43 +109,46 @@ public partial class GameController : Node3D
     #region MainGameLogic
     public void RunGame()
     {
-        var gameState = GameStateManager.GameState;
+        var gameState = GameStateManager.GetCurrentGameState();
 
         switch (gameState)
         {
+            case GameState.TableZoomAnimation or GameState.UserPerspectiveZoomAnimation:
+                if (!cameraController.IsAnimationPlaying())
+                {
+                    TryProgressState(GameStateManager.GetAndErasePostCameraZoomState());
+                }
+                break;
             case GameState.PreRoll:
                 if (Input.IsActionJustPressed("Accept"))
                 {
-                    TryProgressState();
+                    TryProgressState(GameState.FindRollPosition);
                 }
                 break;
             case GameState.FindRollPosition:
                 if (Input.IsActionJustPressed("Accept"))
                 {
-                    TryProgressState();
+                    TryProgressState(GameState.FindRollStrength);
                 }
                 break;
             case GameState.FindRollStrength:
                 if (Input.IsActionJustPressed("Accept"))
                 {
                     DiceManager.MultiplyVelocityByThrowForceValue(UiManager.GetThrowForceBarValue());
-                    TryProgressState();
+                    TryProgressState(GameState.ThrowDice);
                 }
                 break;
+            case GameState.ThrowDice:
+                TryProgressStateWithCameraZoom(GameState.TableZoomAnimation, GameState.Rolling);
+                break;
             case GameState.Rolling:
-                if (DiceManager.RollableDiceCollection.IsDoneRolling() && !cameraController.IsAnimationPlaying())
+                if (DiceManager.RollableDiceCollection.IsDoneRolling())
                 {
-                    TryProgressState();
+                    TryProgressState(GameState.SelectDice);
                 }
                 break;
             case GameState.SelectDice:
                 HandleSelectDiceState();
-                break;
-            case GameState.ExitDiceZoomAnimation:
-                if (!cameraController.IsAnimationPlaying())
-                {
-                    TryProgressState();
-                }
                 break;
             case GameState.GameOver:
                 HandleGameOverState();
@@ -150,29 +158,32 @@ public partial class GameController : Node3D
 
     public void HandleSelectDiceState()
     {
-        if (GameStateManager.GetSelectDiceSubstate is SelectDiceSubstate.Farkled && Input.IsActionJustPressed("Accept"))
+        //Before SelectDiceState, Farkle check is run by state OnEnterAction
+        if (GameStateManager.GetSelectDiceSubstate() is SelectDiceSubstate.FarkledGameOver)
+        {
+            TryProgressStateWithCameraZoom(GameState.TableZoomAnimation, GameState.GameOver);
+            GameOver("You Farkled your last score attempt");
+        }
+        else if (GameStateManager.GetSelectDiceSubstate() is SelectDiceSubstate.FarkledNotGameOver && Input.IsActionJustPressed("Accept"))
         {
             ClearFarkle();
             BuildAndSetScoreText();
             DiceManager.ResetAllDice();
-            cameraController.MoveToUserPerspectiveLocation();
-            TryProgressState();
+            TryProgressStateWithCameraZoom(GameState.UserPerspectiveZoomAnimation, GameState.PreRoll);
         }
         else if (Input.IsActionJustPressed("RerollSingular") && DiceManager.SelectedDiceCollection.Count() > 0
             && StageManager.TryRerollSingleDice(DiceManager.SelectedDiceCollection.Count()))
         {
             DiceManager.RerollSelectedDice();
             BuildAndSetScoreText();
-            cameraController.MoveToUserPerspectiveLocation();
-            TryProgressState();
+            TryProgressStateWithCameraZoom(GameState.UserPerspectiveZoomAnimation, GameState.PreRoll);
         }
         else if (Input.IsActionJustPressed("RerollAll") && StageManager.TryRerollAllDice())
         {
             GD.Print("Try to reroll all dice");
             DiceManager.RerollAllDice();
             BuildAndSetScoreText();
-            cameraController.MoveToUserPerspectiveLocation();
-            TryProgressState();
+            TryProgressStateWithCameraZoom(GameState.UserPerspectiveZoomAnimation, GameState.PreRoll);
         }
         else if (Input.IsActionJustPressed("Accept") && TryAddToRoundScore())
         {
@@ -186,33 +197,48 @@ public partial class GameController : Node3D
                 DiceManager.ResetUnscoredDice();
             }
 
-            cameraController.MoveToUserPerspectiveLocation();
-            TryProgressState();
+            TryProgressStateWithCameraZoom(GameState.UserPerspectiveZoomAnimation, GameState.PreRoll);
         }
         else if (Input.IsActionJustPressed("Confirm") && TrySubmitRoundScore())
         {
+            var didWeGameOver = false;
+            var didWeWin = false;
+
             if (StageManager.IsStageScoreHigherThanScoreToWin())
             {
                 GD.Print("Stage score is higher than score to win.");
                 RoundManager.Reset();
                 if (!StageManager.TryGoToNextStage())
                 {
-                    GameOver("You won!");
+                    didWeGameOver = true;
+                    didWeWin = true;
                 }
             }
             else if (!RoundManager.TryToUseScoreAttempt())
             {
                 GD.Print("No more score attempts.");
-                GameOver("You ran out of score attempts and lost this stage.");
+                didWeGameOver = true;
+                didWeWin = false;
             }
 
-            if (GameStateManager.GameState != GameState.GameOver)
+            if (!didWeGameOver)
             {
                 GD.Print("Moving to next round.");
                 BuildAndSetScoreText();
                 DiceManager.ResetAllDice();
-                cameraController.MoveToUserPerspectiveLocation();
-                TryProgressState();
+                TryProgressStateWithCameraZoom(GameState.UserPerspectiveZoomAnimation, GameState.PreRoll);
+            }
+            else
+            {
+                GameStateManager.TryProgressStateWithCameraZoomBetween(GameState.TableZoomAnimation, GameState.GameOver);
+                if (didWeWin)
+                {
+                    GameOver("You won!");
+                }
+                else
+                {
+                    GameOver("You ran out of score attempts and lost this stage.");
+                }
             }
         }
     }
@@ -222,18 +248,20 @@ public partial class GameController : Node3D
         if (Input.IsActionJustPressed("Accept"))
         {
             StartGame();
+            TryProgressStateWithCameraZoom(GameState.UserPerspectiveZoomAnimation, GameState.PreRoll);
         }
     }
 
-    public bool TryProgressState()
+    public void TryProgressState(GameState nextState)
     {
-        if (GameStateManager.GameState is not GameState.GameOver)
-        {
-            GameStateManager.ProgressState();
-            UiManager.SetInstructionLabel(GameStateManager.GameState, GameStateManager.GetSelectDiceSubstate);
-            return true;
-        }
-        return false;
+        GameStateManager.TryProgressState(nextState);
+        UiManager.SetInstructionLabel(GameStateManager.GetCurrentGameState(), GameStateManager.GetSelectDiceSubstate());
+    }
+
+    public void TryProgressStateWithCameraZoom(GameState cameraZoomState, GameState nextState)
+    {
+        GameStateManager.TryProgressStateWithCameraZoomBetween(cameraZoomState, nextState);
+        UiManager.SetInstructionLabel(GameStateManager.GetCurrentGameState(), GameStateManager.GetSelectDiceSubstate());
     }
 
     #endregion
@@ -241,7 +269,7 @@ public partial class GameController : Node3D
     #region Mouse
     public void HandleMouseInput(InputEvent inputEvent)
     {
-        if (GameStateManager.GameState == GameState.SelectDice)
+        if (GameStateManager.GetCurrentGameState() == GameState.SelectDice)
         {
             if (inputEvent is InputEventMouseButton mouseButtonEvent)
             {
@@ -267,10 +295,8 @@ public partial class GameController : Node3D
         RoundManager.Reset();
         ClearFarkle();
         DiceManager.ResetAllDice();
-        cameraController.MoveToUserPerspectiveLocation();
-        GameStateManager.StartGame();
         BuildAndSetScoreText();
-        UiManager.SetInstructionLabel(GameStateManager.GameState, GameStateManager.GetSelectDiceSubstate);
+        UiManager.SetInstructionLabel(GameState.PreRoll, GameStateManager.GetSelectDiceSubstate());
     }
 
     #endregion
@@ -326,8 +352,7 @@ public partial class GameController : Node3D
     public void GameOver(string extraMessage = null)
     {
         BuildAndSetScoreText();
-        GameStateManager.GameOver();
-        UiManager.SetInstructionLabel(GameStateManager.GameState, GameStateManager.GetSelectDiceSubstate, extraMessage);
+        UiManager.SetInstructionLabel(GameState.GameOver, GameStateManager.GetSelectDiceSubstate(), extraMessage);
         DiceManager.ResetAllDice();
     }
 
@@ -345,18 +370,22 @@ public partial class GameController : Node3D
         return !score.Scored && score.ResultType is CalculateScoreResultType.NoScorableDice;
     }
 
-    public void Farkle()
+    public SelectDiceSubstate Farkle()
     {
-        GameStateManager.Farkle();
+        SelectDiceSubstate sdsState;
         if (!RoundManager.TryToFarkle())
         {
-            GameOver("You Farkled your last score attempt and lost this stage.");
+            GameStateManager.Farkle(isGameOver: true);
+            sdsState = SelectDiceSubstate.FarkledGameOver;
         }
         else
         {
             RoundManager.StartNewRound();
+            GameStateManager.Farkle(isGameOver: false);
+            sdsState = SelectDiceSubstate.FarkledNotGameOver;
         }
         UiManager.Farkle();
+        return sdsState;
     }
 
     public void ClearFarkle()
@@ -371,7 +400,6 @@ public partial class GameController : Node3D
     public void ThrowDice()
     {
         DiceManager.ThrowDice();
-        cameraController.MoveToDiceZoomLocation();
     }
 
     public void BuildAndSetScoreText()
