@@ -1,0 +1,6 @@
+[gd_resource type="SphereMesh" load_steps=2 format=3 uid="uid://bwvxoj7vuwy72"]
+
+[ext_resource type="Material" uid="uid://dq78722yarxjc" path="res://Resources/Materials/TestSphereObstacleMaterial.tres" id="1_aq6dm"]
+
+[resource]
+material = ExtResource("1_aq6dm")

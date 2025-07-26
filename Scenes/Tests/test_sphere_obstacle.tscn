@@ -1,0 +1,8 @@
+[gd_scene load_steps=2 format=3 uid="uid://drdeeoko5e6qn"]
+
+[ext_resource type="SphereMesh" uid="uid://bwvxoj7vuwy72" path="res://Resources/Meshes/TestSphereObstacleMesh.tres" id="1_rouex"]
+
+[node name="TestSphereObstacle" type="Node3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = ExtResource("1_rouex")

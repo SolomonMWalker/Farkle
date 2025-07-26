@@ -14,8 +14,13 @@ public partial class GraphTile : Node3D
         base._Process(delta);
     }
 
-    public Vector2 GetScreenPositionOfGraphTileCenter(Camera3D mainCamera)
+    public Vector2 GetScreenPixelPositionOfGraphTileCenter(Camera3D mainCamera)
     {
         return mainCamera.UnprojectPosition(GlobalPosition);
+    }
+
+    public Vector2 GetScreenUnitsPositionOfGraphTileCenter(Camera3D mainCamera)
+    {
+        return ViewportScaler.GetViewportPositionInUnits(GetScreenPixelPositionOfGraphTileCenter(mainCamera));
     }
 }

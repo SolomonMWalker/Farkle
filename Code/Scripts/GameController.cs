@@ -243,6 +243,11 @@ public partial class GameController : Node3D
         }
     }
 
+    public void HandleSetTableState()
+    {
+
+    }
+
     public void HandleGameOverState()
     {
         if (Input.IsActionJustPressed("Accept"))
@@ -282,6 +287,10 @@ public partial class GameController : Node3D
                     }
                 }
             }
+        }
+        else if (GameStateManager.GetCurrentGameState() == GameState.SetTable)
+        {
+            
         }
     }
 

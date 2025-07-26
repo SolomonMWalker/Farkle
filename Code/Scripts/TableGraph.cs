@@ -7,6 +7,7 @@ public partial class TableGraph : Node3D
     private const string GraphTilePath = "res://Scenes/graph_tile.tscn";
     private PackedScene GraphTilePackedScene { get; set; }
     private Node3D TilesParent { get; set; }
+    private Camera3D MainCamera { get; set; }
 
     [Export]
     public int width = 0;
@@ -47,6 +48,29 @@ public partial class TableGraph : Node3D
                 GraphTiles.Add(tile);
             }
         }
+    }
+
+    public void SetCamera3D(Camera3D camera)
+    {
+        MainCamera = camera;
+    }
+
+    public bool TryGetGraphTileClosestToScreenPosition(Vector2 screenPositionInPixels, out GraphTile closestTile)
+    {
+        closestTile = null;
+        if (MainCamera is null) { return false; }
+        var minSquaredDist = float.MaxValue;
+        foreach (var tile in GraphTiles)
+        {
+            var distSquared = tile.GetScreenPixelPositionOfGraphTileCenter(MainCamera).DistanceSquaredTo(screenPositionInPixels);
+            if (distSquared < minSquaredDist)
+            {
+                closestTile = tile;
+                minSquaredDist = distSquared;
+            }
+        }
+        if (closestTile is null) { return false; }
+        return true;
     }
 
 }
