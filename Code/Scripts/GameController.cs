@@ -13,6 +13,7 @@ public partial class GameController : Node3D
     public PlayerManager PlayerManager { get; private set; }
     public DiceManager DiceManager { get; private set; }
     public ScoreManager ScoreManager { get; private set; }
+    public TableManager TableManager { get; private set; }
     public RoundManager RoundManager { get; private set; }
     public StageManager StageManager { get; private set; }
     public UiManager UiManager { get; private set; }
@@ -32,6 +33,10 @@ public partial class GameController : Node3D
             this.GetChildByName<Node3D>("DiceHolder"),
             this.GetChildByName<Node3D>("OutOfPlayDiceLocation"),
             throwLocationBall.throwLocation);
+        TableManager = new TableManager(
+            (TableGraph)FindChild("TableGraph", recursive: true),
+            cameraController.GetCamera()
+        );
         StageManager = new StageManager(PlayerManager);
         RoundManager = new RoundManager(PlayerManager);
         ScoreManager = new ScoreManager();
