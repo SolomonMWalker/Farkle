@@ -13,17 +13,17 @@ public class ScorableCollection{
     {
         diceCollection = collection;
         faces = diceCollection.GetResultOfRoll();
-        sSet = [.. faces.Select(r => r.Number)];
+        sSet = [.. faces.Select(r => r.OriginalNumber)];
         var buildingDict = new Dictionary<int, int>();
         foreach(DiceFace face in faces)
         {
-            if(buildingDict.ContainsKey(face.Number))
+            if(buildingDict.ContainsKey(face.OriginalNumber))
             {
-                buildingDict[face.Number] += 1;
+                buildingDict[face.OriginalNumber] += 1;
             }
             else
             {
-                buildingDict[face.Number] = 1;
+                buildingDict[face.OriginalNumber] = 1;
             }
         }
         dict = buildingDict.ToDictionary();

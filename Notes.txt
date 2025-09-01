@@ -41,4 +41,10 @@ Game Mechanics
                 MAYBE # of faces per dice
 
 
-        
+Modifiers
+    located on an object, can affect that object or its children
+        ex. dice mod can affect the dice faces
+    for static modifiers, modifications are applied on modifier attachment to object
+        ex. static dice mod that adds 1 to each of its faces is applied on attachment to dice
+    for activated modifiers, the activation method is attached to the activity that activates items
+        ex. attached to dice-thrown, round over, hit obstaclt, hit table, hit floor, etc.

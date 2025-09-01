@@ -4,9 +4,13 @@ public class ViewportScaler
 {
     public const int UnitsPerAxis = 300;
     public static float XAxisPixelsPerUnit, YAxisPixelsPerUnit;
+    public static Viewport Viewport;
 
-    public static void SetPixelsPerAxis(Rect2 viewportRect)
+    public static void SetViewport(Viewport viewport) => Viewport = viewport;
+
+    public static void SetPixelsPerAxis()
     {
+        var viewportRect = Viewport.GetVisibleRect();
         XAxisPixelsPerUnit = viewportRect.Size.X / UnitsPerAxis;
         YAxisPixelsPerUnit = viewportRect.Size.Y / UnitsPerAxis;
     }

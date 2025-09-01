@@ -19,7 +19,7 @@ public partial class DebugMenuDiceTabEntry : MarginContainer
     {
         Dice = dice;
         DiceLabel.Text = Dice.GetInstanceId().ToString();
-        DiceFaceEdit.Text = Dice.ResultOfRoll?.Number.ToString();
+        DiceFaceEdit.Text = Dice.ResultOfRoll?.OriginalNumber.ToString();
     }
 
     public string GetOverrideDiceFaceValue() => DiceFaceEdit.Text;

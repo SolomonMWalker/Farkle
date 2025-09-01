@@ -1,19 +1,19 @@
 public class PlayerManager
 {
     public DiceCollection DiceCollection { get; private set; }
-    private ModifyableValue<int> _scoreTriesPerRound { get; set; }
+    private ModifyableNumericalValue<int> _scoreTriesPerRound { get; set; }
     public int ScoreTriesPerRound
     {
         get => _scoreTriesPerRound.Value;
         set => _scoreTriesPerRound.ModifyValue(value);
     }
-    private ModifyableValue<int> _rerollsPerStage { get; set; }
+    private ModifyableNumericalValue<int> _rerollsPerStage { get; set; }
     public int RerollsPerStage
     {
         get => _rerollsPerStage.Value;
         set => _rerollsPerStage.ModifyValue(value);
     }
-    private ModifyableValue<int> _numberOfPersistentDice { get; set; }
+    private ModifyableNumericalValue<int> _numberOfPersistentDice { get; set; }
     public int NumberOfPersistentDice
     {
         get => _numberOfPersistentDice.Value;
@@ -21,9 +21,9 @@ public class PlayerManager
     }
     public PlayerManager()
     {
-        _scoreTriesPerRound = new ModifyableValue<int>(Configuration.ConfigValues.ScoreTriesPerRound);
-        _rerollsPerStage = new ModifyableValue<int>(Configuration.ConfigValues.RerollsPerStage);
-        _numberOfPersistentDice = new ModifyableValue<int>(Configuration.ConfigValues.NumOfStartingDice);
+        _scoreTriesPerRound = new ModifyableNumericalValue<int>(Configuration.ConfigValues.ScoreTriesPerRound);
+        _rerollsPerStage = new ModifyableNumericalValue<int>(Configuration.ConfigValues.RerollsPerStage);
+        _numberOfPersistentDice = new ModifyableNumericalValue<int>(Configuration.ConfigValues.NumOfStartingDice);
         CreateDiceCollection();
     }
     

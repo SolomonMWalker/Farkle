@@ -24,6 +24,8 @@ public partial class GameController : Node3D
     {
         base._Ready();
         Configuration.SetUpConfiguration();
+        ViewportScaler.SetViewport(GetViewport());
+        GetViewport().SizeChanged += ViewportScaler.SetPixelsPerAxis;
         cameraController = this.GetChildByName<CameraController>("CameraController");
         throwLocationBall = FindChild("DiceTable").GetChildByName<ThrowLocationBall>("ThrowLocationBall");
         UiManager = new UiManager(this.GetChildByName<Control>("ControlParent"));
@@ -129,6 +131,10 @@ public partial class GameController : Node3D
                 {
                     TryProgressState(GameState.FindRollPosition);
                 }
+                else if (Input.IsActionJustPressed("RerollAll"))
+                {
+                    TryProgressStateWithCameraZoom(GameState.TableZoomAnimation, GameState.SetTable);
+                }
                 break;
             case GameState.FindRollPosition:
                 if (Input.IsActionJustPressed("Accept"))
@@ -154,6 +160,9 @@ public partial class GameController : Node3D
                 break;
             case GameState.SelectDice:
                 HandleSelectDiceState();
+                break;
+            case GameState.SetTable:
+                HandleSetTableState();
                 break;
             case GameState.GameOver:
                 HandleGameOverState();
@@ -250,7 +259,10 @@ public partial class GameController : Node3D
 
     public void HandleSetTableState()
     {
-
+        if (Input.IsActionJustPressed("Accept"))
+        {
+            TryProgressStateWithCameraZoom(GameState.UserPerspectiveZoomAnimation, GameState.PreRoll);
+        }
     }
 
     public void HandleGameOverState()
@@ -295,7 +307,10 @@ public partial class GameController : Node3D
         }
         else if (GameStateManager.GetCurrentGameState() == GameState.SetTable)
         {
-            
+            if (inputEvent is InputEventMouseMotion mouseMotionEvent)
+            {
+                TableManager.TrySnapObjectToTile(mouseMotionEvent.Position);
+            }
         }
     }
 

@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 public partial class TableGraph : Node3D
 {
@@ -62,7 +63,9 @@ public partial class TableGraph : Node3D
         var minSquaredDist = float.MaxValue;
         foreach (var tile in GraphTiles)
         {
-            var distSquared = tile.GetScreenPixelPositionOfGraphTileCenter(MainCamera).DistanceSquaredTo(screenPositionInPixels);
+            var distSquared = tile
+                .GetScreenPixelPositionOfGraphTileCenter(MainCamera)
+                .DistanceSquaredTo(screenPositionInPixels);
             if (distSquared < minSquaredDist)
             {
                 closestTile = tile;
@@ -73,4 +76,12 @@ public partial class TableGraph : Node3D
         return true;
     }
 
+    public void UnselectSelectedTiles()
+    {
+        var selectedTiles = GraphTiles.Where(gt => gt.Selected);
+        foreach (var tile in selectedTiles)
+        {
+            tile.UnselectTile();
+        }
+    }
 }
