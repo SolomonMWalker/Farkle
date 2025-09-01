@@ -1,5 +1,3 @@
-using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 public partial class DiceFace() : Node3D
@@ -10,12 +8,9 @@ public partial class DiceFace() : Node3D
     public int numberValue;
 
     public int DiceFaceValue { get; private set; }
-    public int ModifiedDiceFaceValue { get; set; }
+    public int ModifiedDiceFaceValue { get; private set; }
     public RootDice AssociatedDice { get; private set; }
-    public int OriginalNumber => (_overridden ? _overrideDiceFaceValue.numberValue : DiceFaceValue) ?? 0;
-    public int ModifiedNumber => (_overridden ? _overrideDiceFaceValue.numberValue : DiceFaceValue) ?? 0;
-    public List<DiceFaceModifier> Modifiers { get; private set; } = [];
-
+    public int OriginalNumber => (_overridden ? _overrideDiceFaceValue : DiceFaceValue) ?? 0;
     private bool _isDebug = false;
     private Sprite3D sprite3D;
     private DiceFaceTextureColor color = DiceFaceTextureColor.Black;
@@ -23,8 +18,8 @@ public partial class DiceFace() : Node3D
     #region Debug
 
     private bool _overridden = false;
-    private DiceFaceValue _overrideDiceFaceValue;
-    public void Override(DiceFaceValue dfValue)
+    private int? _overrideDiceFaceValue;
+    public void Override(int dfValue)
     {
         if (_isDebug)
         {
@@ -62,9 +57,6 @@ public partial class DiceFace() : Node3D
         sprite3D.TextureFilter = BaseMaterial3D.TextureFilterEnum.Nearest;
         sprite3D.Modulate = Colors.Black;
     }
-
-    public void AddModifier(DiceFaceModifier diceFaceModifier) => Modifiers.Add(diceFaceModifier);
-    public void RemoveModifier(DiceFaceModifier diceFaceModifier) => Modifiers.Remove(Modifiers.FirstOrDefault(m => m.Id == diceFaceModifier.Id));
 }
 
 public enum DiceFaceTextureColor
