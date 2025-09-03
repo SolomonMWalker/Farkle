@@ -1,4 +1,4 @@
-[gd_scene load_steps=11 format=3 uid="uid://ryhbwf8w5jho"]
+[gd_scene load_steps=12 format=3 uid="uid://ryhbwf8w5jho"]
 
 [ext_resource type="PhysicsMaterial" uid="uid://d25ce7roxxajs" path="res://Resources/PhysicsMaterials/RootDicePhysicsMaterial.tres" id="1_2wn8y"]
 [ext_resource type="BoxMesh" uid="uid://078efvk0u5qi" path="res://Resources/Meshes/RootDiceMesh.tres" id="1_mx507"]
@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://clbk0ioy0vgii" path="res://Scenes/dice_face.tscn" id="4_t8ab3"]
 [ext_resource type="Material" uid="uid://18xqjmy1iq8i" path="res://Resources/Materials/RootDiceFlashRedMaterial.tres" id="5_t8ab3"]
 [ext_resource type="Material" uid="uid://c626kg5uasvr6" path="res://Resources/Materials/RootDiceSelectedMaterial.tres" id="6_l4ben"]
+[ext_resource type="Script" uid="uid://d17ryhaw6ig0x" path="res://Code/Scripts/ModifierModule.cs" id="7_l4ben"]
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_tctqp"]
 points = PackedVector3Array(-0.2, -0.2, -0.2, 0.199991, 0.2, 0.2, 0.199991, 0.2, -0.2, 0.199991, -0.2, 0.2, -0.2, 0.2, 0.2, 0.199991, -0.2, -0.2, -0.2, 0.2, -0.2, -0.2, -0.2, 0.2)
@@ -90,3 +91,8 @@ numberValue = 6
 libraries = {
 &"": SubResource("AnimationLibrary_unksr")
 }
+
+[node name="ModifierModule" type="Node3D" parent="."]
+script = ExtResource("7_l4ben")
+
+[node name="ModifiersParent" type="Node" parent="ModifierModule"]
