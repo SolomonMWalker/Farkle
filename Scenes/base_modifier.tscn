@@ -1,3 +1,6 @@
-[gd_scene format=3 uid="uid://cugi8doc8a1sc"]
+[gd_scene load_steps=2 format=3 uid="uid://cugi8doc8a1sc"]
+
+[ext_resource type="Script" uid="uid://cjtga8hvufvu0" path="res://Code/Scripts/BaseModifier.cs" id="1_apc32"]
 
 [node name="BaseModifier" type="Node3D"]
+script = ExtResource("1_apc32")
