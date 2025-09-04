@@ -20,7 +20,7 @@ public class RoundManager
     public void Reset()
     {
         RoundScore = 0;
-        CurrentScoreTries = PlayerManager.ScoreTriesPerRound;
+        CurrentScoreTries = PlayerManager.ScoreTriesPerRound.ModifiedValue;
     }
 
     private bool TrySubtractScoreAttempt(int amount)

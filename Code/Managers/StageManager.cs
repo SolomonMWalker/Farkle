@@ -15,18 +15,18 @@ public class StageManager
     public StageManager(PlayerManager playerManager)
     {
         PlayerManager = playerManager;
-        CurrentRerolls = PlayerManager.RerollsPerStage;
+        CurrentRerolls = PlayerManager.RerollsPerStage.ModifiedValue;
         SetUpTestStages();
     }
 
 
     private bool TrySubtractRerolls(int amount)
     {
-        if (PlayerManager.RerollsPerStage - amount < 0)
+        if (CurrentRerolls - amount < 0)
         {
             return false;
         }
-        PlayerManager.RerollsPerStage = PlayerManager.RerollsPerStage - amount;
+        CurrentRerolls = CurrentRerolls - amount;
         return true;
     }
 
@@ -50,7 +50,7 @@ public class StageManager
         {
             CurrentStageIndex += 1;
             StageScore = 0;
-            CurrentRerolls = PlayerManager.NumberOfPersistentDice;
+            CurrentRerolls = PlayerManager.NumberOfPersistentDice.ModifiedValue;
             return true;
         }
         return false;
@@ -62,7 +62,7 @@ public class StageManager
         SetUpTestStages();
         StageScore = 0;
         CurrentStageIndex = 0;
-        CurrentRerolls = PlayerManager.NumberOfPersistentDice;
+        CurrentRerolls = PlayerManager.NumberOfPersistentDice.ModifiedValue;
     }
 
     public bool TryRerollSingleDice(int numberOfDice) => TrySubtractRerolls(numberOfDice);

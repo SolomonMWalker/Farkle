@@ -5,7 +5,7 @@ using System.Linq;
 
 public partial class ModifierModule : Node3D
 {
-    public PlayerManager playerManager;
+    public static PlayerManager playerManager;
 
     private List<string> ModifierTriggers { get; set; } = [];
     private List<BaseModifier> Modifiers { get; set; } = [];
@@ -37,9 +37,10 @@ public partial class ModifierModule : Node3D
     public void AddModifier(string modifierName)
     {
         var mod = ModifierFactory.InstantiateModifier(modifierName);
+        mod.ModifierModule = this;
         Modifiers.Add(mod);
         ModifiersParent.AddChild(mod);
-        //Add mod to playerManager master modList
+        playerManager.MasterModifierList.Add(mod);
     }
 
     public void RemoveModifier(Guid modifierId)
@@ -48,7 +49,12 @@ public partial class ModifierModule : Node3D
         if (mod is null) { return; }
         if (mod.Activated) { mod.Deactivate(); }
         Modifiers.Remove(mod);
+        if (playerManager.MasterModifierList.Select(m => m.Id).Contains(modifierId))
+        {
+            playerManager.MasterModifierList.Remove(
+                playerManager.MasterModifierList.First(m => m.Id == modifierId)
+            );
+        }
         mod.QueueFree();
-        //Remove mod from playerManager master modList
     }
 }

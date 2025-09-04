@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Linq;
 using Godot;
 
 public record ModifierFactoryEntry(string path, PackedScene pScene)
@@ -12,7 +11,7 @@ public class ModifierFactory
 {
     private Dictionary<string, ModifierFactoryEntry> ModifierEntries = new Dictionary<string, ModifierFactoryEntry>()
     {
-        ["AddOneToDiceFacesDiceModifier"] = new("", null)
+        ["AddOneToDiceFacesDiceModifier"] = new("res://Scenes/Modifiers/add_one_to_dice_faces_dice_modifier.tscn", null)
     };
 
     public BaseModifier InstantiateModifier(string name)

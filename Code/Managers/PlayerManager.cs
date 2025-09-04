@@ -1,34 +1,22 @@
+using System.Collections.Generic;
+
 public class PlayerManager
 {
     public DiceCollection DiceCollection { get; private set; }
-    private ModifyableNumericalValue<int> _scoreTriesPerRound { get; set; }
-    public int ScoreTriesPerRound
-    {
-        get => _scoreTriesPerRound.Value;
-        set => _scoreTriesPerRound.ModifyValue(value);
-    }
-    private ModifyableNumericalValue<int> _rerollsPerStage { get; set; }
-    public int RerollsPerStage
-    {
-        get => _rerollsPerStage.Value;
-        set => _rerollsPerStage.ModifyValue(value);
-    }
-    private ModifyableNumericalValue<int> _numberOfPersistentDice { get; set; }
-    public int NumberOfPersistentDice
-    {
-        get => _numberOfPersistentDice.Value;
-        set => _numberOfPersistentDice.ModifyValue(value);
-    }
+    public List<BaseModifier> MasterModifierList { get; private set; } = [];
+    public ModifyableInt ScoreTriesPerRound { get; private set; }
+    public ModifyableInt RerollsPerStage { get; private set; }
+    public ModifyableInt NumberOfPersistentDice { get; private set; }
     public PlayerManager()
     {
-        _scoreTriesPerRound = new ModifyableNumericalValue<int>(Configuration.ConfigValues.ScoreTriesPerRound);
-        _rerollsPerStage = new ModifyableNumericalValue<int>(Configuration.ConfigValues.RerollsPerStage);
-        _numberOfPersistentDice = new ModifyableNumericalValue<int>(Configuration.ConfigValues.NumOfStartingDice);
+        ScoreTriesPerRound = new ModifyableInt(Configuration.ConfigValues.ScoreTriesPerRound);
+        RerollsPerStage = new ModifyableInt(Configuration.ConfigValues.RerollsPerStage);
+        NumberOfPersistentDice = new ModifyableInt(Configuration.ConfigValues.NumOfStartingDice);
         CreateDiceCollection();
     }
     
     public void CreateDiceCollection()
     {
-        DiceCollection = DiceCollection.InstantiateDiceCollection(NumberOfPersistentDice);
+        DiceCollection = DiceCollection.InstantiateDiceCollection(NumberOfPersistentDice.ModifiedValue);
     }
 }

@@ -13,8 +13,8 @@ public partial class RootDice : RigidBody3D
     public bool selected;
     public bool temporary;
     public RootDice AssociatedPermanentDice { get; private set; } = null;
-    public List<DiceModifier> Modifiers { get; private set; } = [];
     public DiceFaceCollection diceFaceCollection;
+    public ModifierModule ModifierModule { get; private set; }
 
     private CollisionShape3D collisionShape;
     private MeshInstance3D meshInstance;
@@ -146,7 +146,4 @@ public partial class RootDice : RigidBody3D
 
     public List<ulong> GetDiceFaceInstanceIds() => diceFaceCollection.GetDiceFaceInstanceIds();
     public void EndOverride() => diceFaceCollection.EndOverrides();
-
-    public void AddModifier(DiceModifier diceModifier) => Modifiers.Add(diceModifier);
-    public void RemoveModifier(DiceModifier diceModifier) => Modifiers.Remove(Modifiers.FirstOrDefault(m => m.Id == diceModifier.Id));
 }

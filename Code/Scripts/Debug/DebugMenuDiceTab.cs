@@ -90,7 +90,7 @@ public partial class DebugMenuDiceTab : MarginContainer
             var topDiceFace = entry.Dice.ResultOfRoll;
             topDiceFace.EndOverride();
             var overrideScore = int.Parse(entry.GetOverrideDiceFaceValue());
-            topDiceFace.Override(new DiceFaceValue(overrideScore));
+            topDiceFace.Override(overrideScore);
         }
         gController.BuildAndSetScoreText();
     }

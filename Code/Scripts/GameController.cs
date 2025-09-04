@@ -31,6 +31,7 @@ public partial class GameController : Node3D
         UiManager = new UiManager(this.GetChildByName<Control>("ControlParent"));
         GameStateManager = new GameStateManager();
         PlayerManager = new PlayerManager();
+        ModifierModule.playerManager = PlayerManager;
         DiceManager = new DiceManager(PlayerManager,
             this.GetChildByName<Node3D>("DiceHolder"),
             this.GetChildByName<Node3D>("OutOfPlayDiceLocation"),

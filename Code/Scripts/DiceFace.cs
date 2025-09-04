@@ -7,10 +7,10 @@ public partial class DiceFace() : Node3D
     [Export]
     public int numberValue;
 
-    public int DiceFaceValue { get; private set; }
-    public int ModifiedDiceFaceValue { get; private set; }
+    public ModifyableInt DiceFaceValue { get; private set; }
     public RootDice AssociatedDice { get; private set; }
-    public int OriginalNumber => (_overridden ? _overrideDiceFaceValue : DiceFaceValue) ?? 0;
+    public ModifierModule ModifierModule { get; private set; }
+    public int OriginalNumber => (_overridden ? _overrideDiceFaceValue : DiceFaceValue.ModifiedValue) ?? 0;
     private bool _isDebug = false;
     private Sprite3D sprite3D;
     private DiceFaceTextureColor color = DiceFaceTextureColor.Black;
@@ -46,7 +46,7 @@ public partial class DiceFace() : Node3D
         base._Ready();
         AssociatedDice = GetParent<Node3D>().GetParent<RootDice>();
         sprite3D = this.GetChildByName<Sprite3D>("Sprite3D");
-        DiceFaceValue = numberValue;
+        DiceFaceValue = new ModifyableInt(numberValue);
         _isDebug = Configuration.ConfigValues.IsDebug;
         LoadTexture();
     }

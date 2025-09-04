@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3 uid="uid://dyoifue0w312m"]
+
+[ext_resource type="Script" uid="uid://b5tk5i0ftmjxq" path="res://Code/Scripts/Modifiers/AddOneToDiceFacesDiceModifier.cs" id="1_2r5px"]
+
+[node name="AddOneToDiceFacesDiceModifier" type="Node3D"]
+script = ExtResource("1_2r5px")
+metadata/_custom_type_script = "uid://cjtga8hvufvu0"
